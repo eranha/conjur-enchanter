@@ -13,6 +13,7 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ResourceForm extends AbstractResourceForm {
@@ -138,7 +139,31 @@ public class ResourceForm extends AbstractResourceForm {
         onResourceIdTextChange(textFieldId.getText().trim())));
     textFieldId.setToolTipText("<html><b>Required</b>. Identifies the user name. This is the Conjur login name.<br>" +
         "It should not contain special characters such as \":\" or \"/\".<br>It may contain the @ symbol.</html>");
+
+    suggestedResourceName(textFieldId);
     return textFieldId;
+  }
+
+  private void suggestedResourceName(JTextField textFieldId) {
+    Set<String> ids = resources
+        .stream()
+        .filter(i -> i.getType() == resourceType).map(ResourceIdentifier::getId)
+        .collect(Collectors.toSet());
+    int nameIndex = ids.size() + 1;
+
+    String suggestedResourceName = String.format(
+        "%s%s",
+        resourceType,
+        nameIndex);
+
+    while (ids.contains(suggestedResourceName)) {
+      suggestedResourceName = String.format(
+          "%s%s",
+          resourceType,
+          ++nameIndex);
+    }
+
+    textFieldId.setText(suggestedResourceName);
   }
 
   private void onResourceIdTextChange(String text) {
