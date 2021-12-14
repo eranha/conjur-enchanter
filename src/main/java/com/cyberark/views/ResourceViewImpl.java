@@ -15,11 +15,12 @@ import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.*;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.cyberark.Consts.ACTION_TYPE_KEY;
 import static com.cyberark.Consts.CYBR_BLUE;
@@ -311,12 +312,10 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   private void restoreSelection(T selectedResource) {
-    ResourceTableModel<T> resourceTableModel = getModel();
-    OptionalInt index = IntStream.range(0, resourceTableModel.getRowCount())
-        .filter(i -> resourceTableModel.getResourceModel(i).id.equals(selectedResource.id))
-        .findFirst();
-    if (index.isPresent()) {
-      getResourceTable().setRowSelectionInterval(index.getAsInt(), index.getAsInt());
+    int index = resourceTableModel.getResourceModelIndex(selectedResource);
+
+    if (index > -1) {
+      getResourceTable().setRowSelectionInterval(index, index);
     }
   }
 
