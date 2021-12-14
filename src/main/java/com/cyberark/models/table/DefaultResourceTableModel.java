@@ -69,7 +69,7 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
   public int getResourceModelIndex(final ResourceModel resourceModel) {
     if (model != null) {
       OptionalInt indexOpt = IntStream.range(0, model.size())
-          .filter(i -> resourceModel == model.get(i))
+          .filter(i -> resourceModel.id.equals(model.get(i).id))
           .findFirst();
       return indexOpt.orElse(-1);
     }
