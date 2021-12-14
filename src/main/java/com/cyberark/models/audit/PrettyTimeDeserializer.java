@@ -11,6 +11,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class PrettyTimeDeserializer extends StdDeserializer<String> {
+  public PrettyTimeDeserializer() {
+    super((Class<?> )null);
+  }
 
   public PrettyTimeDeserializer(Class<?> vc) {
     super(vc);
