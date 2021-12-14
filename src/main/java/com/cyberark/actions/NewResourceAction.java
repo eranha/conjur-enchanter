@@ -481,20 +481,20 @@ public class NewResourceAction extends AbstractAction {
         pageInfo.getProperty(type.toString()),
         new ResourceForm(
             type,
-            filter(resources, t -> t == ResourceType.policy),
+            resources,
             filter(resources, ROLE_RESOURCE_TYPE::contains)
         )
     );
   }
 
-  private Page getVariableGeneralPage(ResourceType type, List<ResourceIdentifier> resources, Properties pageInfo) {
+  private Page getVariableGeneralPage(ResourceType type,
+                                      List<ResourceIdentifier> resources,
+                                      Properties pageInfo) {
     return new Page(
         PageType.General.toString(),
         "General",
         pageInfo.getProperty(type.toString()),
-        new SecretForm(
-            filter(resources, t -> t == ResourceType.policy)
-        )
+        new SecretForm(resources)
     );
   }
 
