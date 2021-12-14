@@ -15,12 +15,11 @@ import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.cyberark.Consts.ACTION_TYPE_KEY;
 import static com.cyberark.Consts.CYBR_BLUE;
@@ -39,7 +38,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   private Consumer<DataModel> selectionListener;
   private Consumer<DataModel> resourceDoubleClickedListener;
   private final ActionMap menuItemActions = new ActionMap();
-  private final static ActionType[] DEFAUL_MENU_ITEMS_ORDER = new ActionType[] {
+  private final static ActionType[] DEFAULT_MENU_ITEMS_ORDER = new ActionType[] {
       ActionType.NewItem,
       ActionType.EditItem,
       ActionType.DeleteItem,
@@ -67,15 +66,14 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     splitPane.setTopComponent(new JScrollPane(resourceTable));
     splitPane.setBottomComponent(bottomSplitPane);
     setContent(splitPane);
-    resourceTable.getSelectionModel().addListSelectionListener(e -> onResourceSelectedEvent(e));
+    resourceTable.getSelectionModel().addListSelectionListener(this::onResourceSelectedEvent);
     getResourceTable().addMouseListener(getResourceTableMouseListener());
     registerActions();
     setResourceTablePopupMenu();
     splitPane.setDividerLocation(300);
     bottomSplitPane.setDividerLocation(360);
 
-    int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
-    InputMap inputMap = resourceTable.getInputMap(condition);
+    InputMap inputMap = resourceTable.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     ActionMap actionMap = resourceTable.getActionMap();
 
     if (getAction(ActionType.DeleteItem) != null) {
@@ -131,15 +129,14 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   /**
-   * Constructs this view resource table popup menu based on the DEFAUL_MENU_ITEMS_ORDER
-   * adding first the items in DEFAUL_MENU_ITEMS_ORDER if applicable.
+   * Constructs this view resource table popup menu based on the DEFAULT_MENU_ITEMS_ORDER
+   * adding first the items in DEFAULT_MENU_ITEMS_ORDER if applicable.
    * @return JPopupMenu
    */
   private JPopupMenu constructComponentPopupMenu() {
     JPopupMenu popupMenu = new JPopupMenu();
 
-    for (int i = 0; i < DEFAUL_MENU_ITEMS_ORDER.length; i++) {
-      ActionType type = DEFAUL_MENU_ITEMS_ORDER[i];
+    for (ActionType type : DEFAULT_MENU_ITEMS_ORDER) {
       Action action = menuItemActions.get(type);
 
       if (menuItemActions.size() > 2 && type == ActionType.DeleteItem) {
@@ -155,7 +152,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
       }
     }
 
-    Set<ActionType> set = Arrays.stream(DEFAUL_MENU_ITEMS_ORDER).collect(Collectors.toSet());
+    Set<ActionType> set = Arrays.stream(DEFAULT_MENU_ITEMS_ORDER).collect(Collectors.toSet());
 
     // Add the rest of items not in order
     Arrays.stream(menuItemActions.keys())
@@ -178,7 +175,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   /**
-   * Map this resource view actions to thier ActionType property.
+   * Map this resource view actions to their ActionType property.
    * Action with no 'action.type' property are ignored.
    */
   private void registerActions() {
@@ -194,7 +191,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
 
   private void registerAction(ActionMap actionMap, Action action) {
     if (action.getValue(ACTION_TYPE_KEY) == null) {
-      System.out.printf("WARNING! Action: %s has so no %s porperty and will be ignored.%n", ACTION_TYPE_KEY, action);
+      System.out.printf("WARNING! Action: %s has so no %s property and will be ignored.%n", ACTION_TYPE_KEY, action);
       return;
     }
     actionMap.put(action.getValue(ACTION_TYPE_KEY), action);
@@ -224,8 +221,8 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
 
   /**
    * Adds the default action any ResourceView supports.
-   * Classes that extends ResourceView can override this method to add thier own specific actions.
-   * @return
+   * Classes that extends ResourceView can override this method to add their own specific actions.
+   * @return list of actions
    */
   protected List<Action> getActions() {
     List<Action> actions = new ArrayList<>();
@@ -246,7 +243,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   /**
-   * Notifies when a resource is selected in the rsource table.
+   * Notifies when a resource is selected in the resource table.
    * Classes that extends ResourceView can override this method to get notified.
    */
   protected void mouseDoubleClickOnResource() {
@@ -312,8 +309,23 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
       throw new IllegalArgumentException("model");
     }
 
+    T selectedResource = getSelectedResource();
     resourceTableModel =  (ResourceTableModel) model;
     getResourceTable().setModel(resourceTableModel);
+
+    if (selectedResource != null) {
+      restoreSelection(selectedResource);
+    }
+  }
+
+  private void restoreSelection(T selectedResource) {
+    ResourceTableModel<T> resourceTableModel = getModel();
+    OptionalInt index = IntStream.range(0, resourceTableModel.getRowCount())
+        .filter(i -> resourceTableModel.getResourceModel(i).id.equals(selectedResource.id))
+        .findFirst();
+    if (index.isPresent()) {
+      getResourceTable().setRowSelectionInterval(index.getAsInt(), index.getAsInt());
+    }
   }
 
   @Override
@@ -321,12 +333,8 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     getModel().clearData();
   }
 
-  protected ResourceTableModel getModel() {
+  protected ResourceTableModel<T> getModel() {
     return resourceTableModel;
-  }
-
-  protected ViewType getView() {
-    return view;
   }
 
   protected T  getSelectedResource() {
