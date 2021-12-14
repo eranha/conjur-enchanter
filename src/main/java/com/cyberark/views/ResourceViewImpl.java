@@ -303,7 +303,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     }
 
     T selectedResource = getSelectedResource();
-    resourceTableModel =  (ResourceTableModel<T>) model;
+    resourceTableModel = (ResourceTableModel<T>) model;
     getResourceTable().setModel(resourceTableModel);
 
     if (selectedResource != null) {
