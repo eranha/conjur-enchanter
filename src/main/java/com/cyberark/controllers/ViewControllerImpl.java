@@ -112,16 +112,16 @@ class ViewControllerImpl implements ViewController {
   private void onResourceEvent(ActionEvent e) {
     logger.debug("onResourceEvent: {}", e);
 
-    ResourceEvent<? extends ResourceModel> event =
+    ResourceEvent<? extends ResourceModel> resourceEvent =
         (e.getSource() instanceof ResourceEvent)
         ? (ResourceEvent<? extends ResourceModel>) e.getSource()
         : null;
 
-    if (currentViewType != ViewType.Dashboard && event != null) {
-      if (event.getResource() == null && e.getID() == Events.NEW_ITEM) {
+    if (currentViewType != ViewType.Dashboard) {
+      if (resourceEvent == null && e.getID() == Events.NEW_ITEM) {
         reloadView();
       } else {
-        reloadViewIfNewResourceInCurrentView(event);
+        reloadViewIfNewResourceInCurrentView(resourceEvent);
       }
     } 
   }
@@ -154,6 +154,7 @@ class ViewControllerImpl implements ViewController {
     } catch (Exception e) {
       showErrorDialog(e.toString());
       logger.error(e);
+      e.printStackTrace();
     }
 
     logger.trace("getView exit:: return {}", views.get(viewType));
