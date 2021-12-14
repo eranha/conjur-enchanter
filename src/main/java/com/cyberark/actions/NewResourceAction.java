@@ -268,6 +268,7 @@ public class NewResourceAction extends AbstractAction {
     return response;
   }
 
+  @SuppressWarnings("unchecked")
   private String addRole(ResourceType resourceType, List<Page> pages, RoleModel model) throws ResourceAccessException {
     String response;
     // collect memberships (roles that the new role was granted membership)
