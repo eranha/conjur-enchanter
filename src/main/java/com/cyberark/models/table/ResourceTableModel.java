@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ResourceTableModel<T extends ResourceModel> extends ViewModel, TableModel {
   List<T> getResourceModels();
-  ResourceModel getResourceModel(int rowIndex);
+  T getResourceModel(int rowIndex);
   int getResourceModelIndex(ResourceModel resourceModel);
   void clearData();
 }
