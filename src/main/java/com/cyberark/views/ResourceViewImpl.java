@@ -114,7 +114,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
       ListSelectionModel lsm = (ListSelectionModel) event.getSource();
 
       if (resourceTable.getModel() instanceof ResourceTableModel) {
-        ResourceTableModel model = (ResourceTableModel) resourceTable.getModel();
+        var model = (ResourceTableModel<? extends ResourceModel>) resourceTable.getModel();
         ResourceModel resourceModel = lsm.isSelectionEmpty()
             ? null
             : model.getResourceModel(lsm.getMinSelectionIndex());
@@ -264,15 +264,6 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     }
   }
 
-  private void selectResource(ResourceModel resourceModel) {
-    ResourceTableModel model = (ResourceTableModel) resourceTable.getModel();
-    int index =  model.getResourceModelIndex(resourceModel);
-    if (index > -1) {
-      resourceTable.setRowSelectionInterval(index, index);
-      resourceTable.scrollRectToVisible(new Rectangle(resourceTable.getCellRect(index, 0, true)));
-    }
-  }
-
   @Override
   public void applyFilter(String query) {
     resourceTable.setModel(resourceTableModel);
@@ -303,6 +294,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     return resourceTable;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void setModel(ViewModel model) {
     if (!(model instanceof ResourceTableModel)) {
@@ -310,7 +302,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     }
 
     T selectedResource = getSelectedResource();
-    resourceTableModel =  (ResourceTableModel) model;
+    resourceTableModel =  (ResourceTableModel<T>) model;
     getResourceTable().setModel(resourceTableModel);
 
     if (selectedResource != null) {
@@ -339,7 +331,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
 
   protected T  getSelectedResource() {
     if (isTableRowSelected()) {
-      return (T) resourceTableModel.getResourceModel(getResourceTable().getSelectedRow());
+      return resourceTableModel.getResourceModel(getResourceTable().getSelectedRow());
     }
 
     return null;
