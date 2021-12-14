@@ -57,7 +57,7 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
   }
 
   @Override
-  public ResourceModel getResourceModel(int rowIndex) {
+  public T getResourceModel(int rowIndex) {
     if (rowIndex < 0 || rowIndex > model.size() - 1) {
       throw new ArrayIndexOutOfBoundsException(rowIndex);
     }
