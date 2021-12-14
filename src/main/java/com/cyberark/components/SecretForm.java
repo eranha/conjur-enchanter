@@ -17,11 +17,10 @@ public class SecretForm extends ResourceForm {
 
   public SecretForm(List<ResourceIdentifier> resources) {
     super(ResourceType.variable, resources, null );
-    initializeComponents(resources);
   }
 
   @Override
-  protected void initializeComponents(List<ResourceIdentifier> policies) {
+  protected void initializeComponents(List<ResourceIdentifier> resources) {
     setLayout(new GridBagLayout());
     int row = 0;
 
