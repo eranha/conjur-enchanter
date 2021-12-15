@@ -80,7 +80,7 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
     }
 
     // for each role this resource is granted, create a single grant
-    permissions = policyPermissionsBuilder
+    String permissions = policyPermissionsBuilder
         .grants(grantedRoles, resource.getIdentifier()).toPolicy();
 
     InputDialog.showDialog(getMainForm(),
