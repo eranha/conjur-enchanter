@@ -2,6 +2,7 @@ package com.cyberark.actions;
 
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.ResourceModel;
+import com.cyberark.models.ResourceType;
 import com.cyberark.models.RoleModel;
 
 import javax.swing.*;
@@ -43,6 +44,15 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
       }
     } catch (ResourceAccessException ex) {
       showErrorDialog(ex.getMessage());
+    }
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    if (enabled && getSelectedResource().getIdentifier().getType() != ResourceType.user) {
+      super.setEnabled(false);
+    } else {
+      super.setEnabled(enabled);
     }
   }
 }
