@@ -15,4 +15,5 @@ public interface Endpoints {
   //String AUDIT = "%s/audit?limit=50";///audit/roles/org%3Auser%3Afoo?limit=10
   //  //api/audit/roles/org%3Auser%3Abob?limit=10
   String AUDIT = "%s/audit?limit=500";
+  String UPDATE_PASSWORD = "%s/authn/%s/password";
 }

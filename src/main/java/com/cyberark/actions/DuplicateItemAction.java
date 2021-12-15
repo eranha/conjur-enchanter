@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 
 import static com.cyberark.components.PolicyDisplayPane.RESOURCE_ID;
 
+@SelectionBasedAction
 public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> {
   private PolicyDisplayPane policyDisplayPane;
   public DuplicateItemAction(Supplier<T> selectedResource) {
@@ -55,9 +56,15 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
           getResourcesService().getPolicies(),
           policy.toString());
 
-      policyDisplayPane.setPropertyChangeListener(evt -> {
-       rebuildPolicy(type, evt.getPropertyName(), evt.getNewValue(), memberships, members);
-      });
+      policyDisplayPane.setPropertyChangeListener(
+          evt -> rebuildPolicy(
+            type,
+            evt.getPropertyName(),
+            evt.getNewValue(),
+            memberships,
+            members
+          )
+      );
 
       showPolicyForm(policyDisplayPane);
     } catch (ResourceAccessException | JsonProcessingException ex) {

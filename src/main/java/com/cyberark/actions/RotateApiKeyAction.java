@@ -5,18 +5,17 @@ import com.cyberark.models.ResourceModel;
 import com.cyberark.models.RoleModel;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.function.Supplier;
 
+@SelectionBasedAction
 public class RotateApiKeyAction extends ActionBase<RoleModel> {
   @SuppressWarnings("unchecked")
-  public <T extends ResourceModel> RotateApiKeyAction(Supplier<T> selectedResource) {
-    super("Rotate Key", ActionType.RotateApiKey, (Supplier<RoleModel>) selectedResource);
+  public <T extends ResourceModel> RotateApiKeyAction(Supplier<T> selectedResource, String text) {
+    super(text, ActionType.RotateApiKey, (Supplier<RoleModel>) selectedResource);
     putValue(SHORT_DESCRIPTION,
         "Replaces API key with a new, securely random API key");
     putValue(MNEMONIC_KEY, KeyEvent.VK_N);
-    setEnabled(false);
   }
 
   @Override

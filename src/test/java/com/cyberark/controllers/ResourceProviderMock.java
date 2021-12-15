@@ -20,6 +20,11 @@ public class ResourceProviderMock implements ResourceApiProvider {
   }
 
   @Override
+  public String put(URL url, String user, char[] password, String body) throws IOException {
+    return null;
+  }
+
+  @Override
   public String get(URL url, char[] token) throws IOException {
     return returnValue;
   }

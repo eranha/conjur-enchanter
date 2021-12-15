@@ -7,6 +7,8 @@ import java.util.HashMap;
 public interface ResourceApiProvider {
   String get(URL url, String user, char[] password) throws IOException;
 
+  String put(URL url, String user, char[] password, String body) throws IOException;
+
   String get(URL url, char[] token) throws IOException;
 
   String post(URL url, char[] token, String body) throws IOException;

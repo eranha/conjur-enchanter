@@ -5,11 +5,11 @@ import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.ResourceModel;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.function.Supplier;
 
+@SelectionBasedAction
 public class DeleteItemAction<T extends ResourceModel> extends ActionBase<T> {
 
   public DeleteItemAction(Supplier<T> selectedResource) {

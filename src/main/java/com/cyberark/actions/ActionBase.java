@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static com.cyberark.Consts.ACTION_TYPE_KEY;
 
@@ -145,15 +144,6 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
 
   @Override
   public boolean isSelectionBased() {
-    return getActionType() != null && selectionBasedActionTypes.get().anyMatch(i -> i == getActionType());
+    return Arrays.stream(getClass().getDeclaredAnnotations()).anyMatch(a -> a instanceof SelectionBasedAction);
   }
-
-  private final Supplier<Stream<ActionType>> selectionBasedActionTypes = () -> Arrays.stream(new ActionType[]{
-      ActionType.EditItem,
-      ActionType.DeleteItem,
-      ActionType.EditPermissions,
-      ActionType.RotateApiKey,
-      ActionType.ViewPolicy,
-      ActionType.DuplicateItem
-  });
 }

@@ -4,9 +4,9 @@ import com.cyberark.Util;
 import com.cyberark.models.SecretModel;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.util.function.Supplier;
 
+@SelectionBasedAction
 public class EditSecretAction extends EditItemAction<SecretModel> {
   public EditSecretAction(Supplier<SecretModel> selectedRsource) {
     this(selectedRsource, "Edit");

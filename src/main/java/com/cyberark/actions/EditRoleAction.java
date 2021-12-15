@@ -8,7 +8,6 @@ import com.cyberark.models.ResourceType;
 import com.cyberark.models.RoleModel;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,7 @@ import java.util.stream.Collectors;
 /**
  * Adds an actor role either user or host as a meber of one or more groups or layers respectivly.
  */
+@SelectionBasedAction
 public class EditRoleAction extends EditItemAction<RoleModel> {
   public EditRoleAction(Supplier<RoleModel> selectedResource) {
     this(selectedResource, "Edit");
@@ -44,7 +44,7 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
       List<ResourceIdentifier> grantedRoles = new ArrayList<>();
 
       Map<String, ResourceIdentifier> grantedRolesSetsModels = grantingRoles.stream()
-          .collect(Collectors.toMap(k -> k.getId(), v -> v));
+          .collect(Collectors.toMap(ResourceIdentifier::getId, v -> v));
 
       // remove all the granted roles from the granting roles list
       memberships.forEach(i -> {

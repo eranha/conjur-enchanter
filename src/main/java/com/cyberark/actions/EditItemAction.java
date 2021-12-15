@@ -2,10 +2,10 @@ package com.cyberark.actions;
 
 import com.cyberark.models.ResourceModel;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.function.Supplier;
 
+@SelectionBasedAction
 public abstract class EditItemAction<T extends ResourceModel> extends ActionBase<T> {
   public EditItemAction(Supplier<T> selectedResource) {
     this(selectedResource, "Edit");

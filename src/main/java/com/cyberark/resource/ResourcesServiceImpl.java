@@ -117,6 +117,7 @@ class ResourcesServiceImpl implements ResourcesService {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T extends ResourceModel> List<T> getResources(ResourceType type,
                                                         Class<T> clazz) throws ResourceAccessException {
@@ -578,6 +579,56 @@ class ResourcesServiceImpl implements ResourcesService {
     }
 
     return Arrays.stream(auditModels).collect(Collectors.toList());
+  }
+
+  @Override
+  public void updateUserPassword(RoleModel user, char[] password, char[] apiKey) throws ResourceAccessException {
+    validateResourceModel(user);
+
+    if (user.getIdentifier().getType() != ResourceType.user) {
+      throw new IllegalArgumentException("user");
+    }
+
+    if (password == null || password.length == 0) {
+      throw new IllegalArgumentException("password");
+    }
+
+    if (apiKey == null || apiKey.length == 0) {
+      throw new IllegalArgumentException("apiKey");
+    }
+
+    String url = String.format(
+        Endpoints.UPDATE_PASSWORD,
+        getCredentials().url,
+        getCredentials().account);
+
+    try {
+      resourceProvider.put(new URL(url), user.getIdentifier().getId(), apiKey, new String(password));
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new ResourceAccessException(e);
+    }
+  }
+
+  @Override
+  public String getApiKey(RoleModel role, char[] password) throws ResourceAccessException {
+    validateResourceModel(role);
+
+    if (password == null || password.length == 0) {
+      throw new IllegalArgumentException("password");
+    }
+
+    String url = String.format(
+        Endpoints.LOGIN,
+        getCredentials().url,
+        getCredentials().account);
+
+    try {
+      return resourceProvider.get(new URL(url), role.getIdentifier().getId(), password);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new ResourceAccessException(e);
+    }
   }
 
   @Override

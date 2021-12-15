@@ -70,7 +70,8 @@ public interface ResourcesService extends Consts {
       throws ResourceAccessException;
 
   // Give privileges to all the roles in the map to the resource
-  void permit(Map<ResourceIdentifier, Set<String>> privilegesMap, ResourceModel resource) throws ResourceAccessException;
+  void permit(Map<ResourceIdentifier, Set<String>> privilegesMap, ResourceModel resource)
+      throws ResourceAccessException;
 
   List<ResourceIdentifier> getResourceIdentifiers(ResourceType resourceType) throws ResourceAccessException;
 
@@ -80,5 +81,21 @@ public interface ResourcesService extends Consts {
 
   List<AuditEvent> getAuditEvents() throws ResourceAccessException;
 
+  /**
+   * Sets the password of the user argument to the password argument.
+   * @param user The password owner user
+   * @param password The new password
+   * @param apiKey Required for authentication
+   * @throws ResourceAccessException In case of operation failure
+   */
+  void updateUserPassword(RoleModel user, char[] password, char[] apiKey) throws ResourceAccessException;
 
+  /**
+   * Gets the API key of a role given the username and password via HTTP Basic Authentication
+   * @param role The api key owner
+   * @param password Thr password of the role
+   * @return Securely generated random api key
+   * @throws ResourceAccessException in case of error
+   */
+  String getApiKey(RoleModel role, char[] password) throws ResourceAccessException;
 }

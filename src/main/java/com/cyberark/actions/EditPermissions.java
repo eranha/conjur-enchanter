@@ -6,14 +6,14 @@ import com.cyberark.dialogs.InputDialog;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.ResourceEvent;
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.*;
+import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.ResourceModel;
+import com.cyberark.models.ResourceType;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.*;
-import java.util.List;
 import java.util.function.Supplier;
 
+@SelectionBasedAction
 public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
   public EditPermissions(Supplier<T> selectedResource) {
     super("Edit Permissions...", ActionType.EditPermissions, selectedResource);

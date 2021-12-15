@@ -120,7 +120,7 @@ class ViewControllerImpl implements ViewController {
     if (currentViewType != ViewType.Dashboard) {
       if (resourceEvent == null && e.getID() == Events.NEW_ITEM) {
         reloadView();
-      } else {
+      } else if (resourceEvent != null) {
         reloadViewIfNewResourceInCurrentView(resourceEvent);
       }
     } 
@@ -161,6 +161,7 @@ class ViewControllerImpl implements ViewController {
     return view;
   }
 
+  @SuppressWarnings("unchecked")
   private <T extends ResourceModel> List<T> getResources(ViewType viewType) throws ResourceAccessException {
     logger.trace("getResources({}) enter::", viewType);
 

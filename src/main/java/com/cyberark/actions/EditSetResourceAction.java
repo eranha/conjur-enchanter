@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
  * This acitons adds a role (group, layer, user or host) as members
  * to the current selected group or layer.
  */
+@SelectionBasedAction
 public class EditSetResourceAction extends EditItemAction<ResourceModel> {
   public EditSetResourceAction(Supplier<ResourceModel> selectedResource) {
     super(selectedResource);
@@ -55,7 +56,7 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
               .orElse(null));
 
       Map<String, ResourceIdentifier> rolesMap = roles.stream()
-          .collect(Collectors.toMap(k -> k.getId(), v -> v));
+          .collect(Collectors.toMap(ResourceIdentifier::getId, v -> v));
 
       // Get the set role members
       List<Membership> members = getResourcesService().getMembers(role);

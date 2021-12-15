@@ -25,6 +25,11 @@ public class RestApiResourceProvider implements ResourceApiProvider {
   }
 
   @Override
+  public String put(URL url, String user, char[] password, String body) throws IOException {
+    return readResponse(openConnection(url, "PUT", getAuthorizationHeader(user, password), body));
+  }
+
+  @Override
   public String get(URL url, char[] token) throws IOException {
     logger.trace("enter get(url={})", url);
     HashMap<String, String> headers = new HashMap<>();

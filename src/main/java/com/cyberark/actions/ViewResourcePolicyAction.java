@@ -9,13 +9,11 @@ import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@SelectionBasedAction
 public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBase<T> {
   public ViewResourcePolicyAction(Supplier<T> selectedResource) {
     this(selectedResource, "View Policy");
@@ -31,7 +29,6 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
   @Override
   public void actionPerformed(ResourceModel resource) {
     String policy = null;
-    String permissions = null;
     PolicyBuilder policyBuilder = new PolicyBuilder();
     List<Membership> membership = new ArrayList<>();
     List<Membership> members = new ArrayList<>();
@@ -62,12 +59,11 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
 
       if (model.policy_versions.length > 0) {
         // get the latest policy version
-        policy = Arrays.stream(model.policy_versions)
+        Optional<PolicyVersion> policyVersion = Arrays.stream(model.policy_versions)
             .max(Comparator.comparingInt(x -> x.version))
             .stream()
-            .findFirst()
-            .get()
-            .policy_text;
+            .findFirst();
+        policy = policyVersion.map(version -> version.policy_text).orElse(null);
       }
     } else {
       policy = policyBuilder.resource(resource.getIdentifier())

@@ -199,7 +199,6 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   protected List<Action> getMenuActions() {
-
     List<Action> actions = new ArrayList<>();
     Action action = getNewResourceTypeAction();
     action.putValue(Action.NAME, "New...");
