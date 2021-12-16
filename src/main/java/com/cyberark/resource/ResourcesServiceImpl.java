@@ -117,7 +117,7 @@ class ResourcesServiceImpl implements ResourcesService {
     }
   }
 
-  //@SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   @Override
   public <T extends ResourceModel> List<T> getResources(ResourceType type,
                                                         Class<T> clazz) throws ResourceAccessException {
@@ -137,6 +137,7 @@ class ResourcesServiceImpl implements ResourcesService {
       String data  = resourceProvider.get(new URL(getResourcesEndpoint(type)), getAccessToken());
       T[] t = (T[])Array.newInstance(clazz, 0);
       T[] resourceModels = (T[]) readValue(data, t.getClass());
+      // sort by id
       resources = Arrays.stream(resourceModels)
           .sorted((Comparator.comparing(x -> x.id)))
           .collect(Collectors.toList());
