@@ -14,6 +14,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,14 +25,16 @@ public class PrivilegesPanel extends JPanel {
   private final List<ResourceIdentifier> resourceModels;
   private final Map<ResourceIdentifier, Set<String>> resourcePrivileges = new HashMap<>();
   private final Map<ResourceIdentifier, PrivilegesTableModel> privilegesTableModels = new HashMap<>();
+  private final ResourceType resourceType;
   private EditableTable<Privilege> privilegesTable;
 
-  public PrivilegesPanel(List<ResourceIdentifier> resourceModels) {
-    this(new Permission[0], resourceModels);
+  public PrivilegesPanel(ResourceType resourceType, List<ResourceIdentifier> roles) {
+    this(resourceType, new Permission[0], roles);
   }
 
-  public PrivilegesPanel(Permission[] permissions, List<ResourceIdentifier> resourceModels) {
-    this.resourceModels = resourceModels;
+  public PrivilegesPanel(ResourceType resourceType, Permission[] permissions, List<ResourceIdentifier> roles) {
+    this.resourceModels = roles;
+    this.resourceType = resourceType;
 
     Arrays.stream(permissions).forEach(p -> {
       resourcePrivileges.computeIfAbsent(ResourceIdentifier.fromString(p.role), v -> new HashSet<>());
@@ -75,7 +79,7 @@ public class PrivilegesPanel extends JPanel {
             (rolesListModel.getSize() > 0)
               ? rolesListModel.get(0).getId()
               : null,
-            PrivilegesTableModel.VARIABLE_PRIVILEGES),
+            PrivilegesTableModel.EXECUTE_PRIVILEGES),
         m -> new Privilege(String.format("privilege%s", m.getRowCount() + 1), false));
 
     rolesList.setCellRenderer(new ResourceListItemCellRenderer());
@@ -156,11 +160,17 @@ public class PrivilegesPanel extends JPanel {
   private PrivilegesTableModel createPrivilegesTableModel(JList<ResourceIdentifier> rolesList,
                                                           DefaultListModel<ResourceIdentifier> rolesListModel,
                                                           ResourceIdentifier resource) {
+
     Map<String, Boolean> map = new HashMap<>(
-        resource.getType() == ResourceType.variable
-        ? PrivilegesTableModel.VARIABLE_PRIVILEGES
-        : PrivilegesTableModel.RESOURCE_PRIVILEGES);
-    resourcePrivileges.get(resource).forEach(p -> map.put(p, true));
+        resourceType == ResourceType.variable || resourceType == ResourceType.webservice
+        ? PrivilegesTableModel.EXECUTE_PRIVILEGES
+        : PrivilegesTableModel.READ_UPDATE_PRIVILEGES
+    );
+
+    resourcePrivileges.get(resource).forEach(
+        p -> map.put(p, true)
+    );
+
     PrivilegesTableModel model = new PrivilegesTableModel(resource.getId(), map);
 
     model.addTableModelListener(me -> {
@@ -186,20 +196,46 @@ public class PrivilegesPanel extends JPanel {
             .stream()
             .filter(i -> !permittedRolesModel.contains(i))
             .collect(Collectors.toList());
+
     JList<ResourceIdentifier> list = new JList<>();
     DefaultListModel<ResourceIdentifier> rolesModel = new DefaultListModel<>();
     identifiers.forEach(rolesModel::addElement);
+
     list.setModel(rolesModel);
     list.setCellRenderer(new ResourceListItemCellRenderer());
+    list.setPreferredSize(new Dimension(320, 240));
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent evt) {
+        if (evt.getClickCount() == 2) {
+          int index = list.locationToIndex(evt.getPoint());
 
-    if (InputDialog.showDialog(SwingUtilities.getWindowAncestor(this), "Select Roles",
-        true, new JScrollPane(list)) == InputDialog.OK_OPTION) {
+          if (index > -1) {
+            Window ancestor = SwingUtilities.getWindowAncestor(list);
+
+            if (ancestor instanceof JDialog
+                && ((JDialog)ancestor).getRootPane().getDefaultButton() != null) {
+              ((JDialog)ancestor).getRootPane().getDefaultButton().doClick();
+            }
+          }
+        }
+      }
+    });
+
+    if (InputDialog.showDialog(SwingUtilities.getWindowAncestor(this),
+        "Select Roles",
+        true,
+        new JScrollPane(list)
+    ) == InputDialog.OK_OPTION) {
       // add the selected roles to the permitted roles list
       Arrays.stream(list.getSelectedIndices())
           .forEach(i -> permittedRolesModel.addElement(rolesModel.getElementAt(i)));
       // select the first of the selected roles
       if (list.getSelectedIndices().length > 0) {
-        permittedRoles.setSelectedValue(rolesModel.getElementAt(list.getSelectedIndices()[0]), true);
+        permittedRoles.setSelectedValue(
+            rolesModel.getElementAt(list.getSelectedIndices()[0]),
+            true);
       }
     }
   }
@@ -208,15 +244,13 @@ public class PrivilegesPanel extends JPanel {
     return resourcePrivileges;
   }
 
-  // table and list renderers
+  // Table Cell Renderer
   private static class HeaderRenderer implements TableCellRenderer {
 
     DefaultTableCellRenderer renderer;
 
     public HeaderRenderer(JTable table) {
-      renderer = (DefaultTableCellRenderer)
-          table.getTableHeader().getDefaultRenderer();
-
+      renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
     }
 
     @Override
@@ -224,8 +258,15 @@ public class PrivilegesPanel extends JPanel {
         JTable table, Object value, boolean isSelected,
         boolean hasFocus, int row, int col) {
       renderer.setHorizontalAlignment(col > 0 ? JLabel.CENTER : JLabel.LEFT);
+
       return renderer.getTableCellRendererComponent(
-          table, value, isSelected, hasFocus, row, col);
+          table,
+          value,
+          isSelected,
+          hasFocus,
+          row,
+          col
+      );
     }
   }
 }

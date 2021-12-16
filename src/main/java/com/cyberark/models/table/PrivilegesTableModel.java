@@ -12,11 +12,11 @@ public class PrivilegesTableModel extends AbstractEditableTableModel<Privilege> 
   private final String[] columnNames = new String[]{"Permissions for %s", "Allow", "Deny"};
   private String role;
 
-  public static final Map<String, Boolean> VARIABLE_PRIVILEGES =
-      Arrays.stream(new String[]{"read", "execute", "update"})
+  public static final Map<String, Boolean> EXECUTE_PRIVILEGES =
+      Arrays.stream(new String[]{"read", "update", "execute"})
       .collect(Collectors.toMap(privilege -> privilege, data -> false));
 
-  public static final Map<String, Boolean> RESOURCE_PRIVILEGES =
+  public static final Map<String, Boolean> READ_UPDATE_PRIVILEGES =
       Arrays.stream(new String[]{"read", "create", "update"})
           .collect(Collectors.toMap(privilege -> privilege, data -> false));
 

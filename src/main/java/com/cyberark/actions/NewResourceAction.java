@@ -365,7 +365,7 @@ public class NewResourceAction extends AbstractAction {
     // Permissions
     pages.add(getSetResourceGrantsPage(resourceType, resources, pageInfo));
     // Privileges
-    pages.add(getPrivilegesPage(pageInfo, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+    pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
 
     return pages;
   }
@@ -384,7 +384,7 @@ public class NewResourceAction extends AbstractAction {
     // Restrictions
     pages.add(getRestrictionsPage(pageInfo));
     // Privileges
-    pages.add(getPrivilegesPage(pageInfo, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+    pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
 
     return pages;
   }
@@ -411,7 +411,7 @@ public class NewResourceAction extends AbstractAction {
     pages.add(getGeneralPage(resourceType, resources, pageInfo));
 
     // Privileges
-    pages.add(getPrivilegesPage(pageInfo, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+    pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
 
     return pages;
   }
@@ -426,7 +426,7 @@ public class NewResourceAction extends AbstractAction {
     pages.add(getVariableGeneralPage(resourceType, resources, pageInfo));
 
     // Privileges
-    pages.add(getPrivilegesPage(pageInfo, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+    pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
 
     return pages;
   }
@@ -438,12 +438,12 @@ public class NewResourceAction extends AbstractAction {
   // permit resources
   // Required. Identifies the resource whose access is being controlled.
   // policy, user, host, group, layer, variable, webservice.
-  private Page getPrivilegesPage(Properties pageInfo, List<ResourceIdentifier> roles) {
+  private Page getPrivilegesPage(Properties pageInfo, ResourceType resourceType, List<ResourceIdentifier> roles) {
     return new Page(
         PageType.Privileges.toString(),
         "Permissions",
         pageInfo.getProperty("role.privileges"),
-        new PrivilegesPanel(roles));
+        new PrivilegesPanel(resourceType, roles));
   }
 
   private Page getSetResourceGrantsPage(ResourceType type, List<ResourceIdentifier> resources, Properties pageInfo) {

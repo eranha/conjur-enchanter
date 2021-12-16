@@ -22,7 +22,11 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
 
   @Override
   public void actionPerformed(ResourceModel resource) {
-    PrivilegesPanel privilegesPane = new PrivilegesPanel(resource.permissions, getResources());
+    PrivilegesPanel privilegesPane = new PrivilegesPanel(
+        resource.getIdentifier().getType(),
+        resource.permissions,
+        getResources()
+    );
 
     if (InputDialog.showDialog(
         getMainForm(),
