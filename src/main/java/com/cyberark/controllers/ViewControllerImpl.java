@@ -10,7 +10,10 @@ import com.cyberark.event.*;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.models.audit.AuditEvent;
-import com.cyberark.models.table.*;
+import com.cyberark.models.table.DefaultResourceTableModel;
+import com.cyberark.models.table.PolicyTableModel;
+import com.cyberark.models.table.RoleTableModel;
+import com.cyberark.models.table.SecretTableModel;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
 import com.cyberark.views.*;
@@ -161,37 +164,10 @@ class ViewControllerImpl implements ViewController {
     return view;
   }
 
-  @SuppressWarnings("unchecked")
-  private <T extends ResourceModel> List<T> getResources(ViewType viewType) throws ResourceAccessException {
-    logger.trace("getResources({}) enter::", viewType);
-
-    ResourceType type = Util.getResourceType(viewType);
-    List<T> resources = (List<T>) getResourceService().getResources(Util.getResourceType(viewType),
-        getResourceTypeModelClass(type));
-
-    logger.trace("getResources({}) exit:: return {} item(s)", viewType, resources.size());
-    return resources;
-  }
-
   private ResourcesService getResourceService() {
     return ResourceServiceFactory.getInstance().getResourcesService();
   }
 
-  private  Class<? extends ResourceModel> getResourceTypeModelClass(ResourceType type) {
-
-    switch (type) {
-        case user:
-        case host:
-          return RoleModel.class;
-        case policy:
-          return PolicyModel.class;
-        case variable:
-          return SecretModel.class;
-        default:
-      }
-
-      return ResourceModel.class;
-  }
 
   private View createView(ViewType type) {
     View view = null;
@@ -287,10 +263,10 @@ class ViewControllerImpl implements ViewController {
     switch(viewType) {
       case Hosts:
       case Users:
-        model = new RoleTableModel(getResources(viewType));
+        model = new RoleTableModel(getResourceService().getResources(Util.getResourceType(viewType), RoleModel.class));
         break;
       case Policies:
-        model = new PolicyTableModel(getResources(viewType));
+        model = new PolicyTableModel(getResourceService().getResources(ResourceType.policy, PolicyModel.class));
         break;
       case Secrets:
         model = getSecretsViewModel();
@@ -299,7 +275,9 @@ class ViewControllerImpl implements ViewController {
         model = new DashboardViewModel(getAuditEvents(), getResourceCountMap());
         break;
       default:
-        model = new DefaultResourceTableModel<>(getResources(viewType));
+        model = new DefaultResourceTableModel<>(
+            getResourceService().getResources(Util.getResourceType(viewType), ResourceModel.class)
+        );
     }
 
     logger.trace("getViewModel exit:: return: {}", model);
@@ -343,7 +321,7 @@ class ViewControllerImpl implements ViewController {
   private SecretTableModel getSecretsViewModel() throws ResourceAccessException {
     logger.trace("getSecretsViewModel::enter::");
 
-    List<SecretModel> secretModels = getResources(ViewType.Secrets);
+    List<SecretModel> secretModels = getResourceService().getResources(ResourceType.variable, SecretModel.class);
     SecretTableModel model = new SecretTableModel(secretModels);
     Exception[] errors = new Exception[1];
 

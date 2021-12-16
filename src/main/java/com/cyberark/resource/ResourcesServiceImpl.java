@@ -117,7 +117,7 @@ class ResourcesServiceImpl implements ResourcesService {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  //@SuppressWarnings("unchecked")
   @Override
   public <T extends ResourceModel> List<T> getResources(ResourceType type,
                                                         Class<T> clazz) throws ResourceAccessException {
@@ -417,7 +417,9 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
-  public String addRole(ResourceType type, RoleModel model, List<ResourceIdentifier> grantedSetRoles)
+  public String addRole(ResourceType type,
+                        RoleModel model,
+                        List<ResourceIdentifier> grantedSetRoles)
     throws ResourceAccessException {
     logger.trace("enter:: addRole(type={}, model={}, grantedSetRoles{})", type, model, grantedSetRoles);
     validateResourceModel(model);
@@ -427,7 +429,10 @@ class ResourcesServiceImpl implements ResourcesService {
     }
 
     PolicyBuilder policyBuilder = new PolicyBuilder();
-    policyBuilder.resource(model.getIdentifier());
+    policyBuilder
+        .resource(model.getIdentifier())
+        .restrictions(model.restricted_to);
+
     String response = loadPolicy(policyBuilder.toPolicy(), model.policy);
 
     // Create grants in root policy

@@ -70,7 +70,7 @@ public class ResourceForm extends AbstractResourceForm {
   }
 
   protected void addAnnotationsTable(int gridy) {
-    EditableTable<Annotation> tableAnnotations = new EditableTable<>(
+    EditableTableImpl<Annotation> tableAnnotations = new EditableTableImpl<>(
         annotationsTableModel, this::getAnnotation);
 
     tableAnnotations.getTable().setToolTipText(

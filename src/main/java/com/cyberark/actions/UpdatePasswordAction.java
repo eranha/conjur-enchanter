@@ -1,7 +1,6 @@
 package com.cyberark.actions;
 
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.ResourceModel;
 import com.cyberark.models.ResourceType;
 import com.cyberark.models.RoleModel;
 
@@ -11,9 +10,8 @@ import java.util.function.Supplier;
 
 @SelectionBasedAction
 public class UpdatePasswordAction extends ActionBase<RoleModel> {
-  @SuppressWarnings("unchecked")
-  public <T extends ResourceModel> UpdatePasswordAction(Supplier<T> selectedResource, String text) {
-    super(text, ActionType.UpdatePassword, (Supplier<RoleModel>) selectedResource);
+  public UpdatePasswordAction(Supplier<RoleModel> selectedResource, String text) {
+    super(text, ActionType.UpdatePassword, selectedResource);
     putValue(SHORT_DESCRIPTION,
         "Changes a user’s password.");
     putValue(MNEMONIC_KEY, KeyEvent.VK_P);

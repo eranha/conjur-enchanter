@@ -26,7 +26,7 @@ public class PrivilegesPanel extends JPanel {
   private final Map<ResourceIdentifier, Set<String>> resourcePrivileges = new HashMap<>();
   private final Map<ResourceIdentifier, PrivilegesTableModel> privilegesTableModels = new HashMap<>();
   private final ResourceType resourceType;
-  private EditableTable<Privilege> privilegesTable;
+  private EditableTableImpl<Privilege> privilegesTable;
 
   public PrivilegesPanel(ResourceType resourceType, List<ResourceIdentifier> roles) {
     this(resourceType, new Permission[0], roles);
@@ -74,7 +74,7 @@ public class PrivilegesPanel extends JPanel {
 
     rolesListModel.addListDataListener(getRoleListDataListener(rolesListModel));
 
-    privilegesTable = new EditableTable<>(
+    privilegesTable = new EditableTableImpl<>(
         new PrivilegesTableModel(
             (rolesListModel.getSize() > 0)
               ? rolesListModel.get(0).getId()

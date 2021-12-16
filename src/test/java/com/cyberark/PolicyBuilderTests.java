@@ -25,6 +25,21 @@ public class PolicyBuilderTests {
   }
 
   @Test
+  public void restrictionTest() {
+    StringBuilder expected = new StringBuilder();
+    expected
+        .append("- !user").append(System.lineSeparator())
+        .append("  id: foo").append(System.lineSeparator())
+        .append("  restricted_to: [0.0.0.0, 1.1.1.1/32]").append(System.lineSeparator());
+    PolicyBuilder p = new PolicyBuilder();
+    assertEquals(
+        expected.toString(),
+        p.resource(ResourceIdentifier.fromString("org:user:foo"))
+            .restrictions(new String[]{"0.0.0.0", "1.1.1.1/32"})
+            .toPolicy());
+  }
+
+  @Test
   void policyWithOwner() {
     StringBuilder expected = new StringBuilder();
     expected
@@ -45,7 +60,8 @@ public class PolicyBuilderTests {
         .append("  id: my-policy").append(System.lineSeparator())
         .append("  owner: !user foo").append(System.lineSeparator())
         .append("  body:").append(System.lineSeparator())
-        .append("    - !layer my-vms").append(System.lineSeparator())
+        .append("    - !layer").append(System.lineSeparator())
+        .append("      id: my-vms").append(System.lineSeparator())
         .append("    - !host").append(System.lineSeparator())
         .append("      id: my-host-1").append(System.lineSeparator())
         .append("      owner: !layer my-vms").append(System.lineSeparator())
@@ -97,7 +113,9 @@ public class PolicyBuilderTests {
 
   @Test
   void resource() {
-    StringBuilder expected = new StringBuilder("- !user foo");
+    StringBuilder expected = new StringBuilder();
+    expected.append("- !user").append(System.lineSeparator());
+    expected.append("  id: foo");
     PolicyBuilder p = new PolicyBuilder();
     String policy = p.resource(ResourceIdentifier.fromString("test:user:foo")).toPolicy();
     assertEquals(expected.append(System.lineSeparator()).toString(), policy);
@@ -216,7 +234,9 @@ public class PolicyBuilderTests {
 
   @Test
   void annotations() {
-    StringBuilder expected = new StringBuilder("- !user foo");
+    StringBuilder expected = new StringBuilder();
+    expected.append("- !user").append(System.lineSeparator());
+    expected.append("  id: foo");
     expected.append(System.lineSeparator())
       .append("  annotations:").append(System.lineSeparator())
       .append("    a1: \"v1\"").append(System.lineSeparator())

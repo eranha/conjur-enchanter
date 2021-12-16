@@ -54,9 +54,19 @@ public class PolicyBuilder {
   }
 
   public PolicyBuilder resource(ResourceIdentifier resource) {
-    append("- !%s %s",
-        resource.getType(),
-        resource.getId());
+    append("- !%s", resource.getType());
+    append("  id: %s",  resource.getId());
+    return this;
+  }
+
+  public PolicyBuilder restrictions(String[] restrictions) {
+    if (restrictions != null && restrictions.length > 0) {
+      append(
+          "  restricted_to: %s",
+          Arrays.toString(restrictions)
+      );
+    }
+
     return this;
   }
 

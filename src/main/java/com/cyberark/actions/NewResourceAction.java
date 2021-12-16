@@ -268,7 +268,6 @@ public class NewResourceAction extends AbstractAction {
     return response;
   }
 
-  @SuppressWarnings("unchecked")
   private String addRole(ResourceType resourceType, List<Page> pages, RoleModel model) throws ResourceAccessException {
     String response;
     // collect memberships (roles that the new role was granted membership)
@@ -276,7 +275,7 @@ public class NewResourceAction extends AbstractAction {
 
     // set restrictions
     Component component = getPageComponent(PageType.Restrictions, pages);
-    EditableTable<String> table = (component instanceof EditableTable) ? (EditableTable<String>)component : null;
+    EditableTable table = (component instanceof EditableTable) ? (EditableTable)component : null;
     model.restricted_to = Objects.requireNonNull(table).getModel() instanceof StringTableModel
         ? ((StringTableModel)table.getModel()).getItems()
         : new String[0];
@@ -393,7 +392,7 @@ public class NewResourceAction extends AbstractAction {
     return new Page(
         PageType.Restrictions.toString(),
         "Restrictions", pageInfo.getProperty("restrictions"),
-        new EditableTable<>(
+        new EditableTableImpl<>(
             new StringTableModel(), m -> "0.0.0.0", false
         )
     );
