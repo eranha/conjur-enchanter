@@ -19,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -117,28 +116,21 @@ class ResourcesServiceImpl implements ResourcesService {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T extends ResourceModel> List<T> getResources(ResourceType type,
-                                                        Class<T> clazz) throws ResourceAccessException {
-    logger.trace("getResources({}, {}) enter", type, clazz);
+  public List<ResourceModel> getResources(ResourceType type) throws ResourceAccessException {
+    logger.trace("getResources({}) enter", type);
 
     if (type == null) {
       throw new IllegalArgumentException("type");
     }
 
-    if (clazz == null) {
-      throw new IllegalArgumentException("clazz");
-    }
-
-    List<T> resources;
+    List<ResourceModel> resources;
 
     try {
-      String data  = resourceProvider.get(new URL(getResourcesEndpoint(type)), getAccessToken());
-      T[] t = (T[])Array.newInstance(clazz, 0);
-      T[] resourceModels = (T[]) readValue(data, t.getClass());
+      String data = resourceProvider.get(new URL(getResourcesEndpoint(type)), getAccessToken());
+
       // sort by id
-      resources = Arrays.stream(resourceModels)
+      resources = Arrays.stream(readValue(data, ResourceModel[].class))
           .sorted((Comparator.comparing(x -> x.id)))
           .collect(Collectors.toList());
     } catch (IOException e) {
@@ -147,17 +139,46 @@ class ResourcesServiceImpl implements ResourcesService {
       throw new ResourceAccessException(e);
     }
 
-    logger.trace("getResources({}, {}) exit return {} item(s)", type, clazz.getName(),
+    logger.trace("getResources({}) exit return {} item(s)", type,
         resources.size());
 
     return resources;
   }
 
+
   @Override
   public List<PolicyModel> getPolicies() throws ResourceAccessException {
     try {
       String json = resourceProvider.get(new URL(getResourcesEndpoint(ResourceType.policy)), getAccessToken());
-      return Arrays.stream(readValue(json, PolicyModel[].class)).collect(Collectors.toList());
+      return Arrays.stream(readValue(json, PolicyModel[].class))
+          .sorted((Comparator.comparing(x -> x.id)))
+          .collect(Collectors.toList());
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new ResourceAccessException(e);
+    }
+  }
+
+  @Override
+  public List<RoleModel> getRoles(ResourceType roleType) throws ResourceAccessException {
+    try {
+      String json = resourceProvider.get(new URL(getResourcesEndpoint(roleType)), getAccessToken());
+      return Arrays.stream(readValue(json, RoleModel[].class))
+          .sorted((Comparator.comparing(x -> x.id)))
+          .collect(Collectors.toList());
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new ResourceAccessException(e);
+    }
+  }
+
+  @Override
+  public List<SecretModel> getVariables() throws ResourceAccessException {
+    try {
+      String json = resourceProvider.get(new URL(getResourcesEndpoint(ResourceType.variable)), getAccessToken());
+      return Arrays.stream(readValue(json, SecretModel[].class))
+          .sorted((Comparator.comparing(x -> x.id)))
+          .collect(Collectors.toList());
     } catch (IOException e) {
       e.printStackTrace();
       throw new ResourceAccessException(e);

@@ -263,10 +263,10 @@ class ViewControllerImpl implements ViewController {
     switch(viewType) {
       case Hosts:
       case Users:
-        model = new RoleTableModel(getResourceService().getResources(Util.getResourceType(viewType), RoleModel.class));
+        model = new RoleTableModel(getResourceService().getRoles(Util.getResourceType(viewType)));
         break;
       case Policies:
-        model = new PolicyTableModel(getResourceService().getResources(ResourceType.policy, PolicyModel.class));
+        model = new PolicyTableModel(getResourceService().getPolicies());
         break;
       case Secrets:
         model = getSecretsViewModel();
@@ -276,7 +276,7 @@ class ViewControllerImpl implements ViewController {
         break;
       default:
         model = new DefaultResourceTableModel<>(
-            getResourceService().getResources(Util.getResourceType(viewType), ResourceModel.class)
+            getResourceService().getResources(Util.getResourceType(viewType))
         );
     }
 
@@ -321,7 +321,7 @@ class ViewControllerImpl implements ViewController {
   private SecretTableModel getSecretsViewModel() throws ResourceAccessException {
     logger.trace("getSecretsViewModel::enter::");
 
-    List<SecretModel> secretModels = getResourceService().getResources(ResourceType.variable, SecretModel.class);
+    List<SecretModel> secretModels = getResourceService().getVariables();
     SecretTableModel model = new SecretTableModel(secretModels);
     Exception[] errors = new Exception[1];
 

@@ -21,11 +21,13 @@ public interface ResourcesService extends Consts {
 
   String setSecret(SecretModel model, String value) throws ResourceAccessException;
 
-  <T extends ResourceModel> List<T> getResources(ResourceType type,
-                                                 Class<T> clazz)
-      throws ResourceAccessException;
+  List<ResourceModel> getResources(ResourceType type) throws ResourceAccessException;
 
   List<PolicyModel> getPolicies() throws ResourceAccessException;
+
+  List<RoleModel> getRoles(ResourceType roleType) throws ResourceAccessException;
+
+  List<SecretModel> getVariables() throws ResourceAccessException;
 
   String copyPermissions(ResourceModel model, String resourceId) throws ResourceAccessException;
 
