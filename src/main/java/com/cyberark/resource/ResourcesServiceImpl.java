@@ -161,6 +161,14 @@ class ResourcesServiceImpl implements ResourcesService {
 
   @Override
   public List<RoleModel> getRoles(ResourceType roleType) throws ResourceAccessException {
+    if (roleType == null) {
+      throw  new IllegalArgumentException("roleType");
+    }
+
+    if (roleType != ResourceType.user && roleType != ResourceType.host) {
+      throw  new IllegalArgumentException("roleType");
+    }
+
     try {
       String json = resourceProvider.get(new URL(getResourcesEndpoint(roleType)), getAccessToken());
       return Arrays.stream(readValue(json, RoleModel[].class))
