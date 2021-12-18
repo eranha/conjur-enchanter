@@ -19,7 +19,7 @@ public class ApiCallException extends IOException {
         "url=" + url +
         ", responseCode=" + responseCode +
         ", message=" + getMessage() +
-        ", cause=" + getCause().toString() +
+        ", cause=" + ((getCause() != null) ? getCause().toString(): null) +
         '}';
   }
 
