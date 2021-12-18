@@ -6,11 +6,13 @@ import com.cyberark.Util;
 import com.cyberark.components.*;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.ResourceEvent;
+import com.cyberark.exceptions.ApiCallException;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.models.table.StringTableModel;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
+import com.cyberark.views.ErrorView;
 import com.cyberark.views.Icons;
 import com.cyberark.views.ResourceFormView;
 import com.cyberark.wizard.Page;
@@ -61,10 +63,7 @@ public class NewResourceAction extends AbstractAction {
   }
 
   public NewResourceAction(String text, ResourceType type, int mnemonicKey, KeyStroke keyStroke) {
-    super(
-        text
-    );
-
+    super(text);
     this.resourceType = type;
     putValue(SHORT_DESCRIPTION, String.format("Add new '%s' resource", type.toString()));
     putValue(MNEMONIC_KEY, mnemonicKey);
@@ -115,8 +114,12 @@ public class NewResourceAction extends AbstractAction {
       }
     } catch (ResourceAccessException | IOException ex) {
       ex.printStackTrace();
-      JOptionPane.showMessageDialog(getMainForm(), ex.toString(), "Error",
-          JOptionPane.ERROR_MESSAGE);
+
+      if (ex.getCause() instanceof ApiCallException) {
+        ErrorView.showApiCallErrorMessage((ApiCallException) ex.getCause());
+      } else {
+        ErrorView.showErrorMessage(ex.toString());
+      }
     }
   }
 

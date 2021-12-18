@@ -6,10 +6,14 @@ import com.cyberark.controllers.ControllerFactory;
 import com.cyberark.controllers.ViewController;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.ResourceEvent;
+import com.cyberark.exceptions.ApiCallException;
+import com.cyberark.exceptions.ResourceAccessException;
+import com.cyberark.models.Membership;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
+import com.cyberark.views.ErrorView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.swing.*;
@@ -20,6 +24,9 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -66,14 +73,18 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
     return Application.getInstance().getMainForm();
   }
 
-  protected void showErrorDialog(String msg) {
-    JOptionPane.showMessageDialog(getMainForm(), msg, "Error",
-        JOptionPane.ERROR_MESSAGE);
+  protected void showErrorDialog(Exception ex) {
+    showErrorDialog(ex, new HashMap<>());
   }
 
-  protected void showErrorDialog(Exception ex) {
-    JOptionPane.showMessageDialog(getMainForm(), ex.toString(), "Error",
-        JOptionPane.ERROR_MESSAGE);
+  protected void showErrorDialog(Exception ex, Map<Integer, String> errors) {
+    ex.printStackTrace();
+
+    if (ex.getCause() instanceof ApiCallException) {
+      ErrorView.showApiCallErrorMessage((ApiCallException) ex.getCause(), errors);
+    } else {
+      ErrorView.showErrorMessage(ex.toString());
+    }
   }
 
   protected ViewController getViewController() {
@@ -86,6 +97,7 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
 
   protected void promptToCopyApiKeyToClipboard(String response, ResourceIdentifier model) {
     String apiKey;
+
     try {
       apiKey = Util.extractApiKey(
           response,
@@ -145,5 +157,30 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
   @Override
   public boolean isSelectionBased() {
     return Arrays.stream(getClass().getDeclaredAnnotations()).anyMatch(a -> a instanceof SelectionBasedAction);
+  }
+
+  protected List<Membership> getMembers(ResourceIdentifier resourceIdentifier) throws ResourceAccessException {
+    try {
+      return getResourcesService().getMembers(resourceIdentifier);
+    } catch (ResourceAccessException e) {
+      handleRoleError(e);
+    }
+    return null;
+  }
+
+  private void handleRoleError(ResourceAccessException e) throws ResourceAccessException {
+    HashMap<Integer, String> errors = new HashMap<>();
+    errors.put(404, "role");
+    showErrorDialog((ApiCallException) e.getCause(), errors);
+    throw e;
+  }
+
+  protected List<Membership> getMembership(ResourceIdentifier resourceIdentifier) throws ResourceAccessException {
+    try {
+      return getResourcesService().getMembership(resourceIdentifier);
+    } catch (ResourceAccessException e) {
+      handleRoleError(e);
+    }
+    return null;
   }
 }

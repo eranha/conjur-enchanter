@@ -2,14 +2,15 @@ package com.cyberark.actions;
 
 import com.cyberark.Application;
 import com.cyberark.Consts;
-import com.cyberark.Util;
 import com.cyberark.components.ApiKeysView;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.Events;
+import com.cyberark.exceptions.ApiCallException;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.ResourceType;
 import com.cyberark.resource.ResourcesService;
+import com.cyberark.views.ErrorView;
 import com.cyberark.views.MessageView;
 import com.cyberark.views.PolicyFormView;
 import com.cyberark.views.ViewFactory;
@@ -21,7 +22,6 @@ import java.awt.event.KeyEvent;
 import static com.cyberark.Consts.APP_NAME;
 
 public class NewPolicyAction extends NewResourceAction {
-  private final ResourcesService resourcesService;
   private final MessageView messageView;
 
   public NewPolicyAction(ResourcesService resourcesService,
@@ -32,7 +32,6 @@ public class NewPolicyAction extends NewResourceAction {
         KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK)
     );
 
-    this.resourcesService = resourcesService;
     this.messageView = messageView;
   }
 
@@ -78,10 +77,15 @@ public class NewPolicyAction extends NewResourceAction {
       }
     } catch (ResourceAccessException ex) {
       ex.printStackTrace();
-      viewFactory.getMessageView().showMessageDialog(String.format(
-          "Error loading policy: %s", ex.getMessage()
-          ), "Error",
-          JOptionPane.ERROR_MESSAGE);
+
+      if (ex.getCause() instanceof ApiCallException) {
+        ErrorView.showApiCallErrorMessage((ApiCallException) ex.getCause());
+      } else {
+        ErrorView.showErrorMessage(String.format(
+            "Error loading policy: %s",
+            ex.getMessage()
+        ));
+      }
     }
   }
 

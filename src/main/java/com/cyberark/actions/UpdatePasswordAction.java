@@ -6,6 +6,7 @@ import com.cyberark.models.RoleModel;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
@@ -41,7 +42,10 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
         }
       }
     } catch (ResourceAccessException ex) {
-      showErrorDialog(ex.getMessage());
+      HashMap<Integer, String> errors = new HashMap<>();
+      errors.put(422, "error");
+      errors.put(404, "update.password");
+      showErrorDialog(ex, errors);
     }
   }
 

@@ -2,6 +2,7 @@ package com.cyberark.resource;
 
 import com.cyberark.event.ApiCallEvent;
 import com.cyberark.event.EventPublisher;
+import com.cyberark.exceptions.ApiCallException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -88,8 +89,25 @@ public class RestApiResourceProvider implements ResourceApiProvider {
   private String request(URL url, String requestMethod, HashMap<String, String> headers, String body)
       throws IOException {
 
-    HttpURLConnection conn = openConnection(url, requestMethod, headers, body);
-    String response = readResponse(conn);
+    HttpURLConnection conn = null;
+    String response;
+
+    try {
+      conn = openConnection(url, requestMethod, headers, body);
+    } catch (IOException ex) {
+      throw new ApiCallException("Error opening connection to: {}",
+          url,
+          ex,
+          conn.getResponseCode()
+      );
+    }
+
+    try {
+      response = readResponse(conn);
+    } catch (IOException ex) {
+      throw new ApiCallException("Error reading response from: {}", url, ex, conn.getResponseCode());
+    }
+
     fireApiCallEvent(url, requestMethod, headers, body, conn.getResponseCode(), response);
 
     return response;

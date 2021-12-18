@@ -32,18 +32,15 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
     PolicyBuilder policyBuilder = new PolicyBuilder();
     List<Membership> membership = new ArrayList<>();
     List<Membership> members = new ArrayList<>();
+    ResourceType type = resource.getIdentifier().getType();
 
-    try {
-      ResourceType type = resource.getIdentifier().getType();
-
-      if (Util.isRoleResource(type)) {
-        membership = getResourcesService().getMembership(resource.getIdentifier());
-        members = getResourcesService().getMembers(resource.getIdentifier());
+    if (Util.isRoleResource(type)) {
+      try {
+        members = getMembers(resource.getIdentifier());
+        membership = getMembership(resource.getIdentifier());
+      } catch (ResourceAccessException ex) {
+        return;
       }
-    } catch (ResourceAccessException ex) {
-      ex.printStackTrace();
-      showErrorDialog(ex);
-      return;
     }
 
     List<ResourceIdentifier> grantedRoles = membership.stream()
@@ -51,8 +48,6 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
 
     List<ResourceIdentifier> memberRoles = members.stream()
         .map(i -> ResourceIdentifier.fromString(i.getMember())).collect(Collectors.toList());
-
-    ResourceType type = resource.getIdentifier().getType();
 
     if (resource.getIdentifier().getType() == ResourceType.policy) {
       PolicyModel model = (PolicyModel) resource;

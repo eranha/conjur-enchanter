@@ -75,7 +75,7 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
         }
         EventPublisher.getInstance().fireEvent(new ResourceEvent<>(resource));
       } catch (ResourceAccessException ex) {
-        showErrorDialog(ex.getMessage());
+        showErrorDialog(ex);
       }
     }// @Dialog approved
   }
@@ -90,7 +90,7 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
         return getResourcesService().getResourceIdentifiers(Util::isRoleResource);
       }
     } catch (ResourceAccessException e) {
-      showErrorDialog(e.getMessage());
+      showErrorDialog(e);
     }
 
     return new ArrayList<>();

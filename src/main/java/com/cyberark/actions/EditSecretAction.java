@@ -4,15 +4,16 @@ import com.cyberark.Util;
 import com.cyberark.models.SecretModel;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
 public class EditSecretAction extends EditItemAction<SecretModel> {
-  public EditSecretAction(Supplier<SecretModel> selectedRsource) {
-    this(selectedRsource, "Edit");
+  public EditSecretAction(Supplier<SecretModel> selectedResource) {
+    this(selectedResource, "Edit");
   }
-  public EditSecretAction(Supplier<SecretModel> selectedRsource, String text) {
-    super(selectedRsource, text);
+  public EditSecretAction(Supplier<SecretModel> selectedResource, String text) {
+    super(selectedResource, text);
   }
 
   @Override
@@ -24,7 +25,10 @@ public class EditSecretAction extends EditItemAction<SecretModel> {
         getResourcesService().setSecret(secretModel, input);
         fireEvent(secretModel);
       } catch (Exception ex) {
-        showErrorDialog(ex.getMessage());
+        HashMap<Integer, String> errors = new HashMap<>();
+        errors.put(422, "error");
+        errors.put(404, "variable");
+        showErrorDialog(ex, errors);
       }
     }
   }

@@ -1,6 +1,7 @@
 package com.cyberark.views;
 
 import com.cyberark.actions.EditSecretAction;
+import com.cyberark.actions.RotateSecretAction;
 import com.cyberark.models.*;
 import com.cyberark.models.table.ResourceTableModel;
 import com.cyberark.models.table.SecretTableModel;
@@ -23,6 +24,7 @@ public class SecretsView extends ResourceViewImpl<SecretModel> {
   protected List<Action> getMenuActions() {
     List<Action> items = super.getMenuActions();
     items.add(new EditSecretAction(this::getSelectedResource, "Set Secret..."));
+    items.add(new RotateSecretAction(this::getSelectedResource, "Rotate Secret..."));
     return items;
   }
 

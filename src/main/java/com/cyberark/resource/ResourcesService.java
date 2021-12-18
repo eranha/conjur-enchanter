@@ -100,4 +100,6 @@ public interface ResourcesService extends Consts {
    * @throws ResourceAccessException in case of error
    */
   String getApiKey(RoleModel role, char[] password) throws ResourceAccessException;
+
+  void rotateSecret(SecretModel secretModel) throws ResourceAccessException;
 }

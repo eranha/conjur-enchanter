@@ -117,6 +117,25 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
+  public void rotateSecret(SecretModel model) throws ResourceAccessException {
+    validateResourceModel(model);
+    String id = getResourceId(model).getId();
+
+
+    String url = String.format(
+        Endpoints.ROTATE_SECRET,
+        app.getCredentials().url,
+        app.getCredentials().account,
+        id);
+    try {
+      resourceProvider.post(new URL(url), getAccessToken(), null);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new ResourceAccessException(e);
+    }
+  }
+
+  @Override
   public List<ResourceModel> getResources(ResourceType type) throws ResourceAccessException {
     logger.trace("getResources({}) enter", type);
 

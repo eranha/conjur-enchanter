@@ -2,6 +2,7 @@ package com.cyberark.actions;
 
 import com.cyberark.components.ItemsSelector;
 import com.cyberark.dialogs.InputDialog;
+import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.Membership;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
@@ -59,7 +60,14 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
           .collect(Collectors.toMap(ResourceIdentifier::getId, v -> v));
 
       // Get the set role members
-      List<Membership> members = getResourcesService().getMembers(role);
+      List<Membership> members;
+
+      try {
+        members = getResourcesService().getMembers(role);
+      } catch (ResourceAccessException ex) {
+        return;
+      }
+
       List<ResourceIdentifier> grantedRoles = new ArrayList<>();
 
       
@@ -110,7 +118,7 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
       }
     } catch (Exception ex) {
       ex.printStackTrace();
-      showErrorDialog(ex.toString());
+      showErrorDialog(ex);
     }
   }
 }

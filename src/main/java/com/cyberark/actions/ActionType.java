@@ -9,5 +9,6 @@ public enum ActionType {
   ReloadView,
   ViewPolicy,
   UpdatePassword,
-  RotateApiKey
+  RotateApiKey,
+  RotateSecret
 }

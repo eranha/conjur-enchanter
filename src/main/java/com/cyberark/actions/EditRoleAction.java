@@ -2,6 +2,7 @@ package com.cyberark.actions;
 
 import com.cyberark.components.ItemsSelector;
 import com.cyberark.dialogs.InputDialog;
+import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.Membership;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceType;
@@ -40,7 +41,14 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
             : t == ResourceType.layer);
 
       // Get the resourceIdentifier memberships
-      List<Membership> memberships = getResourcesService().getMembership(resourceIdentifier);
+      List<Membership> memberships = null;
+
+      try {
+        memberships = getMembership(resourceIdentifier);
+      } catch (ResourceAccessException ex) {
+        return;
+      }
+
       List<ResourceIdentifier> grantedRoles = new ArrayList<>();
 
       Map<String, ResourceIdentifier> grantedRolesSetsModels = grantingRoles.stream()
@@ -91,7 +99,7 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
       }
     } catch (Exception ex) {
       ex.printStackTrace();
-      showErrorDialog(ex.toString());
+      showErrorDialog(ex);
     }
   }
 }

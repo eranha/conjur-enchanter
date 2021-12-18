@@ -5,6 +5,7 @@ import com.cyberark.models.RoleModel;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
@@ -28,7 +29,9 @@ public class RotateApiKeyAction extends ActionBase<RoleModel> {
         promptToCopyApiKeyToClipboard(apiKey, getSelectedResource().getIdentifier());
       }
     } catch (ResourceAccessException ex) {
-      showErrorDialog(ex.getMessage());
+      HashMap<Integer, String> errors = new HashMap<>();
+      errors.put(401, "rotate.api.key");
+      showErrorDialog(ex, errors);
     }
   }
 }

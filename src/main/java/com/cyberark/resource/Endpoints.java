@@ -8,6 +8,7 @@ public interface Endpoints {
   String RESOURCES_KIND_COUNT = "%s/resources/%s?kind=%s&count=true";
   String RESOURCES = "%s/resources/%s";
   String SECRET = "%s/secrets/%s/variable/%s";
+  String ROTATE_SECRET = "%s/secrets/%s/variable/%s?expirations";
   String POLICY = "%s/policies/%s/policy/%s";
   String MEMBERSHIPS = "%s/roles/%s/%s/%s?memberships";
   String MEMBERS = "%s/roles/%s/%s/%s?members";

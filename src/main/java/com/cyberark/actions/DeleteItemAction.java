@@ -33,7 +33,7 @@ public class DeleteItemAction<T extends ResourceModel> extends ActionBase<T> {
         getResourcesService().delete(resource);
         fireEvent(resource);
       } catch (ResourceAccessException ex) {
-        showErrorDialog(ex.getMessage());
+        showErrorDialog(ex);
       }
     }
   }
