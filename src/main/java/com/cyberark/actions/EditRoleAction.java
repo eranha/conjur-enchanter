@@ -46,7 +46,7 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
       try {
         memberships = getMembership(resourceIdentifier);
       } catch (ResourceAccessException ex) {
-        return;
+        return; // called method in super class displays the error
       }
 
       List<ResourceIdentifier> grantedRoles = new ArrayList<>();
@@ -98,7 +98,6 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
         }
       }
     } catch (Exception ex) {
-      ex.printStackTrace();
       showErrorDialog(ex);
     }
   }

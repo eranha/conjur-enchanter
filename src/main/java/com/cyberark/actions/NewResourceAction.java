@@ -6,7 +6,6 @@ import com.cyberark.Util;
 import com.cyberark.components.*;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.ResourceEvent;
-import com.cyberark.exceptions.ApiCallException;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.models.table.StringTableModel;
@@ -114,12 +113,7 @@ public class NewResourceAction extends AbstractAction {
       }
     } catch (ResourceAccessException | IOException ex) {
       ex.printStackTrace();
-
-      if (ex.getCause() instanceof ApiCallException) {
-        ErrorView.showApiCallErrorMessage((ApiCallException) ex.getCause());
-      } else {
-        ErrorView.showErrorMessage(ex.toString());
-      }
+      ErrorView.showErrorMessage(ex);
     }
   }
 

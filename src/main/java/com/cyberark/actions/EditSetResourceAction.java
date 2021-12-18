@@ -63,9 +63,9 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
       List<Membership> members;
 
       try {
-        members = getResourcesService().getMembers(role);
+        members = getMembers(role);
       } catch (ResourceAccessException ex) {
-        return;
+        return; // called method in super class display the error message
       }
 
       List<ResourceIdentifier> grantedRoles = new ArrayList<>();
@@ -117,7 +117,6 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
         }
       }
     } catch (Exception ex) {
-      ex.printStackTrace();
       showErrorDialog(ex);
     }
   }

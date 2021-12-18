@@ -48,6 +48,15 @@ public class ErrorView {
     }
   }
 
+  public static void showErrorMessage(Exception ex) {
+    if (ex.getCause() instanceof ApiCallException) {
+      ApiCallException cause = (ApiCallException) ex.getCause();
+      showApiCallErrorMessage(cause);
+    } else {
+      showErrorMessage(ex.getMessage());
+    }
+  }
+
   public static void showErrorMessage(String msg) {
     ViewFactory viewFactory = ViewFactory.getInstance();
 

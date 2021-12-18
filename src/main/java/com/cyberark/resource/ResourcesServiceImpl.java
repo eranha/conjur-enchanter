@@ -461,11 +461,6 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
-  public String addRole(ResourceType type, RoleModel model) throws ResourceAccessException {
-    return addRole(type, model, new ArrayList<>());
-  }
-
-  @Override
   public String addRole(ResourceType type,
                         RoleModel model,
                         List<ResourceIdentifier> grantedSetRoles)
@@ -560,11 +555,6 @@ class ResourcesServiceImpl implements ResourcesService {
 
     loadPolicy(policyBuilder.toPolicy(), ROOT_POLICY);
     logger.trace("exit::permit(privileges={}, resource={})", privileges, resource);
-  }
-
-  @Override
-  public List<ResourceIdentifier> getResourceIdentifiers(ResourceType resourceType) throws ResourceAccessException {
-    return getResourceIdentifiers(t -> true);
   }
 
   @Override

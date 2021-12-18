@@ -3,25 +3,20 @@ package com.cyberark.actions;
 import com.cyberark.Application;
 import com.cyberark.components.DefaultDocumentListener;
 import com.cyberark.components.ResourceTree;
-import com.cyberark.controllers.ControllerFactory;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.resource.ResourceServiceFactory;
+import com.cyberark.views.ErrorView;
 import com.cyberark.views.Icons;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.TableRowSorter;
 import javax.swing.text.BadLocationException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -45,14 +40,16 @@ public class ShowResourceTreeAction extends AbstractAction {
           .getResourcesService()
           .getPolicyResources();
       tree[0] = new ResourceTree(resources);
-    } catch (ResourceAccessException resourceAccessException) {
-      resourceAccessException.printStackTrace();
+    } catch (ResourceAccessException ex) {
+      ex.printStackTrace();
+      ErrorView.showErrorMessage(ex);
+      return;
     }
 
     JPanel panel = new JPanel(new BorderLayout());
     JScrollPane scrollPane = new JScrollPane(tree[0]);
-    //scrollPane.setPreferredSize(new Dimension(320, 240));
     JTextField search = new JTextField();
+
     search.getDocument().addDocumentListener(new DefaultDocumentListener(event -> {
       DefaultMutableTreeNode node = null;
       System.out.println(event);

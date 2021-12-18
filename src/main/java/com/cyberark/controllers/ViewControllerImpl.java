@@ -155,9 +155,9 @@ class ViewControllerImpl implements ViewController {
       logger.debug("setViewModel model: {}", model);
       view.setModel(model);
     } catch (Exception e) {
-      showErrorDialog(e.toString());
       logger.error(e);
       e.printStackTrace();
+      ErrorView.showErrorMessage(e);
     }
 
     logger.trace("getView exit:: return {}", views.get(viewType));
@@ -365,10 +365,10 @@ class ViewControllerImpl implements ViewController {
       try {
         getMainForm().clearSearchText();
         getMainForm().getComponentView().setModel(getViewModel(view));
-      } catch (Exception exception) {
-        exception.printStackTrace();
-        JOptionPane.showMessageDialog(getMainForm(), exception.getMessage(), "Error",
-            JOptionPane.ERROR_MESSAGE);
+      } catch (Exception e) {
+        e.printStackTrace();
+        logger.error(e);
+        ErrorView.showErrorMessage(e);
       }
     }
   }

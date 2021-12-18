@@ -49,8 +49,6 @@ public interface ResourcesService extends Consts {
 
   String revoke(List<ResourceIdentifier> members, ResourceIdentifier role) throws ResourceAccessException;
 
-  String addRole(ResourceType type, RoleModel model) throws ResourceAccessException;
-
   String addRole(ResourceType type, RoleModel model, List<ResourceIdentifier> grantedSetRoles)
       throws ResourceAccessException;
 
@@ -74,8 +72,6 @@ public interface ResourcesService extends Consts {
   // Give privileges to all the roles in the map to the resource
   void permit(Map<ResourceIdentifier, Set<String>> privilegesMap, ResourceModel resource)
       throws ResourceAccessException;
-
-  List<ResourceIdentifier> getResourceIdentifiers(ResourceType resourceType) throws ResourceAccessException;
 
   Map<ResourceIdentifier, List<ResourceIdentifier>> getPolicyResources() throws ResourceAccessException;
 
@@ -101,5 +97,11 @@ public interface ResourcesService extends Consts {
    */
   String getApiKey(RoleModel role, char[] password) throws ResourceAccessException;
 
+  /**
+   * Immediately expires the secret value and rotates the existing secret value of the secret
+   * corresponding to the secretMOdel argument.
+   * @param secretModel The secret to rotate
+   * @throws ResourceAccessException If the operation fails
+   */
   void rotateSecret(SecretModel secretModel) throws ResourceAccessException;
 }

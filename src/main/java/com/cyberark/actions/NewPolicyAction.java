@@ -81,10 +81,12 @@ public class NewPolicyAction extends NewResourceAction {
       if (ex.getCause() instanceof ApiCallException) {
         ErrorView.showApiCallErrorMessage((ApiCallException) ex.getCause());
       } else {
-        ErrorView.showErrorMessage(String.format(
-            "Error loading policy: %s",
-            ex.getMessage()
-        ));
+        ErrorView.showErrorMessage(
+            String.format(
+              "Error loading policy: %s",
+              ex.getMessage()
+          )
+        );
       }
     }
   }

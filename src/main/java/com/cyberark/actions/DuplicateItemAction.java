@@ -51,7 +51,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
             ? getMembers(resourceIdentifier)
             : new ArrayList<>();
       } catch (ResourceAccessException ex) {
-        return;
+        return; // called method in super class displays the error
       }
 
       // TODO switch to policy builder
@@ -75,7 +75,6 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
       showPolicyForm(policyDisplayPane);
     } catch (ResourceAccessException | JsonProcessingException ex) {
       showErrorDialog(ex);
-      ex.printStackTrace();
     }
   }
 
@@ -106,10 +105,18 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
       String policyBranch = policyDisplayPane.getBranch();
 
       if (policyText != null && policyText.trim().length() > 0) {
-        String response = getResourcesService().loadPolicy(policyText, policyBranch == null ? "root" : policyBranch);
+        String response = getResourcesService().loadPolicy(
+            policyText,
+            policyBranch == null
+                ? "root"
+                : policyBranch
+        );
 
         if (policyDisplayPane.isCopyPermissions()) {
-          getResourcesService().copyPermissions(getSelectedResource(), policyDisplayPane.getResourceId());
+          getResourcesService().copyPermissions(
+              getSelectedResource(),
+              policyDisplayPane.getResourceId()
+          );
         }
 
         if (getSelectedResource() instanceof RoleModel) {

@@ -39,7 +39,7 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
         members = getMembers(resource.getIdentifier());
         membership = getMembership(resource.getIdentifier());
       } catch (ResourceAccessException ex) {
-        return;
+        return; // called method in super class displays the error
       }
     }
 
