@@ -14,5 +14,5 @@ public interface ResourceView extends View {
   Action getAction(ActionType type);
   void toggleSelectionBasedActions(boolean enabled);
   void setSelectionListener(Consumer<DataModel> consumer);
-  void setTableRowDoubleClickedEventListener(Consumer<DataModel> consumer);
+  void setTableRowDoubleClickedEventListener(Consumer<ResourceView> consumer);
 }

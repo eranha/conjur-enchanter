@@ -37,7 +37,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   private final JTable permissionsTable = new DataTable();
   private final JTable annotationsTable = new DataTable();
   private Consumer<DataModel> selectionListener;
-  private Consumer<DataModel> resourceDoubleClickedListener;
+  private Consumer<ResourceView> resourceDoubleClickedListener;
   private final ActionMap menuItemActions = new ActionMap();
   private final static ActionType[] DEFAULT_MENU_ITEMS_ORDER = new ActionType[] {
       ActionType.NewItem,
@@ -248,7 +248,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
    */
   protected void mouseDoubleClickOnResource() {
     if (resourceDoubleClickedListener != null) {
-      resourceDoubleClickedListener.accept(getSelectedResource());
+      resourceDoubleClickedListener.accept(this);
     }
   }
 
@@ -342,7 +342,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   @Override
-  public void setTableRowDoubleClickedEventListener(Consumer<DataModel> consumer) {
+  public void setTableRowDoubleClickedEventListener(Consumer<ResourceView> consumer) {
     this.resourceDoubleClickedListener = consumer;
   }
 

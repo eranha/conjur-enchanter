@@ -2,18 +2,16 @@ package com.cyberark.controllers;
 
 import com.cyberark.Application;
 import com.cyberark.Util;
-import com.cyberark.actions.ActionType;
 import com.cyberark.actions.ViewNavigationAction;
 import com.cyberark.components.ApiCallLogView;
 import com.cyberark.components.MainForm;
 import com.cyberark.event.*;
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.*;
+import com.cyberark.models.DashboardViewModel;
+import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.ResourceModel;
+import com.cyberark.models.ResourceType;
 import com.cyberark.models.audit.AuditEvent;
-import com.cyberark.models.table.DefaultResourceTableModel;
-import com.cyberark.models.table.PolicyTableModel;
-import com.cyberark.models.table.RoleTableModel;
-import com.cyberark.models.table.SecretTableModel;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
 import com.cyberark.views.*;
@@ -23,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +31,9 @@ import static com.cyberark.Util.getViewType;
 
 class ViewControllerImpl implements ViewController {
   private static final Logger logger = LogManager.getLogger(ViewControllerImpl.class);
-  private final Map<ViewType, View> views = new HashMap<>();
   private ViewType currentViewType;
+  private final ResourceViewController resourceViewController = new ResourceViewControllerImpl();
+  DashboardView dashboardView;
 
   ViewControllerImpl() {
     EventPublisher.getInstance().addListener(this::onResourceEvent);
@@ -145,19 +143,18 @@ class ViewControllerImpl implements ViewController {
 
     try {
       logger.debug("computeIfAbsent viewType: {}", viewType);
-      views.computeIfAbsent(viewType, this::createView);
-
-      view = views.get(viewType);
-
-      logger.debug("set view model");
-      setViewModel(viewType);
+      if (viewType == ViewType.Dashboard) {
+        view = getDashboardView();
+      } else {
+        view = getResourceView(viewType);
+      }
     } catch (Exception e) {
       logger.error(e);
       e.printStackTrace();
       ErrorView.showErrorMessage(e);
     }
 
-    logger.trace("getView exit:: return {}", views.get(viewType));
+    logger.trace("getView exit");
     return view;
   }
 
@@ -165,35 +162,20 @@ class ViewControllerImpl implements ViewController {
     return ResourceServiceFactory.getInstance().getResourcesService();
   }
 
-  private View createView(ViewType type) {
-    View view = null;
-    ResourceView resourceView = null;
-
-    switch (type) {
-      case Dashboard:
-        view = new DashboardView(this::actionPerformed);
-        break;
-      case Policies:
-        resourceView = new PoliciesView();
-        break;
-      case Secrets:
-        resourceView = new SecretsView();
-        break;
-      case Users:
-      case Hosts:
-        resourceView = new RolesView(type);
-        break;
-      default:
-        resourceView = new CommonResourceView(type);
-        break;
+  private View getDashboardView() throws ResourceAccessException {
+    if (dashboardView == null) {
+      dashboardView = new DashboardView(this::actionPerformed);
     }
+    dashboardView.setModel(
+        new DashboardViewModel(getAuditEvents(), getResourceCountMap())
+    );
+    return dashboardView;
+  }
 
-    if (type != ViewType.Dashboard) { // no operation on dashboard
-      resourceView.setSelectionListener(r -> toggleSelectionBasedAction(r != null));
-      resourceView.setTableRowDoubleClickedEventListener(this::fireEditActionPerformed);
-    }
-
-    return (type == ViewType.Dashboard ? view : resourceView);
+  private View getResourceView(ViewType type) throws ResourceAccessException {
+    ResourceView view = resourceViewController.getResourceView(type);
+    resourceViewController.setResourceViewModel(view.getType());
+    return view;
   }
 
   @Override
@@ -228,85 +210,26 @@ class ViewControllerImpl implements ViewController {
   }
 
   private View getCurrentView() {
-    return views.get(currentViewType);
-  }
 
-  private void fireEditActionPerformed(DataModel model) {
-    View view = views.get(getCurrentViewType());
-    if (view instanceof ResourceView) {
-      fireActionPerformed((ResourceView) view);
-    }
-  }
-
-  private void fireActionPerformed(ResourceView view) {
-    Action action = view.getAction(ActionType.EditItem);
-
-    if (action != null) {
-      action.actionPerformed(
-          new ActionEvent(this, ActionEvent.ACTION_FIRST,
-              ActionType.EditItem.toString()));
-    }
-  }
-
-  private void toggleSelectionBasedAction(boolean enabled) {
-    ((ResourceView) views.get(getCurrentViewType())).toggleSelectionBasedActions(enabled);
+    return currentViewType == ViewType.Dashboard
+        ? dashboardView
+        : resourceViewController.getResourceView(currentViewType);
   }
 
   private void setViewModel(ViewType viewType) throws Exception {
     logger.trace("setViewModel enter:: {}", viewType);
 
-    DefaultResourceTableModel<? extends ResourceModel> model;
-
-    switch (viewType) {
-      case Dashboard:
-        views.get(viewType).setModel(
-            new DashboardViewModel(getAuditEvents(), getResourceCountMap())
-        );
-        break;
-      case Policies:
-        getPoliciesView().setResourceTableModel(
-            new PolicyTableModel(getResourceService().getPolicies())
-        );
-        break;
-      case Hosts:
-      case Users:
-        getRolesView(viewType).setResourceTableModel(
-          new RoleTableModel(
-            getResourceService().getRoles(Util.getResourceType(viewType))
-          )
-        );
-        break;
-      case Secrets:
-        getSecretsView().setResourceTableModel(
-          getSecretsViewModel()
-        );
-        break;
-      default:
-        getResourceView(viewType).setResourceTableModel(
-          new DefaultResourceTableModel<>(
-            getResourceService().getResources(Util.getResourceType(viewType))
-          )
-        );
+    if (viewType == ViewType.Dashboard) {
+      dashboardView.setModel(
+          new DashboardViewModel(getAuditEvents(), getResourceCountMap())
+      );
+    } else {
+      resourceViewController.setResourceViewModel(
+        viewType
+      );
     }
 
     logger.trace("setViewModel exit::");
-
-  }
-
-  private CommonResourceView getResourceView(ViewType viewType) {
-    return (CommonResourceView) views.get(viewType);
-  }
-
-  private PoliciesView getPoliciesView() {
-    return (PoliciesView) views.get(ViewType.Policies);
-  }
-
-  private RolesView getRolesView(ViewType viewType) {
-    return (RolesView) views.get(viewType);
-  }
-
-  private SecretsView getSecretsView() {
-    return (SecretsView) views.get(ViewType.Secrets);
   }
 
   private List<AuditEvent> getAuditEvents() throws ResourceAccessException {
@@ -336,43 +259,6 @@ class ViewControllerImpl implements ViewController {
 
   private Integer getResourceCount(ResourceType type) throws ResourceAccessException {
     return getResourceService().getResourcesCount(type);
-  }
-
-  /**
-   * Creates a secrets model and populates it with the latest secret version value
-   *
-   * @return ResourceTableModel
-   * @throws ResourceAccessException In case of an error retrieving the secret
-   */
-  private SecretTableModel getSecretsViewModel() throws ResourceAccessException {
-    logger.trace("getSecretsViewModel::enter::");
-
-    List<SecretModel> secretModels = getResourceService().getVariables();
-    SecretTableModel model = new SecretTableModel(secretModels);
-    Exception[] errors = new Exception[1];
-
-    // Populate the model with latest secret version
-    secretModels.forEach(i -> {
-      try {
-        if (i.getSecrets().length > 0) {
-          i.setSecret(getResourceService().getSecret(i).toCharArray());
-        }
-      } catch (ResourceAccessException e) {
-        if (e.getCause() instanceof FileNotFoundException) {
-          logger.warn("Secret with id: {}}, has no value\nError: {}}", i.getId(), e.getCause());
-        } else {
-          errors[0] = e;
-          logger.error(e);
-        }
-      }
-    });
-
-    if (errors[0] != null) {
-      throw new ResourceAccessException(errors[0]);
-    }
-
-    logger.trace("getSecretsViewModel::exit:: return: {}", model);
-    return model;
   }
 
   @Override
@@ -409,7 +295,7 @@ class ViewControllerImpl implements ViewController {
 
     logger.debug("Set currentViewType: {}", viewType);
     currentViewType = viewType;
-
+    resourceViewController.setViewType(currentViewType);
     logger.debug("Set main form view to: {}", viewType);
     getMainForm().setView(getView(currentViewType));
 
@@ -423,7 +309,8 @@ class ViewControllerImpl implements ViewController {
 
   @Override
   public void clearAllViews() {
-    views.values().forEach(View::clearData);
+    dashboardView.clearData();
+    resourceViewController.clearData();
   }
 
   private MainForm getMainForm() {
