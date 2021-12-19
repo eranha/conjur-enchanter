@@ -6,11 +6,8 @@ import com.cyberark.views.ViewType;
 
 public interface ResourceViewController {
   ResourceView getResourceView(ViewType viewType);
-
   void setResourceViewModel(ViewType view) throws ResourceAccessException;
-
   void setViewType(ViewType viewType);
-
   void clearData();
 }
 
