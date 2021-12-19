@@ -1,7 +1,7 @@
 package com.cyberark.actions;
 
 import com.cyberark.Consts;
-import com.cyberark.PolicyTranslator;
+import com.cyberark.PolicyBuilder;
 import com.cyberark.Util;
 import com.cyberark.components.PolicyDisplayPane;
 import com.cyberark.dialogs.InputDialog;
@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.cyberark.components.PolicyDisplayPane.RESOURCE_ID;
 
@@ -57,13 +58,10 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
       final List<Membership> memberships = membershipsList.get(0);
       final List<Membership> members = membershipsList.get(1);
 
-      // TODO switch to policy builder
-      StringBuilder policy = PolicyTranslator.toPolicy(resource, type, id, members, memberships);
-
       policyDisplayPane = new PolicyDisplayPane(
           id,
           getResourcesService().getPolicies(),
-          policy.toString());
+          getPolicyText(resource, id, members, memberships));
 
       policyDisplayPane.setPropertyChangeListener(
           evt -> rebuildPolicy(
@@ -85,15 +83,61 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
                              List<Membership> memberships, List<Membership> members) {
     if (RESOURCE_ID.equals(propertyName)
         && Util.stringIsNotNullOrEmpty(newResourceName)) {
-      // TODO switch to policy builder
-      StringBuilder updatedPolicy = PolicyTranslator.toPolicy(
+      policyDisplayPane.setPolicyText(
+        getPolicyText(
           getSelectedResource(),
-          type,
           newResourceName.toString(),
           members,
-          memberships);
-      policyDisplayPane.setPolicyText(updatedPolicy.toString());
+          memberships
+        )
+      );
     }
+  }
+
+  private String getPolicyText(ResourceModel resource,
+                               String id,
+                               List<Membership> members,
+                               List<Membership> memberships) {
+    PolicyBuilder pb = new PolicyBuilder();
+    ResourceIdentifier resourceIdentifier = resource.getIdentifier();
+    ResourceIdentifier copy = ResourceIdentifier.fromString(
+        resourceIdentifier.getAccount(),
+        resourceIdentifier.getType(),
+        id
+    );
+
+    ResourceIdentifier owner = resource.getOwner() != null
+        ? ResourceIdentifier.fromString(resource.getOwner()):
+        null;
+
+    if (owner != null && "admin".compareTo(owner.getId()) != 0) {
+      pb.resource(copy, owner);
+    } else {
+      pb.resource(copy);
+    }
+
+    if (members.size() > 1) { // admin is always a member
+      pb.grants(
+          resourceIdentifier,
+          members
+              .stream()
+              .map(i -> ResourceIdentifier.fromString(i.getMember()))
+              .filter(i -> "admin".compareTo(i.getId()) != 0)
+              .collect(Collectors.toList())
+      );
+    }
+
+    if (memberships.size() > 0) {
+      pb.grants(
+          memberships
+              .stream()
+              .map(i -> ResourceIdentifier.fromString(i.getRole()))
+              .collect(Collectors.toList()),
+          copy
+      );
+    }
+
+    return pb.toPolicy();
   }
 
   private void showPolicyForm(PolicyDisplayPane policyDisplayPane) throws ResourceAccessException,

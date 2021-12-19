@@ -394,8 +394,7 @@ class ViewControllerImpl implements ViewController {
     }
   }
 
-  @Override
-  public ViewType getCurrentViewType() {
+  private ViewType getCurrentViewType() {
     Objects.requireNonNull(currentViewType);
     return currentViewType;
   }
