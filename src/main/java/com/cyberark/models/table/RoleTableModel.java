@@ -36,7 +36,7 @@ public class RoleTableModel extends DefaultResourceTableModel<RoleModel> {
     RoleModel model = roleModels.get(rowIndex);
 
     if (columnIndex == 4) {
-      return model.restricted_to.length > 0 ? Arrays.toString(model.restricted_to) : null;
+      return model.getRestrictedTo().length > 0 ? Arrays.toString(model.getRestrictedTo()) : null;
     }
     return super.getValueAt(rowIndex, columnIndex);
   }

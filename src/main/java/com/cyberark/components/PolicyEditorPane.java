@@ -377,7 +377,7 @@ public class PolicyEditorPane extends JPanel {
     policyBranchTree = new PoliciesTree(
         policyModels
             .stream()
-            .map(i -> ResourceIdentifier.fromString(i.id))
+            .map(i -> ResourceIdentifier.fromString(i.getId()))
             .collect(Collectors.toList()));
     policyBranchTree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
     policyBranchTree.getSelectionModel().addTreeSelectionListener(e -> setPolicyBranch(

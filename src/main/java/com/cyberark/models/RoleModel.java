@@ -7,21 +7,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Represent a user or a host in the system.
  */
 public class RoleModel extends ResourceModel {
-  public String[] restricted_to;
+  private String[] restrictedTo;
 
 
   public RoleModel() {
   }
 
   @JsonCreator
-  public RoleModel(@JsonProperty("created_at") String created_at,
+  public RoleModel(@JsonProperty("created_at") String createdAt,
                    @JsonProperty("id") String id,
                    @JsonProperty("owner") String owner,
                    @JsonProperty("policy") String policy,
                    @JsonProperty("permissions") Permission[] permissions,
                    @JsonProperty("annotations") Annotation[] annotations,
-                   @JsonProperty("restricted_to") String[] restricted_to) {
-    super(created_at, id, owner, policy, permissions, annotations);
-    this.restricted_to = restricted_to;
+                   @JsonProperty("restricted_to") String[] restrictedTo) {
+    super(createdAt, id, owner, policy, permissions, annotations);
+    this.restrictedTo = restrictedTo;
+  }
+
+  public String[] getRestrictedTo() {
+    return restrictedTo;
+  }
+
+  public void setRestrictedTo(String[] restrictedTo) {
+    this.restrictedTo = restrictedTo;
   }
 }

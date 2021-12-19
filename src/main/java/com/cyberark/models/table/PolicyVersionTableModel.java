@@ -42,27 +42,27 @@ public class PolicyVersionTableModel extends AbstractTableModel {
 
     switch (columnIndex) {
       case 0:
-        return model.id;
+        return model.getId();
       case 1:
-        return model.version;
+        return model.getVersion();
       case 2:
-        return model.role;
+        return model.getRole();
       case 3:
-        return model.created_at;
+        return model.getCreatedAt();
       case 4:
-        return model.policy_text;
+        return model.getPolicyText();
       case 5:
-        return model.policy_sha256;
+        return model.getPolicySha256();
       case 6:
-        return model.finished_at;
+        return model.getFinishedAt();
       case 7:
-        return model.client_ip;
+        return model.getClientIp();
     }
 
     return null;
   }
 
   public String getPolicyVersion(int rowIndex) {
-    return policyVersions[rowIndex].policy_text;
+    return policyVersions[rowIndex].getPolicyText();
   }
 }

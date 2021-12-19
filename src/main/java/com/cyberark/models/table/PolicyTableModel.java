@@ -13,8 +13,8 @@ public class PolicyTableModel extends DefaultResourceTableModel<PolicyModel> {
   }
 
   public PolicyVersion[] getPolicyVersion(int rowIndex) {
-    Stream<PolicyVersion> sorted = Arrays.stream(getModel().get(rowIndex).policy_versions)
-        .sorted((x, y) -> Integer.compare(y.version, x.version));
+    Stream<PolicyVersion> sorted = Arrays.stream(getModel().get(rowIndex).getPolicyVersions())
+        .sorted((x, y) -> Integer.compare(y.getVersion(), x.getVersion()));
     return sorted.toArray(PolicyVersion[]::new);
   }
 }

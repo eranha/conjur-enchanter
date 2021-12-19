@@ -49,14 +49,14 @@ class ResourcesServiceImpl implements ResourcesService {
 
     validateResourceModel(model);
 
-    if (Util.isNullOrEmptyString(model.policy)) {
+    if (Util.isNullOrEmptyString(model.getPolicy())) {
       throw new IllegalArgumentException("Resource policy is missing");
     }
 
     PolicyBuilder policyBuilder = new PolicyBuilder();
 
     policyBuilder.delete(model.getIdentifier());
-    String policy = ResourceIdentifier.fromString(model.policy).getId();
+    String policy = ResourceIdentifier.fromString(model.getPolicy()).getId();
 
     patchPolicy(policyBuilder.toPolicy(), policy);
   }
@@ -150,7 +150,7 @@ class ResourcesServiceImpl implements ResourcesService {
 
       // sort by id
       resources = Arrays.stream(readValue(data, ResourceModel[].class))
-          .sorted((Comparator.comparing(x -> x.id)))
+          .sorted((Comparator.comparing(ResourceModel::getId)))
           .collect(Collectors.toList());
     } catch (IOException e) {
       e.printStackTrace();
@@ -170,7 +170,7 @@ class ResourcesServiceImpl implements ResourcesService {
     try {
       String json = resourceProvider.get(new URL(getResourcesEndpoint(ResourceType.policy)), getAccessToken());
       return Arrays.stream(readValue(json, PolicyModel[].class))
-          .sorted((Comparator.comparing(x -> x.id)))
+          .sorted((Comparator.comparing(ResourceModel::getId)))
           .collect(Collectors.toList());
     } catch (IOException e) {
       e.printStackTrace();
@@ -191,7 +191,7 @@ class ResourcesServiceImpl implements ResourcesService {
     try {
       String json = resourceProvider.get(new URL(getResourcesEndpoint(roleType)), getAccessToken());
       return Arrays.stream(readValue(json, RoleModel[].class))
-          .sorted((Comparator.comparing(x -> x.id)))
+          .sorted((Comparator.comparing(ResourceModel::getId)))
           .collect(Collectors.toList());
     } catch (IOException e) {
       e.printStackTrace();
@@ -204,7 +204,7 @@ class ResourcesServiceImpl implements ResourcesService {
     try {
       String json = resourceProvider.get(new URL(getResourcesEndpoint(ResourceType.variable)), getAccessToken());
       return Arrays.stream(readValue(json, SecretModel[].class))
-          .sorted((Comparator.comparing(x -> x.id)))
+          .sorted((Comparator.comparing(ResourceModel::getId)))
           .collect(Collectors.toList());
     } catch (IOException e) {
       e.printStackTrace();
@@ -226,7 +226,7 @@ class ResourcesServiceImpl implements ResourcesService {
         ResourceIdentifier.fromString(
           String.format("%s:%s:%s", app.getCredentials().account, model.getIdentifier().getType(), resourceId)
         ),
-        model.permissions
+        model.getPermissions()
     );
 
     return patchPolicy(policyBuilder.toPolicy(), ROOT_POLICY);
@@ -475,9 +475,9 @@ class ResourcesServiceImpl implements ResourcesService {
     PolicyBuilder policyBuilder = new PolicyBuilder();
     policyBuilder
         .resource(model.getIdentifier())
-        .restrictions(model.restricted_to);
+        .restrictions(model.getRestrictedTo());
 
-    String response = loadPolicy(policyBuilder.toPolicy(), model.policy);
+    String response = loadPolicy(policyBuilder.toPolicy(), model.getPolicy());
 
     // Create grants in root policy
     if (!grantedSetRoles.isEmpty()) {
@@ -507,7 +507,7 @@ class ResourcesServiceImpl implements ResourcesService {
 
     StringBuilder policy = buildPolicyString(type, model, members);
     logger.debug("Policy:\n{}", policy);
-    String response = loadPolicy(policy.toString(), model.policy != null ? model.policy : ROOT_POLICY);
+    String response = loadPolicy(policy.toString(), model.getPolicy() != null ? model.getPolicy() : ROOT_POLICY);
     logger.trace("exit::addResource:: response: {}", response);
     return response;
   }
@@ -523,9 +523,9 @@ class ResourcesServiceImpl implements ResourcesService {
         (role, privileges) -> policyBuilder.deny(role, resource.getIdentifier(), privileges)
     );
 
-    patchPolicy(policyBuilder.toPolicy(), resource.policy == null
+    patchPolicy(policyBuilder.toPolicy(), resource.getPolicy() == null
         ? ROOT_POLICY
-        : ResourceIdentifier.fromString(resource.policy).getId());
+        : ResourceIdentifier.fromString(resource.getPolicy()).getId());
     logger.trace("exit::deny(resource={}, roleToPrivileges={})", resource, roleToPrivileges);
   }
 
@@ -706,7 +706,7 @@ class ResourcesServiceImpl implements ResourcesService {
 
 
   private ResourceIdentifier getResourceId(ResourceModel model) {
-    ResourceIdentifier id = ResourceIdentifier.fromString(model.id);
+    ResourceIdentifier id = ResourceIdentifier.fromString(model.getId());
 
     if (Util.isNullOrEmptyString(id.getId())) {
       throw new IllegalArgumentException("Resource id is missing");
@@ -719,7 +719,7 @@ class ResourcesServiceImpl implements ResourcesService {
       throw new IllegalArgumentException("model");
     }
 
-    if (Util.isNullOrEmptyString(model.id)) {
+    if (Util.isNullOrEmptyString(model.getId())) {
       throw new IllegalArgumentException("Resource id is missing");
     }
   }
@@ -759,16 +759,16 @@ class ResourcesServiceImpl implements ResourcesService {
     policy.append(String.format("- !%s\n", type));
     policy.append(String.format("  id: %s\n", model.getIdentifier().getId()));
 
-    if (model.owner != null) {
-      ResourceIdentifier owner = ResourceIdentifier.fromString(model.owner);
+    if (model.getOwner() != null) {
+      ResourceIdentifier owner = ResourceIdentifier.fromString(model.getOwner());
       policy.append(String.format("  owner: !%s %s\n", owner.getType(), owner.getId()));
     }
 
-    if (model.annotations.length > 0) {
+    if (model.getAnnotations().length > 0) {
       policy.append("  annotations:\n");
 
-      for (Annotation annotation : model.annotations) {
-        policy.append(String.format("    %s: \"%s\"\n", annotation.name, annotation.value));
+      for (Annotation annotation : model.getAnnotations()) {
+        policy.append(String.format("    %s: \"%s\"\n", annotation.getName(), annotation.getValue()));
       }
     }
 

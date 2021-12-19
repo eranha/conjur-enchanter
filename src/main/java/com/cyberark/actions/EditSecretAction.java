@@ -19,7 +19,7 @@ public class EditSecretAction extends EditItemAction<SecretModel> {
   @Override
   public void actionPerformed(SecretModel secretModel) {
     String input = JOptionPane.showInputDialog(getMainForm(),
-        "Update secret value?", secretModel.secret);
+        "Update secret value?", secretModel.getSecret());
     if(Util.stringIsNotNullOrEmpty(input)) {
       try {
         getResourcesService().setSecret(secretModel, input);

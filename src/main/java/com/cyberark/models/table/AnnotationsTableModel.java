@@ -40,13 +40,13 @@ public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation
 
     switch (col) {
       case 0:
-        annotation.name = value.toString();
+        annotation.setName(value.toString());
         break;
       case 1:
-        annotation.value = value.toString();
+        annotation.setValue(value.toString());
         break;
       case 2:
-        annotation.policy = value.toString();
+        annotation.setPolicy(value.toString());
         break;
     }
 
@@ -69,11 +69,11 @@ public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation
   public Object getValueAt(int rowIndex, int columnIndex) {
     switch (columnIndex) {
       case 0:
-        return annotations.get(rowIndex).name;
+        return annotations.get(rowIndex).getName();
       case 1:
-        return annotations.get(rowIndex).value;
+        return annotations.get(rowIndex).getValue();
       case 2:
-        return annotations.get(rowIndex).policy;
+        return annotations.get(rowIndex).getPolicy();
     }
     return null;
   }

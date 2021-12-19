@@ -37,8 +37,8 @@ public class PrivilegesPanel extends JPanel {
     this.resourceType = resourceType;
 
     Arrays.stream(permissions).forEach(p -> {
-      resourcePrivileges.computeIfAbsent(ResourceIdentifier.fromString(p.role), v -> new HashSet<>());
-      resourcePrivileges.get(ResourceIdentifier.fromString(p.role)).add(p.privilege);
+      resourcePrivileges.computeIfAbsent(ResourceIdentifier.fromString(p.getRole()), v -> new HashSet<>());
+      resourcePrivileges.get(ResourceIdentifier.fromString(p.getRole())).add(p.getPrivilege());
     });
 
     initializeComponents();

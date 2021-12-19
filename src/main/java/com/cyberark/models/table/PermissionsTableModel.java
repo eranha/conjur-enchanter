@@ -31,11 +31,11 @@ public class PermissionsTableModel extends AbstractTableModel {
   public Object getValueAt(int rowIndex, int columnIndex) {
     switch (columnIndex) {
       case 0:
-        return permissions[rowIndex].role;
+        return permissions[rowIndex].getRole();
       case 1:
-        return permissions[rowIndex].privilege;
+        return permissions[rowIndex].getPrivilege();
       case 2:
-        return permissions[rowIndex].policy;
+        return permissions[rowIndex].getPolicy();
     }
     return null;
   }

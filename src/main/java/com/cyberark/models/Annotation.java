@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Annotation {
-  public String name;
-  public String value;
-  public String policy;
+  private String name;
+  private String value;
+  private String policy;
 
   @JsonCreator
   public Annotation(@JsonProperty("name") String name,
@@ -24,5 +24,29 @@ public class Annotation {
         ", value='" + value + '\'' +
         ", policy='" + policy + '\'' +
         '}';
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public String getPolicy() {
+    return policy;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
+
+  public void setPolicy(String policy) {
+    this.policy = policy;
   }
 }

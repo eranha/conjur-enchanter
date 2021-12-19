@@ -23,7 +23,7 @@ public class ResourceListItemCellRenderer extends DefaultListCellRenderer {
 
     if (value instanceof ResourceModel) {
       ResourceModel model = (ResourceModel) value;
-      resource = ResourceIdentifier.fromString(model.id);
+      resource = ResourceIdentifier.fromString(model.getId());
     } else if (value instanceof ResourceIdentifier) {
       resource = (ResourceIdentifier) value;
     }

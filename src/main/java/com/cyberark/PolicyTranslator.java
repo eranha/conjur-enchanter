@@ -19,21 +19,21 @@ public class PolicyTranslator {
     policy.append(String.format(PolicyStatements.TYPE, type));
     policy.append(String.format(PolicyStatements.ID, id));
 
-    if (model.owner != null) {
-      ResourceIdentifier owner = ResourceIdentifier.fromString(model.owner);
+    if (model.getOwner() != null) {
+      ResourceIdentifier owner = ResourceIdentifier.fromString(model.getOwner());
       policy.append(String.format(PolicyStatements.OWNER, owner.getType(), owner.getId()));
     }
 
-    if (model.annotations.length > 0) {
+    if (model.getAnnotations().length > 0) {
       policy.append(PolicyStatements.ANNOTATIONS).append(System.lineSeparator());
 
-      for (Annotation annotation : model.annotations) {
-        policy.append(String.format(PolicyStatements.NAME_VALUE, annotation.name, annotation.value));
+      for (Annotation annotation : model.getAnnotations()) {
+        policy.append(String.format(PolicyStatements.NAME_VALUE, annotation.getName(), annotation.getValue()));
       }
     }
 
     if (model instanceof RoleModel) {
-      String[] restricted_to = ((RoleModel)model).restricted_to;
+      String[] restricted_to = ((RoleModel) model).getRestrictedTo();
       if (restricted_to != null && restricted_to.length > 0) {
         policy.append(
             String.format(
@@ -76,9 +76,9 @@ public class PolicyTranslator {
     StringBuilder policy = new StringBuilder();
     Map<String, List<String>> permissions = new HashMap<>();
 
-    Arrays.stream(model.permissions).forEach(p -> {
-      permissions.computeIfAbsent(p.role, v -> new ArrayList<>());
-      permissions.get(p.role).add(p.privilege);
+    Arrays.stream(model.getPermissions()).forEach(p -> {
+      permissions.computeIfAbsent(p.getRole(), v -> new ArrayList<>());
+      permissions.get(p.getRole()).add(p.getPrivilege());
     });
 
     permissions.forEach((role, privileges) -> {

@@ -34,7 +34,7 @@ public class SecretTableModel extends DefaultResourceTableModel<SecretModel> {
     SecretModel model = getModel().get(rowIndex);
 
     if (columnIndex == 4) {
-      return Util.maskSecret(model.secret);
+      return Util.maskSecret(model.getSecret());
     }
 
     return super.getValueAt(rowIndex, columnIndex);

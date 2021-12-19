@@ -273,9 +273,9 @@ public class NewResourceAction extends AbstractAction {
     // set restrictions
     Component component = getPageComponent(PageType.Restrictions, pages);
     EditableTable table = (component instanceof EditableTable) ? (EditableTable)component : null;
-    model.restricted_to = Objects.requireNonNull(table).getModel() instanceof StringTableModel
+    model.setRestrictedTo(Objects.requireNonNull(table).getModel() instanceof StringTableModel
         ? ((StringTableModel)table.getModel()).getItems()
-        : new String[0];
+        : new String[0]);
 
     response = getResourcesService().addRole(resourceType, model, grantedSetRoles);
     return response;
@@ -335,10 +335,10 @@ public class NewResourceAction extends AbstractAction {
   }
 
   private <T extends ResourceModel> void populateModel(ResourceType resourceType, T model, ResourceFormView view) {
-    model.id =  getResourceFullyQualifiedId(resourceType, view.getId());
-    model.owner = view.getOwner();
-    model.policy = view.getPolicy();
-    model.annotations = view.getAnnotations().toArray(new Annotation[0]);
+    model.setId(getResourceFullyQualifiedId(resourceType, view.getId()));
+    model.setOwner(view.getOwner());
+    model.setPolicy(view.getPolicy());
+    model.setAnnotations(view.getAnnotations().toArray(new Annotation[0]));
   }
   
   private static String getResourceFullyQualifiedId(ResourceType resourceType, String id) {

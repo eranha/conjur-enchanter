@@ -24,37 +24,37 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
   public void actionPerformed(ResourceModel resource) {
     PrivilegesPanel privilegesPane = new PrivilegesPanel(
         resource.getIdentifier().getType(),
-        resource.permissions,
+        resource.getPermissions(),
         getResources()
     );
 
     if (InputDialog.showDialog(
         getMainForm(),
-        String.format("Edit Permissions of %s", ResourceIdentifier.fromString(resource.id).getId()),
+        String.format("Edit Permissions of %s", ResourceIdentifier.fromString(resource.getId()).getId()),
         true,
         privilegesPane) == InputDialog.OK_OPTION) {
       Map<ResourceIdentifier, Set<String>> updatedPrivileges = privilegesPane.getResourcePrivileges();
       HashMap<ResourceIdentifier, Set<String>> deniedPrivileges = new HashMap<>();
       HashMap<ResourceIdentifier, Set<String>> permittedMap = new HashMap<>();
 
-      Arrays.stream(resource.permissions).forEach(permission -> {
-        ResourceIdentifier role = ResourceIdentifier.fromString(permission.role);
+      Arrays.stream(resource.getPermissions()).forEach(permission -> {
+        ResourceIdentifier role = ResourceIdentifier.fromString(permission.getRole());
         if (!updatedPrivileges.containsKey(role) ||
             updatedPrivileges
                 .get(role)
                 .stream()
-                .noneMatch(p -> p.equals(permission.privilege))) {
+                .noneMatch(p -> p.equals(permission.getPrivilege()))) {
           deniedPrivileges.computeIfAbsent(role, v -> new HashSet<>());
-          deniedPrivileges.get(role).add(permission.privilege);
+          deniedPrivileges.get(role).add(permission.getPrivilege());
         }
       });
 
       // Map resource permission: role -> privileges
       HashMap<ResourceIdentifier, Set<String>> resourcePermissions = new HashMap<>();
-      Arrays.stream(resource.permissions).forEach(p -> {
-            ResourceIdentifier id = ResourceIdentifier.fromString(p.role);
+      Arrays.stream(resource.getPermissions()).forEach(p -> {
+            ResourceIdentifier id = ResourceIdentifier.fromString(p.getRole());
             resourcePermissions.computeIfAbsent(id, v -> new HashSet<>());
-            resourcePermissions.get(id).add(p.privilege);
+            resourcePermissions.get(id).add(p.getPrivilege());
           }
       );
 

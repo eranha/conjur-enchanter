@@ -52,18 +52,18 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
     if (resource.getIdentifier().getType() == ResourceType.policy) {
       PolicyModel model = (PolicyModel) resource;
 
-      if (model.policy_versions.length > 0) {
+      if (model.getPolicyVersions().length > 0) {
         // get the latest policy version
-        Optional<PolicyVersion> policyVersion = Arrays.stream(model.policy_versions)
-            .max(Comparator.comparingInt(x -> x.version))
+        Optional<PolicyVersion> policyVersion = Arrays.stream(model.getPolicyVersions())
+            .max(Comparator.comparingInt(PolicyVersion::getVersion))
             .stream()
             .findFirst();
-        policy = policyVersion.map(version -> version.policy_text).orElse(null);
+        policy = policyVersion.map(PolicyVersion::getPolicyText).orElse(null);
       }
     } else {
       policy = policyBuilder.resource(resource.getIdentifier())
-          .annotations(resource.annotations)
-          .permissions(resource.getIdentifier(), resource.permissions)
+          .annotations(resource.getAnnotations())
+          .permissions(resource.getIdentifier(), resource.getPermissions())
       .toPolicy();
     }
 

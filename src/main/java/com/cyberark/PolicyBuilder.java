@@ -106,7 +106,7 @@ public class PolicyBuilder {
       append("  annotations:");
       Arrays.stream(annotations).forEach(annotation -> append(
              "    %s: \"%s\"",
-             annotation.name, annotation.value));
+          annotation.getName(), annotation.getValue()));
     }
     return this;
   }
@@ -164,9 +164,9 @@ public class PolicyBuilder {
     Map<ResourceIdentifier, Set<String>> map = new HashMap<>();
 
     Arrays.stream(permissions).forEach(p -> {
-      ResourceIdentifier role = ResourceIdentifier.fromString(p.role);
+      ResourceIdentifier role = ResourceIdentifier.fromString(p.getRole());
       map.computeIfAbsent(role , v -> new HashSet<>());
-      map.get(role).add(p.privilege);
+      map.get(role).add(p.getPrivilege());
     });
 
     map.forEach((role, privileges) -> permit(role, resource, privileges));

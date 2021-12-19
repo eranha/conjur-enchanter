@@ -39,13 +39,13 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
 
       switch (columnIndex) {
         case 0:
-          return row.id;
+          return row.getId();
         case 1:
-          return row.owner;
+          return row.getOwner();
         case 2:
-          return row.policy;
+          return row.getPolicy();
         case 3:
-          return row.created_at;
+          return row.getCreatedAt();
       }
     }
     return null;
@@ -69,7 +69,7 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
   public int getResourceModelIndex(final ResourceModel resourceModel) {
     if (model != null) {
       OptionalInt indexOpt = IntStream.range(0, model.size())
-          .filter(i -> resourceModel.id.equals(model.get(i).id))
+          .filter(i -> resourceModel.getId().equals(model.get(i).getId()))
           .findFirst();
       return indexOpt.orElse(-1);
     }

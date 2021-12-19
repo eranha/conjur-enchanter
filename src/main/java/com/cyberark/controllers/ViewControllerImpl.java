@@ -354,12 +354,12 @@ class ViewControllerImpl implements ViewController {
     // Populate the model with latest secret version
     secretModels.forEach(i -> {
       try {
-        if (i.secrets.length > 0) {
-          i.secret = getResourceService().getSecret(i).toCharArray();
+        if (i.getSecrets().length > 0) {
+          i.setSecret(getResourceService().getSecret(i).toCharArray());
         }
       } catch (ResourceAccessException e) {
         if (e.getCause() instanceof FileNotFoundException) {
-          logger.warn("Secret with id: {}}, has no value\nError: {}}", i.id, e.getCause());
+          logger.warn("Secret with id: {}}, has no value\nError: {}}", i.getId(), e.getCause());
         } else {
           errors[0] = e;
           logger.error(e);

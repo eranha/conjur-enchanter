@@ -167,11 +167,11 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   private void populateResourceData(ResourceModel resourceModel) {
     permissionsTable.setModel(new PermissionsTableModel(
         resourceModel != null
-            ? resourceModel.permissions
+            ? resourceModel.getPermissions()
             : new Permission[0]));
     annotationsTable.setModel(new AnnotationsTableModel(
         resourceModel != null
-            ? resourceModel.annotations
+            ? resourceModel.getAnnotations()
             : new Annotation[0]));
   }
 
@@ -270,7 +270,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
 
     List<T> items = resourceTableModel.getResourceModels()
         .stream()
-        .filter(r -> r.id.contains(query))
+        .filter(r -> r.getId().contains(query))
         .collect(Collectors.toList());
 
     resourceTable.setModel(createTableModel(items));

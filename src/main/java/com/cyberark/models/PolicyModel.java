@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PolicyModel extends ResourceModel {
-  public PolicyVersion[] policy_versions;
+  private PolicyVersion[] policyVersions;
 
   @JsonCreator
   public PolicyModel(
@@ -14,8 +14,12 @@ public class PolicyModel extends ResourceModel {
       @JsonProperty("policy") String policy,
       @JsonProperty("permissions") Permission[] permissions,
       @JsonProperty("annotations") Annotation[] annotations,
-      @JsonProperty("policy_versions") PolicyVersion[] policy_versions) {
+      @JsonProperty("policy_versions") PolicyVersion[] policyVersions) {
     super(created_at, id, owner, policy, permissions, annotations);
-    this.policy_versions = policy_versions;
+    this.policyVersions = policyVersions;
+  }
+
+  public PolicyVersion[] getPolicyVersions() {
+    return policyVersions;
   }
 }
