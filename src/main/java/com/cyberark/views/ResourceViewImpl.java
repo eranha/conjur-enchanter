@@ -294,20 +294,8 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     return resourceTable;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void setModel(ViewModel model) {
-    if (!(model instanceof ResourceTableModel)) {
-      throw new IllegalArgumentException("model");
-    }
-
-    T selectedResource = getSelectedResource();
-    resourceTableModel = (ResourceTableModel<T>) model;
-    getResourceTable().setModel(resourceTableModel);
-
-    if (selectedResource != null) {
-      restoreSelection(selectedResource);
-    }
   }
 
   private void restoreSelection(T selectedResource) {
@@ -356,5 +344,15 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   @Override
   public void setTableRowDoubleClickedEventListener(Consumer<DataModel> consumer) {
     this.resourceDoubleClickedListener = consumer;
+  }
+
+  public void setResourceTableModel(ResourceTableModel<T> model) {
+    T selectedResource = getSelectedResource();
+    resourceTableModel = model;
+    getResourceTable().setModel(resourceTableModel);
+
+    if (selectedResource != null) {
+      restoreSelection(selectedResource);
+    }
   }
 }

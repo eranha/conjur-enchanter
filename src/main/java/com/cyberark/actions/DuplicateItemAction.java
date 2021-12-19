@@ -40,22 +40,25 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
     ResourceType type = resourceIdentifier.getType();
 
     try {
-      final List<Membership>[] memberships = new List[2];
+      final ArrayList<List<Membership>> membershipsList = new ArrayList<>(2);
 
 
       try {
-        memberships[0] = Util.isRoleResource(type)
+        membershipsList.add(Util.isRoleResource(type)
             ? getMembership(resourceIdentifier)
-            : new ArrayList<>();
-        memberships[1] = Util.isRoleResource(type)
+            : new ArrayList<>());
+        membershipsList.add(Util.isRoleResource(type)
             ? getMembers(resourceIdentifier)
-            : new ArrayList<>();
+            : new ArrayList<>());
       } catch (ResourceAccessException ex) {
         return; // called method in super class displays the error
       }
 
+      final List<Membership> memberships = membershipsList.get(0);
+      final List<Membership> members = membershipsList.get(1);
+
       // TODO switch to policy builder
-      StringBuilder policy = PolicyTranslator.toPolicy(resource, type, id, memberships[1], memberships[0]);
+      StringBuilder policy = PolicyTranslator.toPolicy(resource, type, id, members, memberships);
 
       policyDisplayPane = new PolicyDisplayPane(
           id,
@@ -67,8 +70,8 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
             type,
             evt.getPropertyName(),
             evt.getNewValue(),
-            memberships[0],
-            memberships[1]
+            memberships,
+            members
           )
       );
 

@@ -33,9 +33,9 @@ import java.util.Objects;
 import static com.cyberark.Util.getViewType;
 
 class ViewControllerImpl implements ViewController {
+  private static final Logger logger = LogManager.getLogger(ViewControllerImpl.class);
   private final Map<ViewType, View> views = new HashMap<>();
   private ViewType currentViewType;
-  private static final Logger logger = LogManager.getLogger(ViewControllerImpl.class);
 
   ViewControllerImpl() {
     EventPublisher.getInstance().addListener(this::onResourceEvent);
@@ -83,7 +83,7 @@ class ViewControllerImpl implements ViewController {
     // Close all dialogs as the events from the inactivityListener are random
     // and might trigger while a modal dialog is open
     for (Window w : JDialog.getWindows()) {
-      if ( w instanceof JDialog) {
+      if (w instanceof JDialog) {
         w.setVisible(false);
         w.dispose();
       }
@@ -98,7 +98,7 @@ class ViewControllerImpl implements ViewController {
         .append("-".repeat(64))
         .append(
             String.format(
-              "%n url: %s%n request method: %s%n headers: %s%n body:%s%n---%n response code: %s%n response:%n%s",
+                "%n url: %s%n request method: %s%n headers: %s%n body:%s%n---%n response code: %s%n response:%n%s",
                 e.getUrl(),
                 e.getRequestMethod(),
                 e.getHeaders(),
@@ -117,8 +117,8 @@ class ViewControllerImpl implements ViewController {
 
     ResourceEvent<? extends ResourceModel> resourceEvent =
         (e.getSource() instanceof ResourceEvent)
-        ? (ResourceEvent<? extends ResourceModel>) e.getSource()
-        : null;
+            ? (ResourceEvent<? extends ResourceModel>) e.getSource()
+            : null;
 
     if (currentViewType != ViewType.Dashboard) {
       if (resourceEvent == null && e.getID() == Events.NEW_ITEM) {
@@ -126,7 +126,7 @@ class ViewControllerImpl implements ViewController {
       } else if (resourceEvent != null) {
         reloadViewIfNewResourceInCurrentView(resourceEvent);
       }
-    } 
+    }
   }
 
   private void reloadViewIfNewResourceInCurrentView(ResourceEvent<? extends ResourceModel> event) {
@@ -134,7 +134,7 @@ class ViewControllerImpl implements ViewController {
     ResourceType resourceType = identifier.getType();
 
     if (Util.getViewType(resourceType) == currentViewType) {
-        reloadView();
+      reloadView();
     }
   }
 
@@ -149,11 +149,8 @@ class ViewControllerImpl implements ViewController {
 
       view = views.get(viewType);
 
-      logger.debug("getViewModel viewType: {}", viewType);
-      ViewModel model = getViewModel(viewType);
-
-      logger.debug("setViewModel model: {}", model);
-      view.setModel(model);
+      logger.debug("set view model");
+      setViewModel(viewType);
     } catch (Exception e) {
       logger.error(e);
       e.printStackTrace();
@@ -167,7 +164,6 @@ class ViewControllerImpl implements ViewController {
   private ResourcesService getResourceService() {
     return ResourceServiceFactory.getInstance().getResourcesService();
   }
-
 
   private View createView(ViewType type) {
     View view = null;
@@ -188,7 +184,7 @@ class ViewControllerImpl implements ViewController {
         resourceView = new RolesView(type);
         break;
       default:
-        resourceView = new ResourceViewImpl<>(type);
+        resourceView = new CommonResourceView(type);
         break;
     }
 
@@ -197,7 +193,7 @@ class ViewControllerImpl implements ViewController {
       resourceView.setTableRowDoubleClickedEventListener(this::fireEditActionPerformed);
     }
 
-    return (type == ViewType.Dashboard ? view :  resourceView);
+    return (type == ViewType.Dashboard ? view : resourceView);
   }
 
   @Override
@@ -236,9 +232,9 @@ class ViewControllerImpl implements ViewController {
   }
 
   private void fireEditActionPerformed(DataModel model) {
-    View view  = views.get(getCurrentViewType());
+    View view = views.get(getCurrentViewType());
     if (view instanceof ResourceView) {
-      fireActionPerformed((ResourceView)view);
+      fireActionPerformed((ResourceView) view);
     }
   }
 
@@ -253,35 +249,64 @@ class ViewControllerImpl implements ViewController {
   }
 
   private void toggleSelectionBasedAction(boolean enabled) {
-    ((ResourceView)views.get(getCurrentViewType())).toggleSelectionBasedActions(enabled);
+    ((ResourceView) views.get(getCurrentViewType())).toggleSelectionBasedActions(enabled);
   }
 
-  private ViewModel getViewModel(ViewType viewType) throws Exception {
-    logger.trace("getViewModel enter:: {}", viewType);
-    ViewModel model;
+  private void setViewModel(ViewType viewType) throws Exception {
+    logger.trace("setViewModel enter:: {}", viewType);
 
-    switch(viewType) {
-      case Hosts:
-      case Users:
-        model = new RoleTableModel(getResourceService().getRoles(Util.getResourceType(viewType)));
+    DefaultResourceTableModel<? extends ResourceModel> model;
+
+    switch (viewType) {
+      case Dashboard:
+        views.get(viewType).setModel(
+            new DashboardViewModel(getAuditEvents(), getResourceCountMap())
+        );
         break;
       case Policies:
-        model = new PolicyTableModel(getResourceService().getPolicies());
+        getPoliciesView().setResourceTableModel(
+            new PolicyTableModel(getResourceService().getPolicies())
+        );
+        break;
+      case Hosts:
+      case Users:
+        getRolesView(viewType).setResourceTableModel(
+          new RoleTableModel(
+            getResourceService().getRoles(Util.getResourceType(viewType))
+          )
+        );
         break;
       case Secrets:
-        model = getSecretsViewModel();
-        break;
-      case Dashboard:
-        model = new DashboardViewModel(getAuditEvents(), getResourceCountMap());
+        getSecretsView().setResourceTableModel(
+          getSecretsViewModel()
+        );
         break;
       default:
-        model = new DefaultResourceTableModel<>(
+        getResourceView(viewType).setResourceTableModel(
+          new DefaultResourceTableModel<>(
             getResourceService().getResources(Util.getResourceType(viewType))
+          )
         );
     }
 
-    logger.trace("getViewModel exit:: return: {}", model);
-    return model;
+    logger.trace("setViewModel exit::");
+
+  }
+
+  private CommonResourceView getResourceView(ViewType viewType) {
+    return (CommonResourceView) views.get(viewType);
+  }
+
+  private PoliciesView getPoliciesView() {
+    return (PoliciesView) views.get(ViewType.Policies);
+  }
+
+  private RolesView getRolesView(ViewType viewType) {
+    return (RolesView) views.get(viewType);
+  }
+
+  private SecretsView getSecretsView() {
+    return (SecretsView) views.get(ViewType.Secrets);
   }
 
   private List<AuditEvent> getAuditEvents() throws ResourceAccessException {
@@ -301,7 +326,7 @@ class ViewControllerImpl implements ViewController {
 
     Map<ResourceType, Integer> map = new HashMap<>();
 
-    for (ResourceType type: ResourceType.values()) {
+    for (ResourceType type : ResourceType.values()) {
       map.put(type, getResourceCount(type));
     }
 
@@ -315,6 +340,7 @@ class ViewControllerImpl implements ViewController {
 
   /**
    * Creates a secrets model and populates it with the latest secret version value
+   *
    * @return ResourceTableModel
    * @throws ResourceAccessException In case of an error retrieving the secret
    */
@@ -349,11 +375,6 @@ class ViewControllerImpl implements ViewController {
     return model;
   }
 
-  private void showErrorDialog(String msg) {
-    JOptionPane.showMessageDialog(getMainForm(), msg, "Error",
-        JOptionPane.ERROR_MESSAGE);
-  }
-
   @Override
   public void setStatusLabel(String msg) {
     getMainForm().setStatusLabel(msg);
@@ -364,7 +385,7 @@ class ViewControllerImpl implements ViewController {
     if (getMainForm().getComponentView().getType() == view) {
       try {
         getMainForm().clearSearchText();
-        getMainForm().getComponentView().setModel(getViewModel(view));
+        setViewModel(getMainForm().getComponentView().getType());
       } catch (Exception e) {
         e.printStackTrace();
         logger.error(e);
