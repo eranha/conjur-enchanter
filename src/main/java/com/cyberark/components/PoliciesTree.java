@@ -17,18 +17,23 @@ public class PoliciesTree extends JTree {
   }
 
   public void setModel(List<ResourceIdentifier> policies) {
-    setCellRenderer(new ResourceTreeTreeCellRenderer());
+    if (policies == null || policies.isEmpty()) {
+      throw new IllegalArgumentException("policies cannot be null or empty");
+    }
 
     if (policies.stream().anyMatch(i -> i.getType() != ResourceType.policy)) {
-      throw new IllegalArgumentException("input list contains non-policy type resources");
+      throw new IllegalArgumentException("input list contains unexpected non-policy type resources");
     }
+
+    setCellRenderer(new ResourceTreeTreeCellRenderer());
+
 
     // populate the policies as tree nodes
     policies.forEach(policy ->
         nodes.put(policy.getId(), new DefaultMutableTreeNode(policy)));
 
     if (!nodes.containsKey("root")) {
-      throw new IllegalArgumentException("root policy not provided");
+      throw new IllegalArgumentException("root policy not not found in policies");
     }
 
     policies.forEach(i -> {
@@ -50,6 +55,6 @@ public class PoliciesTree extends JTree {
   public ResourceIdentifier getSelectedPolicy() {
     return getLastSelectedPathComponent() != null
         ? (ResourceIdentifier) ((DefaultMutableTreeNode) getLastSelectedPathComponent()).getUserObject()
-        : null;
+        : (ResourceIdentifier) nodes.get("root").getUserObject();
   }
 }
