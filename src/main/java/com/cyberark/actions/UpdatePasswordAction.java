@@ -7,10 +7,13 @@ import com.cyberark.models.RoleModel;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
 public class UpdatePasswordAction extends ActionBase<RoleModel> {
+  private final static Map<Integer, String> errorCodes = getErrorCodeMapping();
+
   public UpdatePasswordAction(Supplier<RoleModel> selectedResource, String text) {
     super(text, ActionType.UpdatePassword, selectedResource);
     putValue(SHORT_DESCRIPTION,
@@ -42,10 +45,7 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
         }
       }
     } catch (ResourceAccessException ex) {
-      HashMap<Integer, String> errors = new HashMap<>();
-      errors.put(422, "error");
-      errors.put(404, "update.password");
-      showErrorDialog(ex, errors);
+      showErrorDialog(ex, errorCodes);
     }
   }
 
@@ -56,5 +56,12 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
     } else {
       super.setEnabled(enabled);
     }
+  }
+
+  private static HashMap<Integer, String> getErrorCodeMapping() {
+    HashMap<Integer, String> errors = new HashMap<>();
+    errors.put(422, "error");
+    errors.put(404, "update.password");
+    return errors;
   }
 }

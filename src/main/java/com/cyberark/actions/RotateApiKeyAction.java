@@ -6,10 +6,13 @@ import com.cyberark.models.RoleModel;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
 public class RotateApiKeyAction extends ActionBase<RoleModel> {
+  private final static Map<Integer, String> errorCodes = getErrorCodeMapping();
+
   public RotateApiKeyAction(Supplier<RoleModel> selectedResource, String text) {
     super(text, ActionType.RotateApiKey, selectedResource);
     putValue(SHORT_DESCRIPTION,
@@ -29,9 +32,13 @@ public class RotateApiKeyAction extends ActionBase<RoleModel> {
         promptToCopyApiKeyToClipboard(apiKey, getSelectedResource().getIdentifier());
       }
     } catch (ResourceAccessException ex) {
-      HashMap<Integer, String> errors = new HashMap<>();
-      errors.put(401, "rotate.api.key");
-      showErrorDialog(ex, errors);
+      showErrorDialog(ex, errorCodes);
     }
+  }
+
+  private static HashMap<Integer, String> getErrorCodeMapping() {
+    HashMap<Integer, String> errors = new HashMap<>();
+    errors.put(401, "rotate.api.key");
+    return errors;
   }
 }

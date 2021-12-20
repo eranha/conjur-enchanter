@@ -4,10 +4,13 @@ import com.cyberark.models.SecretModel;
 
 import javax.swing.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
 public class RotateSecretAction extends ActionBase<SecretModel> {
+  private final static Map<Integer, String> errorCodes = getErrorCodeMapping();
+
   public RotateSecretAction(Supplier<SecretModel> selectedResource) {
     this(selectedResource,"Rotate");
   }
@@ -37,11 +40,15 @@ public class RotateSecretAction extends ActionBase<SecretModel> {
         getResourcesService().rotateSecret(secretModel);
         fireEvent(secretModel);
       } catch (Exception ex) {
-        HashMap<Integer, String> errors = new HashMap<>();
-        errors.put(422, "error");
-        errors.put(404, "variable");
-        showErrorDialog(ex, errors);
+        showErrorDialog(ex, errorCodes);
       }
     }
+  }
+
+  private static HashMap<Integer, String> getErrorCodeMapping() {
+    HashMap<Integer, String> errors = new HashMap<>();
+    errors.put(422, "error");
+    errors.put(404, "variable");
+    return errors;
   }
 }
