@@ -56,7 +56,7 @@ class AuthnControllerImpl implements AuthnController {
     MainForm form = new MainForm(viewController::setView, viewController::actionPerformed);
     logger.debug("Constructing InactivityListener");
     inactivityListener = new InactivityListener(form, new LogoutAction());
-    logger.debug("Application manin form created");
+    logger.debug("Application main form created");
     return form;
   }
 

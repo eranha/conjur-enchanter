@@ -6,4 +6,11 @@ public abstract class AbstractEditableTableModel<T> extends AbstractTableModel {
   public abstract void addRow(T row);
   public abstract void removeRow(int rowIndex);
 
+  public enum EditMode {
+    AddRemove,
+    AddOnly,
+    ReadOnly
+  }
+
+  public abstract EditMode getEditMode();
 }

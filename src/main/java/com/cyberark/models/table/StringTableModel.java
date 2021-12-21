@@ -32,6 +32,11 @@ public class StringTableModel extends AbstractEditableTableModel<String> {
   }
 
   @Override
+  public EditMode getEditMode() {
+    return EditMode.AddRemove;
+  }
+
+  @Override
   public int getRowCount() {
     return rows.size();
   }

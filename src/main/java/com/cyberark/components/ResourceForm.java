@@ -30,7 +30,7 @@ public class ResourceForm extends AbstractResourceForm {
                       List<ResourceIdentifier> owners) {
     this.resources = resources;
     this.resourceType = resourceType;
-    annotationsTableModel = new AnnotationsTableModel(true);
+    annotationsTableModel = new AnnotationsTableModel(AnnotationsTableModel.EditMode.AddRemove);
     textFieldId = createIdTextField();
     initializeComponents(owners);
   }

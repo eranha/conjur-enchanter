@@ -23,9 +23,8 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
 
   @Override
   public void actionPerformed(ResourceModel resource) {
-
-
     ResourceType type = getSelectedResource().getIdentifier().getType();
+
     PrivilegesPanel privilegesPane = new PrivilegesPanel(
         !(Util.isRoleResource(type) || Util.isSetResource(type))
             ? "Roles" : "Resources",
@@ -38,7 +37,7 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
 
     if (InputDialog.showDialog(
         getMainForm(),
-        String.format("Edit Permissions of %s", ResourceIdentifier.fromString(resource.getId()).getId()),
+        String.format("Edit Permissions of %s", resource.getId()),
         true,
         form) == InputDialog.OK_OPTION) {
       Map<ResourceIdentifier, Set<String>> updatedPrivileges = privilegesPane.getResourcePrivileges();

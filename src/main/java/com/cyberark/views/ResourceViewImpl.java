@@ -210,6 +210,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
       actions.add(new EditSetResourceAction(this::getSelectedResource, "Edit Members..."));
     }
 
+    actions.add(new EditAnnotationsAction(this::getSelectedResource));
     actions.add(new DeleteItemAction<>(this::getSelectedResource, "Delete..."));
     actions.add(new DuplicateItemAction<>(this::getSelectedResource));
     actions.add(new EditPermissions<>(this::getSelectedResource));

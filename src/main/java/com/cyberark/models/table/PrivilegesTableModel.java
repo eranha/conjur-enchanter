@@ -119,6 +119,11 @@ public class PrivilegesTableModel extends AbstractEditableTableModel<Privilege> 
     fireTableDataChanged();
   }
 
+  @Override
+  public EditMode getEditMode() {
+    return EditMode.AddRemove;
+  }
+
   public List<Privilege> getPrivileges() {
     return privileges;
   }

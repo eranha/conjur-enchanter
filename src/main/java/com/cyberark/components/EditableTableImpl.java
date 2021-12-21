@@ -45,6 +45,9 @@ public class EditableTableImpl<T> extends JPanel implements EditableTable {
 
     removeRowButton.setEnabled(false);
 
+    addRowButton.setVisible(getModel().getEditMode() != AbstractEditableTableModel.EditMode.ReadOnly);
+    removeRowButton.setVisible(getModel().getEditMode() == AbstractEditableTableModel.EditMode.AddRemove);
+
     removeRowButton.addActionListener(e -> model.removeRow(table.getSelectedRow()));
 
     table.getSelectionModel().addListSelectionListener(e -> removeRowButton.setEnabled(table.getSelectedRow() > -1));

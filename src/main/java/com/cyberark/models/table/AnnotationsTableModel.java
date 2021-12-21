@@ -8,12 +8,20 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation> {
-  private final boolean editable;
-  ArrayList<Annotation> annotations = new ArrayList<>();
-  String[] columnNames = new String[]{"name", "value", "policy"};
+  private final ArrayList<Annotation> annotations ;
+  private final String[] columnNames = new String[]{"name", "value", "policy"};
+  private final EditMode editMode;
+
+  public AnnotationsTableModel(EditMode editMode) {
+    this(editMode, new Annotation[0]);
+  }
 
   public AnnotationsTableModel(Annotation[] annotations) {
-    this(false);
+    this(EditMode.ReadOnly, annotations);
+  }
+
+  public AnnotationsTableModel(EditMode editMode, Annotation[] annotations) {
+    this.editMode = editMode;
     this.annotations = Arrays.stream(annotations).collect(Collectors.toCollection(ArrayList::new));
   }
 
@@ -22,9 +30,6 @@ public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation
   }
 
 
-  public AnnotationsTableModel(boolean editable) {
-    this.editable = editable;
-  }
 
   @Override
   public String getColumnName(int column) {
@@ -32,7 +37,7 @@ public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation
   }
 
   public boolean isCellEditable(int row, int col) {
-    return editable;
+    return editMode != EditMode.ReadOnly;
   }
 
   public void setValueAt(Object value, int row, int col) {
@@ -88,5 +93,10 @@ public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation
   public void removeRow(int selectedRow) {
     annotations.remove(selectedRow);
     fireTableChanged(new TableModelEvent(this));
+  }
+
+  @Override
+  public EditMode getEditMode() {
+    return editMode;
   }
 }
