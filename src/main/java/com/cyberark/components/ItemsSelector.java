@@ -1,6 +1,5 @@
 package com.cyberark.components;
 
-import com.cyberark.Util;
 import com.cyberark.models.ResourceIdentifier;
 
 import javax.swing.*;
@@ -26,14 +25,13 @@ public class ItemsSelector extends JPanel {
 
   private void initializeComponents(List<ResourceIdentifier> items) {
     setLayout(new GridBagLayout());
-    String itemsLabel = items.size() > 0 ? Util.resourceTypeToTitle(items.get(0).getType()) : "Items";
 
     items.forEach(unSelectedItemsModel::addElement);
 
     leftList.setCellRenderer(new ResourceListItemCellRenderer());
     rightList.setCellRenderer(new ResourceListItemCellRenderer());
 
-    add(getItemsPanel(String.format("Available %ss:", itemsLabel), leftList),
+    add(getItemsPanel("Available:", leftList),
         new GridBagConstraints(
             0, 0, 1, 1, 1, 1,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -49,7 +47,7 @@ public class ItemsSelector extends JPanel {
         )
     );
 
-    add(getItemsPanel(String.format("Granted %ss:", itemsLabel), rightList),
+    add(getItemsPanel("Granted:", rightList),
         new GridBagConstraints(
             2, 0, 1, 1, 1, 1,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH,
