@@ -1,15 +1,24 @@
 package com.cyberark.models.table;
 
 import com.cyberark.models.Permission;
+import com.cyberark.models.ResourceIdentifier;
 
 import javax.swing.table.AbstractTableModel;
 
 public class PermissionsTableModel extends AbstractTableModel {
-  Permission[] permissions;
-  String[] columnNames = new String[]{"role", "privilege", "policy"};
+  private Permission[] permissions;
+  private final String[] columnNames = new String[]{"role", "privilege"};
+  private final Class<?>[] columnClass = new Class<?>[] {
+     ResourceIdentifier.class, String.class
+  };
 
   public PermissionsTableModel(Permission[] permissions) {
     this.permissions = permissions;
+  }
+
+  @Override
+  public Class<?> getColumnClass(int columnIndex) {
+    return columnClass[columnIndex];
   }
 
   @Override
@@ -29,14 +38,8 @@ public class PermissionsTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    switch (columnIndex) {
-      case 0:
-        return permissions[rowIndex].getRole();
-      case 1:
-        return permissions[rowIndex].getPrivilege();
-      case 2:
-        return permissions[rowIndex].getPolicy();
-    }
-    return null;
+    return columnIndex == 0
+        ? ResourceIdentifier.fromString(permissions[rowIndex].getRole())
+        : permissions[rowIndex].getPrivilege();
   }
 }
