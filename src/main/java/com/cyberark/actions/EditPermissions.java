@@ -13,6 +13,7 @@ import com.cyberark.models.ResourceType;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @SelectionBasedAction
 public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
@@ -24,6 +25,8 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
   @Override
   public void actionPerformed(ResourceModel resource) {
     ResourceType type = getSelectedResource().getIdentifier().getType();
+    boolean isRole = Util.isRoleResource(type) || Util.isSetResource(type) || type == ResourceType.policy;
+
 
     PrivilegesPanel privilegesPane = new PrivilegesPanel(
         !(Util.isRoleResource(type) || Util.isSetResource(type))
@@ -33,53 +36,71 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
         getResources()
     );
 
-    Form form = new Form("Permissions", getResourcesInfo().getProperty("role.privileges"), privilegesPane);
+    Form form = new Form(
+        "Permissions",
+        getResourcesInfo().getProperty("role.privileges"),
+        privilegesPane
+    );
 
     if (InputDialog.showDialog(
         getMainForm(),
         String.format("Edit Permissions of %s", resource.getId()),
         true,
         form) == InputDialog.OK_OPTION) {
+
       Map<ResourceIdentifier, Set<String>> updatedPrivileges = privilegesPane.getResourcePrivileges();
       HashMap<ResourceIdentifier, Set<String>> deniedPrivileges = new HashMap<>();
       HashMap<ResourceIdentifier, Set<String>> permittedMap = new HashMap<>();
 
-      Arrays.stream(resource.getPermissions()).forEach(permission -> {
-        ResourceIdentifier role = ResourceIdentifier.fromString(permission.getRole());
-        if (!updatedPrivileges.containsKey(role) ||
-            updatedPrivileges
-                .get(role)
-                .stream()
-                .noneMatch(p -> p.equals(permission.getPrivilege()))) {
-          deniedPrivileges.computeIfAbsent(role, v -> new HashSet<>());
-          deniedPrivileges.get(role).add(permission.getPrivilege());
+      Arrays.stream(resource.getPermissions())
+        .forEach(permission -> {
+          ResourceIdentifier role = ResourceIdentifier.fromString(permission.getRole());
+          if (!updatedPrivileges.containsKey(role) ||
+              updatedPrivileges
+                  .get(role)
+                  .stream()
+                  .noneMatch(p -> p.equals(permission.getPrivilege()))) {
+            deniedPrivileges.computeIfAbsent(role, v -> new HashSet<>());
+            deniedPrivileges.get(role).add(permission.getPrivilege());
+          }
         }
-      });
+      );
 
       // Map resource permission: role -> privileges
       HashMap<ResourceIdentifier, Set<String>> resourcePermissions = new HashMap<>();
-      Arrays.stream(resource.getPermissions()).forEach(p -> {
-            ResourceIdentifier id = ResourceIdentifier.fromString(p.getRole());
-            resourcePermissions.computeIfAbsent(id, v -> new HashSet<>());
-            resourcePermissions.get(id).add(p.getPrivilege());
-          }
+      Arrays.stream(resource.getPermissions())
+        .forEach(p -> {
+          ResourceIdentifier id = ResourceIdentifier.fromString(p.getRole());
+          resourcePermissions.computeIfAbsent(id, v -> new HashSet<>());
+          resourcePermissions.get(id).add(p.getPrivilege());
+        }
       );
 
-      updatedPrivileges.forEach((role, listOfPrivileges) -> listOfPrivileges.forEach(p -> {
-        if (!resourcePermissions.containsKey(role) || !resourcePermissions.get(role).contains(p)) {
-          permittedMap.computeIfAbsent(role, v -> new HashSet<>());
-          permittedMap.get(role).add(p);
-        }
-      }));
-      System.out.printf("denyList: %s\n", deniedPrivileges);
-      System.out.printf("permitList: %s\n", permittedMap);
+      updatedPrivileges
+        .forEach((role, listOfPrivileges) -> listOfPrivileges.forEach(p -> {
+            if (!resourcePermissions.containsKey(role) || !resourcePermissions.get(role).contains(p)) {
+              permittedMap.computeIfAbsent(role, v -> new HashSet<>());
+              permittedMap.get(role).add(p);
+            }
+          }
+        )
+      );
+
+
       try {
+
         if (!deniedPrivileges.isEmpty()){
           getResourcesService().deny(resource, deniedPrivileges);
         }
+
         if (!permittedMap.isEmpty()) {
-          getResourcesService().permit(resource, permittedMap);
+          if (isRole) {
+            getResourcesService().permit(resource, permittedMap);
+          } else {
+            getResourcesService().permit(permittedMap, resource);
+          }
         }
+
         EventPublisher.getInstance().fireEvent(new ResourceEvent<>(resource));
       } catch (ResourceAccessException ex) {
         showErrorDialog(ex);
@@ -88,22 +109,28 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
   }
 
   private List<ResourceIdentifier> getResources() {
-    ResourceType resourceType = getSelectedRresourceType();
-
+    ResourceType resourceType = getSelectedResourceType();
+    List<ResourceIdentifier> resources;
     try {
       if (Util.isRoleResource(resourceType)) {
-        return getResourcesService().getResourceIdentifiers();
+        resources = getResourcesService().getResourceIdentifiers();
       } else {
-        return getResourcesService().getResourceIdentifiers(Util::isRoleResource);
+        resources = getResourcesService().getResourceIdentifiers(Util::isRoleResource);
       }
     } catch (ResourceAccessException e) {
       showErrorDialog(e);
+      return new ArrayList<>();
     }
 
-    return new ArrayList<>();
+    // filter out the current selected resource
+    final String selectedResourceId = getSelectedResource().getIdentifier().getId();
+    return resources
+        .stream()
+        .filter(r -> !(r.getId().equals(selectedResourceId)))
+        .collect(Collectors.toList());
   }
 
-  private ResourceType getSelectedRresourceType() {
+  private ResourceType getSelectedResourceType() {
     return getSelectedResource().getIdentifier().getType();
   }
 }
