@@ -3,6 +3,7 @@ package com.cyberark.views;
 import com.cyberark.Util;
 import com.cyberark.actions.*;
 import com.cyberark.components.DataTable;
+import com.cyberark.components.RoleTableCellRenderer;
 import com.cyberark.components.TitlePanel;
 import com.cyberark.models.*;
 import com.cyberark.models.table.AnnotationsTableModel;
@@ -59,6 +60,9 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     TitlePanel annotationsPanel = new TitlePanel("Annotations", new JScrollPane(annotationsTable), CYBR_BLUE);
     bottomSplitPane.setLeftComponent(permissionsPanel);
     bottomSplitPane.setRightComponent(annotationsPanel);
+
+
+    permissionsTable.setDefaultRenderer(ResourceIdentifier.class, new RoleTableCellRenderer());
 
     splitPane.setTopComponent(new JScrollPane(resourceTable));
     splitPane.setBottomComponent(bottomSplitPane);
