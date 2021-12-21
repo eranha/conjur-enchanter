@@ -1,6 +1,5 @@
 package com.cyberark.views;
 
-import com.cyberark.ConjurEnchanter;
 import com.cyberark.models.ResourceType;
 import jiconfont.DefaultIconCode;
 import jiconfont.IconCode;
@@ -30,6 +29,13 @@ public class Icons {
   public static final char ICON_LOCK = '\ue809';
   public static final char ICON_SPIN = '\ue801';
   public static final char ICON_HOST_ROTATOR = '\ue814';
+  public static final char ICON_UP_OPEN = '\ue80e';
+  public static final char ICON_CUSTOM_TYPES = '\ue80f';
+  public static final char ICON_COG = '\ue817';
+  public static final char ICON_PUPPET = '\ue81a';
+  public static final char ICON_MOVE = '\ue812';
+  public static final char ICON_DOWN_OPEN = '\ue813';
+  public static final char ICON_CIRCLE = '\uf111';
 
   public static final int DEFAULT_FONT_SIZE = 24;
   private static Icons instance;

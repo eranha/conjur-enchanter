@@ -29,10 +29,17 @@ public class PrivilegesPanel extends JPanel {
   private EditableTableImpl<Privilege> privilegesTable;
 
   public PrivilegesPanel(ResourceType resourceType, List<ResourceIdentifier> roles) {
-    this(resourceType, new Permission[0], roles);
+    this("Resources", resourceType, new Permission[0], roles);
   }
 
   public PrivilegesPanel(ResourceType resourceType, Permission[] permissions, List<ResourceIdentifier> roles) {
+    this("Resources", resourceType, permissions, roles);
+  }
+
+  public PrivilegesPanel(String resourcesType,
+                         ResourceType resourceType,
+                         Permission[] permissions,
+                         List<ResourceIdentifier> roles) {
     this.resourceModels = roles;
     this.resourceType = resourceType;
 
@@ -41,17 +48,17 @@ public class PrivilegesPanel extends JPanel {
       resourcePrivileges.get(ResourceIdentifier.fromString(p.getRole())).add(p.getPrivilege());
     });
 
-    initializeComponents();
+    initializeComponents(resourcesType);
   }
 
   public Map<ResourceIdentifier, Set<String>> getPrivileges() {
     return resourcePrivileges;
   }
 
-  private void initializeComponents() {
+  private void initializeComponents(String resourcesType) {
     JList<ResourceIdentifier> rolesList = new JList<>();
     DefaultListModel<ResourceIdentifier> rolesListModel = new DefaultListModel<>();
-    JLabel label = new JLabel("Resources:");
+    JLabel label = new JLabel(String.format("%s:", resourcesType));
     JButton addRoleButton = new JButton("Add...");
     JButton removeRoleButton = new JButton("Remove");
 

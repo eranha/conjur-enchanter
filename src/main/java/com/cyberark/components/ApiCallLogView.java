@@ -1,13 +1,16 @@
 package com.cyberark.components;
 
+import com.cyberark.views.Icons;
+
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+
+import static com.cyberark.Consts.DARK_BG;
 
 public class ApiCallLogView extends JPanel {
   private static ApiCallLogView instance;
@@ -22,8 +25,8 @@ public class ApiCallLogView extends JPanel {
     add(new JScrollPane(log), BorderLayout.CENTER);
 
     JPanel searchPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    JButton next = new BasicArrowButton(BasicArrowButton.SOUTH);
-    JButton prev = new BasicArrowButton(BasicArrowButton.NORTH);
+    JButton next = new JButton(Icons.getInstance().getIcon(Icons.ICON_DOWN_OPEN, 16, DARK_BG));
+    JButton prev = new JButton(Icons.getInstance().getIcon(Icons.ICON_UP_OPEN, 16, DARK_BG));
     JPanel panel = new JPanel();
     panel.setBackground(Color.white);
     panel.add(searchTextField);

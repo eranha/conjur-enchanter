@@ -27,4 +27,7 @@ public interface Consts {
     Patch,
     Put
   }
+
+  String RESOURCES_INFO_PROPERTIES = "/resources_info.properties";
+  String HTML_PARAGRAPH = "<html><body style='width: %1spx'>%1s</body></html>";
 }

@@ -33,8 +33,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.cyberark.Consts.ACTION_TYPE_KEY;
-import static com.cyberark.Consts.DARK_BG;
+import static com.cyberark.Consts.*;
 
 public class NewResourceAction extends AbstractAction {
 
@@ -46,7 +45,6 @@ public class NewResourceAction extends AbstractAction {
           ResourceType.layer})
   ).collect(Collectors.toList());
 
-  private static final String WIZARD_STEPS_INFO_PROPERTIES = "/wizard_steps_info.properties";
   private final ResourceType resourceType;
 
   private enum PageType {
@@ -118,13 +116,7 @@ public class NewResourceAction extends AbstractAction {
   }
 
   private InputStream getWizardPagesInfoProperties() throws FileNotFoundException {
-    InputStream resourceAsStream = getClass().getResourceAsStream(WIZARD_STEPS_INFO_PROPERTIES);
-
-    if (resourceAsStream == null) {
-      throw new FileNotFoundException(WIZARD_STEPS_INFO_PROPERTIES);
-    }
-
-    return resourceAsStream;
+    return Util.getProperties(RESOURCES_INFO_PROPERTIES);
   }
 
   protected void showResponse(ResourceIdentifier model, String response) {
@@ -434,12 +426,17 @@ public class NewResourceAction extends AbstractAction {
   // permit resources
   // Required. Identifies the resource whose access is being controlled.
   // policy, user, host, group, layer, variable, webservice.
-  private Page getPrivilegesPage(Properties pageInfo, ResourceType resourceType, List<ResourceIdentifier> roles) {
+  private Page getPrivilegesPage(Properties pageInfo,
+                                 ResourceType resourceType,
+                                 List<ResourceIdentifier> roles) {
     return new Page(
         PageType.Privileges.toString(),
         "Permissions",
         pageInfo.getProperty("role.privileges"),
-        new PrivilegesPanel(resourceType, roles));
+        new PrivilegesPanel(
+            !(Util.isRoleResource(resourceType) || Util.isSetResource(resourceType))
+              ? "Roles" : "Resources",
+            resourceType, new Permission[0], roles));
   }
 
   private Page getSetResourceGrantsPage(ResourceType type, List<ResourceIdentifier> resources, Properties pageInfo) {

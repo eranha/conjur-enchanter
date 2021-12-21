@@ -23,14 +23,13 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.cyberark.Consts.ACTION_TYPE_KEY;
+import static com.cyberark.Consts.RESOURCES_INFO_PROPERTIES;
 
 /**
  * Base action of all actions that gets performed an a selected resource model.
@@ -182,5 +181,16 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
       handleRoleError(e);
     }
     return null;
+  }
+
+  protected Properties getResourcesInfo() {
+    Properties info = new Properties();
+
+    try {
+      info.load(Util.getProperties(RESOURCES_INFO_PROPERTIES));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return info;
   }
 }

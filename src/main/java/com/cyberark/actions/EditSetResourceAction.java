@@ -1,5 +1,7 @@
 package com.cyberark.actions;
 
+import com.cyberark.Util;
+import com.cyberark.components.Form;
 import com.cyberark.components.ItemsSelector;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
@@ -89,11 +91,24 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
 
       itemsSelector.setPreferredSize(new Dimension(500, 360));
 
+      Form form = new Form(
+          String.format("Add %s to %s",
+              role.getType() == ResourceType.group ? "Users" : "Hosts",
+              Util.resourceTypeToTitle(role.getType())),
+          getResourcesInfo().getProperty("role.members"),
+          itemsSelector
+      );
+
+
       if (InputDialog.showDialog(
           getMainForm(),
-          "Grant Roles",
+          String.format(
+              "Add %s to %s: %s",
+              role.getType() == ResourceType.group ? "Users" : "Hosts",
+              Util.resourceTypeToTitle(role.getType()), role.getId()
+          ),
           true,
-          itemsSelector) == InputDialog.OK_OPTION) {
+          form) == InputDialog.OK_OPTION) {
         List<ResourceIdentifier> selectedItems = itemsSelector.getSelectedItems();
         List<ResourceIdentifier> unSelectedItems = itemsSelector.getUnSelectedItems();
 

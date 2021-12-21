@@ -1,6 +1,7 @@
 package com.cyberark.actions;
 
 import com.cyberark.Util;
+import com.cyberark.components.Form;
 import com.cyberark.components.PrivilegesPanel;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.event.EventPublisher;
@@ -22,17 +23,24 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
 
   @Override
   public void actionPerformed(ResourceModel resource) {
+
+
+    ResourceType type = getSelectedResource().getIdentifier().getType();
     PrivilegesPanel privilegesPane = new PrivilegesPanel(
+        !(Util.isRoleResource(type) || Util.isSetResource(type))
+            ? "Roles" : "Resources",
         resource.getIdentifier().getType(),
         resource.getPermissions(),
         getResources()
     );
 
+    Form form = new Form("Permissions", getResourcesInfo().getProperty("role.privileges"), privilegesPane);
+
     if (InputDialog.showDialog(
         getMainForm(),
         String.format("Edit Permissions of %s", ResourceIdentifier.fromString(resource.getId()).getId()),
         true,
-        privilegesPane) == InputDialog.OK_OPTION) {
+        form) == InputDialog.OK_OPTION) {
       Map<ResourceIdentifier, Set<String>> updatedPrivileges = privilegesPane.getResourcePrivileges();
       HashMap<ResourceIdentifier, Set<String>> deniedPrivileges = new HashMap<>();
       HashMap<ResourceIdentifier, Set<String>> permittedMap = new HashMap<>();

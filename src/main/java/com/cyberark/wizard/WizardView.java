@@ -2,12 +2,13 @@ package com.cyberark.wizard;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static com.cyberark.Consts.HTML_PARAGRAPH;
 
 /**
  * This class represents the wizard view
@@ -35,7 +36,6 @@ class WizardView {
   private final Map<WizardNavigationCommand, JButton> navigationButtons = new HashMap<>();
   private final Map<String, JLabel> steplabels = new HashMap<>();
   private JDialog dlg;
-  private final String html = "<html><body style='width: %1spx'>%1s";
 
 
   WizardView(Icon icon, String title, Consumer<WizardNavigationCommand> actionListener, List<Page> pages) {
@@ -92,7 +92,7 @@ class WizardView {
               BorderFactory.createEmptyBorder()));
 
           infoPane.add(Box.createVerticalStrut(12));
-          infoPane.add(new JLabel(String.format(html, 400, p.getDescription())));
+          infoPane.add(new JLabel(String.format(HTML_PARAGRAPH, 400, p.getDescription())));
           infoPane.add(Box.createVerticalStrut(12));
           JPanel hr = new JPanel();
           hr.setBorder(BorderFactory.createLineBorder(Color.lightGray));
@@ -102,7 +102,7 @@ class WizardView {
 
           pane.add(infoPane, BorderLayout.NORTH);
           pane.add(p.getPageView(), BorderLayout.CENTER);
-          pagesPane.add(pane, p.getId().toString());
+          pagesPane.add(pane, p.getId());
         }
     );
 
@@ -146,7 +146,7 @@ class WizardView {
     pageIndex = index;
     // bold the new step
     setStepLableFont(pageIndex, boldLabelFont);
-    cardLayout.show(pagesPane, pages.get(pageIndex).getId().toString());
+    cardLayout.show(pagesPane, pages.get(pageIndex).getId());
   }
 
   void setStepLableFont(int pageIndex, Font font) {

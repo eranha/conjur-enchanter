@@ -13,6 +13,10 @@ import javax.swing.text.Highlighter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -31,7 +35,6 @@ public class PolicyEditorPane extends JPanel {
   private String policyBranch;
   private PropertyChangeListener propertyChangeListener;
   private JLabel policyTextTip;
-  private JPanel policyTextButtonsPanel;
 
 
   public PolicyEditorPane(List<PolicyModel> policyModels, String policyText) {
@@ -50,12 +53,32 @@ public class PolicyEditorPane extends JPanel {
     policyTextArea.getHighlighter().removeAllHighlights();
   }
 
+  private void highlightPlaceHoldersInPolicy() {
+    char[] chars = policyTextArea.getText().trim().toCharArray();
+    ArrayList<Point> positions = new ArrayList<>();
+    Point currentPoint = null;
+
+    // text <text> text <text> text
+    for (int i = 0; i < chars.length; i++) {
+      if (chars[i] == '<' || chars[i] == '>') {
+        if (currentPoint != null) {
+          currentPoint.y = i + 1;
+          positions.add(currentPoint);
+          currentPoint = null;
+        }
+
+        if (chars[i] == '<') {
+          currentPoint = new Point(i, i);
+        }
+      }
+    }
+
+    highlightTextInPolicy(positions);
+  }
+
   public void highlightTextInPolicy(Set<String> words) {
-    int pos = 0;
     String text = policyTextArea.getText().trim();
-    Highlighter highlighter = policyTextArea.getHighlighter();
-    Highlighter.HighlightPainter painter =
-        new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
+
 
     policyTextArea.getHighlighter().removeAllHighlights();
     ArrayList<Point> positions = new ArrayList<>();
@@ -73,21 +96,29 @@ public class PolicyEditorPane extends JPanel {
       }
     });
 
+    highlightTextInPolicy(positions);
+  }
+
+  private void highlightTextInPolicy(List<Point> positions) {
+    int pos = 0;
+    Highlighter highlighter = policyTextArea.getHighlighter();
+    Highlighter.HighlightPainter painter =
+        new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
     positions.forEach(
-      p -> {
-        Rectangle viewRect;
+        p -> {
+          Rectangle viewRect;
 
-        try {
-          viewRect = policyTextArea.modelToView2D(p.x).getBounds();
-          policyTextArea.scrollRectToVisible(viewRect);
-          highlighter.addHighlight(p.x, p.y, painter);
-        } catch (BadLocationException e) {
-          e.printStackTrace();
+          try {
+            viewRect = policyTextArea.modelToView2D(p.x).getBounds();
+            policyTextArea.scrollRectToVisible(viewRect);
+            highlighter.addHighlight(p.x, p.y, painter);
+          } catch (BadLocationException e) {
+            e.printStackTrace();
+          }
+
+          policyTextArea.setCaretPosition(pos);
+          policyTextArea.moveCaretPosition(pos);
         }
-
-        policyTextArea.setCaretPosition(pos);
-        policyTextArea.moveCaretPosition(pos);
-      }
     );
   }
 
@@ -97,6 +128,8 @@ public class PolicyEditorPane extends JPanel {
     JLabel fileContentLabel = new JLabel("Text:");
     JLabel branchLabel = new JLabel("Branch:");
 
+
+
     initPolicyTextArea();
     initPolicyBranchTree();
 
@@ -104,9 +137,9 @@ public class PolicyEditorPane extends JPanel {
     contentPanel.setLayout(new GridBagLayout());
 
     // line - buttons
-    createButtonsPanel();
+    createPolicyStatementButtonsPanel();
 
-    add(policyTextButtonsPanel,
+    add(createPolicyStatementButtonsPanel(),
         new GridBagConstraints(
         1, 0, 1, 1, 1, 0,
           GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
@@ -162,37 +195,70 @@ public class PolicyEditorPane extends JPanel {
     );
   }
 
-  private void createButtonsPanel() {
-    policyTextButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    policyTextButtonsPanel.add(createPolicyButton(ResourceType.policy));
-    policyTextButtonsPanel.add(createPolicyButton(ResourceType.user));
-    policyTextButtonsPanel.add(createPolicyButton(ResourceType.host));
-    policyTextButtonsPanel.add(createPolicyButton(ResourceType.group));
-    policyTextButtonsPanel.add(createPolicyButton(ResourceType.layer));
-    policyTextButtonsPanel.add(createPolicyButton(ResourceType.variable));
-    policyTextButtonsPanel.add(createPolicyButton(ResourceType.webservice));
+  private void showTextPopupMenu(MouseEvent e) {
+    JPopupMenu menu = new JPopupMenu();
+    JMenuItem copy = new JMenuItem(policyTextArea.getSelectedText() == null ? "Copy" : "Copy Selection");
+    JMenuItem clear = new JMenuItem("Clear All");
+
+    copy.addActionListener(ae -> {
+      String selectedText = policyTextArea.getSelectedText();
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clipboard.setContents(
+          new StringSelection(
+              (selectedText == null
+                ? policyTextArea.getText().trim()
+                : selectedText)
+      ), null);
+    });
+
+    clear.addActionListener(ae -> policyTextArea.setText(""));
+
+    menu.add(copy);
+    menu.add(clear);
+
+    menu.show(policyTextArea, e.getX(),e.getY());
+  }
+
+  private Component createPolicyStatementButtonsPanel() {
+    JPanel panel = new JPanel(new BorderLayout());
+    JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+    panel.add(new JLabel("Policy Statement Shortcuts:"), BorderLayout.WEST);
+    panel.add(btnPanel, BorderLayout.CENTER);
+    panel.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
+
+    btnPanel.add(Box.createVerticalBox());
+    btnPanel.add(createPolicyButton(ResourceType.policy));
+    btnPanel.add(createPolicyButton(ResourceType.user));
+    btnPanel.add(createPolicyButton(ResourceType.host));
+    btnPanel.add(createPolicyButton(ResourceType.group));
+    btnPanel.add(createPolicyButton(ResourceType.layer));
+    btnPanel.add(createPolicyButton(ResourceType.variable));
+    btnPanel.add(createPolicyButton(ResourceType.webservice));
 
     JButton buttonHostFactory = new JButton(Icons.getInstance().getIcon(Icons.ICON_HOST_ROTATOR, 16, DARK_BG));
     buttonHostFactory.addActionListener(e -> appendLineToPolicy(hostFactoryFragment()));
-    buttonHostFactory.setToolTipText("Host Factory");
+    buttonHostFactory.setToolTipText("<html>Add a <b>Host Factory</b> Policy Statement");
 
-    policyTextButtonsPanel.add(buttonHostFactory);
+    btnPanel.add(buttonHostFactory);
 
     JButton buttonGrant = new JButton(Icons.getInstance().getIcon(Icons.LOCK_ICON_UNICODE, 16, DARK_BG));
     buttonGrant.addActionListener(e -> appendLineToPolicy(grantFragment()));
-    buttonGrant.setToolTipText("Grant");
-    policyTextButtonsPanel.add(buttonGrant);
+    buttonGrant.setToolTipText("<html>Add a <b>Grant</b> Policy Statement</html>");
+    btnPanel.add(buttonGrant);
 
-    JButton buttonPermission = new JButton(Icons.getInstance().getIcon(Icons.ICON_SPIN, 16, DARK_BG));
+    JButton buttonPermission = new JButton(Icons.getInstance().getIcon(Icons.ICON_MOVE, 16, DARK_BG));
     buttonPermission.addActionListener(e -> appendLineToPolicy(permissionFragment()));
-    buttonPermission.setToolTipText("Permit");
-    policyTextButtonsPanel.add(buttonPermission);
+    buttonPermission.setToolTipText("<html>Add a <b>Permit</b> Policy Statement</html>");
+    btnPanel.add(buttonPermission);
+
+    return panel;
   }
 
   private String permissionFragment() {
     String fragment = "- !permit%s" +
         "  role: !<kind-of-role> <role-name>%s" +
-        "  privileges: [ x, y, z]%s" +
+        "  privileges: [x, y, z]%s" +
         "  role: !<kind-of-role> <role-name>";
 
     return String.format(
@@ -205,8 +271,8 @@ public class PolicyEditorPane extends JPanel {
 
   private String grantFragment() {
     String fragment = "- !grant%s" +
-        "  role: !<kind-of-role> <role-name> #Granting role.%s" +
-        "  members:                          #Recipient roles.%s" +
+        "  role: !<kind-of-role> <role-name>%s" +
+        "  members:%s" +
         "    - !<kind-of-role> <role-name>%s" +
         "    - !<kind-of-role> <role-name>";
 
@@ -225,12 +291,20 @@ public class PolicyEditorPane extends JPanel {
     }
 
     policyTextArea.append(line);
+    highlightPlaceHoldersInPolicy();
   }
 
   private JButton createPolicyButton(ResourceType type) {
     JButton button = new JButton(Icons.getInstance().getIcon(type, 16, DARK_BG));
     button.addActionListener(e -> appendResourceLineToPolicy(type));
-    button.setToolTipText(Util.resourceTypeToTitle(type));
+    button.setToolTipText(
+        String.format(
+            (type != ResourceType.policy
+                ?  "<html>Add a <b>%s</b> Policy Statement</html>"
+                : "<html>Add a <b>%s</b> Statement</html>"),
+          Util.resourceTypeToTitle(type)
+        )
+    );
     return button;
   }
 
@@ -270,7 +344,8 @@ public class PolicyEditorPane extends JPanel {
     String fragment = "- !webservice%n" +
         "  id: webservice%s%n" +
         "  owner: !<kind-of-role> <role-name>%n" +
-        "  annotations:%n";
+        "  annotations:%n" +
+        "    <key>: <value>";
 
     return String.format(
         fragment,
@@ -352,7 +427,7 @@ public class PolicyEditorPane extends JPanel {
     String fragment = "- !host-factory%n" +
         "  id: host-factory%s%n" +
         "  owner: !<kind-of-role> <role-name>%n" +
-        "  layers: [ !layer <layer-name>, ... ]%n" +
+        "  layers: [ !layer <layer-name>, !layer <layer-name> ]%n" +
         "  annotations:%n" +
         "    <key>: <value>";
 
@@ -371,6 +446,19 @@ public class PolicyEditorPane extends JPanel {
                 policyTextArea.getText()));
       }
     }));
+
+    policyTextArea.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        System.out.println("e = " + e);
+        System.out.println("e.isPopupTrigger() = " + e.isPopupTrigger());
+        super.mouseClicked(e);
+        if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
+          showTextPopupMenu(e);
+        }
+      }
+    });
+
   }
 
   private void initPolicyBranchTree() {

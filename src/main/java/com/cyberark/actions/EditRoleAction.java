@@ -1,5 +1,7 @@
 package com.cyberark.actions;
 
+import com.cyberark.Util;
+import com.cyberark.components.Form;
 import com.cyberark.components.ItemsSelector;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
@@ -32,19 +34,19 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
   @Override
   public void actionPerformed(RoleModel roleModel) {
     try {
-      ResourceIdentifier resourceIdentifier = roleModel.getIdentifier();
+      ResourceIdentifier role = roleModel.getIdentifier();
 
       // Get all the possible granting roles, must be either group or layer.
       List<ResourceIdentifier> grantingRoles = getResourcesService().getResourceIdentifiers(
-          t -> resourceIdentifier.getType() == ResourceType.user
+          t -> role.getType() == ResourceType.user
             ? t == ResourceType.group
             : t == ResourceType.layer);
 
-      // Get the resourceIdentifier memberships
-      List<Membership> memberships = null;
+      // Get the role memberships
+      List<Membership> memberships;
 
       try {
-        memberships = getMembership(resourceIdentifier);
+        memberships = getMembership(role);
       } catch (ResourceAccessException ex) {
         return; // called method in super class displays the error
       }
@@ -70,13 +72,24 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
           grantingRoles, grantedRoles
       );
 
+      Form form = new Form(
+          String.format("Add %s to %s",
+              Util.resourceTypeToTitle(role.getType()),
+              (role.getType() == ResourceType.user ? "Groups" : "Layers")),
+          getResourcesInfo().getProperty("role.members"),
+          itemsSelector
+      );
+
       itemsSelector.setPreferredSize(new Dimension(500, 360));
 
       if (InputDialog.showDialog(
           getMainForm(),
-          "Manage Access",
+          String.format("Add %s: %s to %s",
+              Util.resourceTypeToTitle(role.getType()),
+              role.getId(),
+              (role.getType() == ResourceType.user ? "Groups" : "Layers")),
           true,
-          itemsSelector) == InputDialog.OK_OPTION) {
+          form) == InputDialog.OK_OPTION) {
         List<ResourceIdentifier> selectedItems = itemsSelector.getSelectedItems();
         List<ResourceIdentifier> unSelectedItems = itemsSelector.getUnSelectedItems();
 

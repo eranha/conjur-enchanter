@@ -6,7 +6,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Arrays;
+
+import static com.cyberark.Consts.RESOURCES_INFO_PROPERTIES;
 
 /**
  * Utility functions
@@ -185,5 +189,20 @@ public class Util {
    */
   public static boolean isSetResource(ResourceType type) {
     return type == ResourceType.layer || type == ResourceType.group;
+  }
+
+  /**
+   * Loads a Properties object with file from disk.
+   * @return Properties object
+   * @throws FileNotFoundException if the properties file is not found
+   */
+  public static InputStream getProperties(String name) throws FileNotFoundException {
+    InputStream resourceAsStream = Util.class.getResourceAsStream(name);
+
+    if (resourceAsStream == null) {
+      throw new FileNotFoundException(name);
+    }
+
+    return resourceAsStream;
   }
 }
