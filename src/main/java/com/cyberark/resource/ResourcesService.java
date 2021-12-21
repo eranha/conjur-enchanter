@@ -64,13 +64,22 @@ public interface ResourcesService extends Consts {
   void deny(ResourceModel resource, HashMap<ResourceIdentifier, Set<String>> privileges)
       throws ResourceAccessException;
 
-
-  // Give the resource all the privileges in the map
-  void permit(ResourceModel resource, Map<ResourceIdentifier, Set<String>> privileges)
+  /**
+   * Grants the role argument with privileges to the resource argument.
+   * @param role Identifies the privileged role
+   * @param privileges Map of resource to privileges
+   * @throws ResourceAccessException if any exception occurs.
+   */
+  void permit(ResourceModel role, Map<ResourceIdentifier, Set<String>> privileges)
       throws ResourceAccessException;
 
-  // Give privileges to all the roles in the map to the resource
-  void permit(Map<ResourceIdentifier, Set<String>> privilegesMap, ResourceModel resource)
+  /**
+   * Grants all roles in privileges map argument with privileges to the resource argument.
+   * @param resource Identifies the resource whose access is being controlled.
+   * @param privileges Map of role to privileges
+   * @throws ResourceAccessException if any exception occurs.
+   */
+  void permit(Map<ResourceIdentifier, Set<String>> privileges, ResourceModel resource)
       throws ResourceAccessException;
 
   Map<ResourceIdentifier, List<ResourceIdentifier>> getPolicyResources() throws ResourceAccessException;
