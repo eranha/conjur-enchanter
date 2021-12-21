@@ -1,5 +1,7 @@
 package com.cyberark.models.table;
 
+import com.cyberark.Util;
+import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
 
 import javax.swing.table.AbstractTableModel;
@@ -11,9 +13,30 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
     implements ResourceTableModel<T> {
   private final List<T> model;
   private final String[] columnNames =  {"id", "owner", "policy", "created_at"};
+  private String[][] grid;
 
   public DefaultResourceTableModel(List<T> model) {
     this.model = model;
+    grid = new String[model.size()][];
+
+    populateTableModel(model);
+  }
+
+  private void populateTableModel(List<T> model) {
+    for (int i = 0; i < model.size(); i++) {
+      ResourceModel row = model.get(i);
+      ResourceIdentifier id = row.getIdentifier();
+      grid[i] = new String[] {
+          id.getId(),
+          Util.stringIsNotNullOrEmpty(row.getOwner())
+              ? ResourceIdentifier.fromString(row.getOwner()).getId()
+              : null,
+          Util.stringIsNotNullOrEmpty(row.getPolicy())
+              ? ResourceIdentifier.fromString(row.getPolicy()).getId()
+              : null,
+          row.getCreatedAt()
+      };
+    }
   }
 
   @Override
@@ -33,22 +56,7 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    if (model != null) {
-
-      ResourceModel row = model.get(rowIndex);
-
-      switch (columnIndex) {
-        case 0:
-          return row.getId();
-        case 1:
-          return row.getOwner();
-        case 2:
-          return row.getPolicy();
-        case 3:
-          return row.getCreatedAt();
-      }
-    }
-    return null;
+     return (model != null && grid != null) ? grid[rowIndex][columnIndex] : null;
   }
 
   @Override
@@ -81,6 +89,7 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
   public void clearData() {
     if (model != null) {
       model.clear();
+      grid = null;
       fireTableDataChanged();
     }
   }
