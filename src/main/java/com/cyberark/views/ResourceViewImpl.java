@@ -9,6 +9,8 @@ import com.cyberark.models.table.AnnotationsTableModel;
 import com.cyberark.models.table.DefaultResourceTableModel;
 import com.cyberark.models.table.PermissionsTableModel;
 import com.cyberark.models.table.ResourceTableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -18,7 +20,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,8 @@ import static javax.swing.event.TableModelEvent.DELETE;
  * @param <T> The ResourceModel of this ResourceView
  */
 public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implements ResourceView {
+  private static final Logger logger = LogManager.getLogger(ResourceViewImpl.class);
+
   private ResourceTableModel<T> resourceTableModel;
   private final ViewType view;
   private final DataTable resourceTable = new DataTable();
@@ -39,13 +42,6 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   private Consumer<DataModel> selectionListener;
   private Consumer<ResourceView> resourceDoubleClickedListener;
   private final ActionMap menuItemActions = new ActionMap();
-  private final static ActionType[] DEFAULT_MENU_ITEMS_ORDER = new ActionType[] {
-      ActionType.NewItem,
-      ActionType.EditItem,
-      ActionType.DeleteItem,
-      ActionType.ViewPolicy,
-      ActionType.DuplicateItem
-  };
 
   private final NewResourceActions newResourceActions = new NewResourceActions();
 
@@ -137,29 +133,22 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   private JPopupMenu constructComponentPopupMenu() {
     JPopupMenu popupMenu = new JPopupMenu();
 
-    for (ActionType type : DEFAULT_MENU_ITEMS_ORDER) {
-      Action action = menuItemActions.get(type);
+    Arrays.stream(ActionType.values())
+    .forEach(type -> {
+        Action action = menuItemActions.get(type);
+        if (menuItemActions.size() > 2 && type == ActionType.DeleteItem) {
+          popupMenu.addSeparator();
+        }
 
-      if (menuItemActions.size() > 2 && type == ActionType.DeleteItem) {
-        popupMenu.addSeparator();
+        if (menuItemActions.get(type) != null) {
+          popupMenu.add(new JMenuItem(action));
+        }
+
+        if (menuItemActions.size() > 3 && type == ActionType.DeleteItem) {
+          popupMenu.addSeparator();
+        }
       }
-
-      if (menuItemActions.get(type) != null) {
-        popupMenu.add(new JMenuItem(action));
-      }
-
-      if (menuItemActions.size() > 3 && type == ActionType.DeleteItem) {
-        popupMenu.addSeparator();
-      }
-    }
-
-    Set<ActionType> set = Arrays.stream(DEFAULT_MENU_ITEMS_ORDER).collect(Collectors.toSet());
-
-    // Add the rest of items not in order
-    Arrays.stream(menuItemActions.keys())
-        .filter(i -> i instanceof ActionType)
-        .filter(i -> !set.contains((ActionType)i))
-        .forEach(i -> popupMenu.add(new JMenuItem(menuItemActions.get(i))));
+    );
 
     return popupMenu;
   }
@@ -192,7 +181,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
 
   private void registerAction(ActionMap actionMap, Action action) {
     if (action.getValue(ACTION_TYPE_KEY) == null) {
-      System.out.printf("WARNING! Action: %s has so no %s property and will be ignored.%n", ACTION_TYPE_KEY, action);
+      logger.warn("WARNING! Action: {} has no {} property and will be ignored", ACTION_TYPE_KEY, action);
       return;
     }
     actionMap.put(action.getValue(ACTION_TYPE_KEY), action);
@@ -210,12 +199,12 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
       actions.add(new EditSetResourceAction(this::getSelectedResource, "Edit Members..."));
     }
 
-    actions.add(new EditAnnotationsAction(this::getSelectedResource));
+    // general actions for all resource types
+    actions.add(new EditAnnotationsAction<>(this::getSelectedResource));
     actions.add(new DeleteItemAction<>(this::getSelectedResource, "Delete..."));
     actions.add(new DuplicateItemAction<>(this::getSelectedResource));
     actions.add(new EditPermissions<>(this::getSelectedResource));
     actions.add(new ViewResourcePolicyAction<>(this::getSelectedResource));
-    actions.add(new EditPermissions<>(this::getSelectedResource));
 
     return actions;
   }
