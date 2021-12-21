@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation> {
   private final ArrayList<Annotation> annotations ;
-  private final String[] columnNames = new String[]{"name", "value", "policy"};
+  private final String[] columnNames = new String[]{"name", "value"};
   private final EditMode editMode;
 
   public AnnotationsTableModel(EditMode editMode) {
@@ -50,9 +50,6 @@ public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation
       case 1:
         annotation.setValue(value.toString());
         break;
-      case 2:
-        annotation.setPolicy(value.toString());
-        break;
     }
 
     fireTableCellUpdated(row, col);
@@ -72,15 +69,9 @@ public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    switch (columnIndex) {
-      case 0:
-        return annotations.get(rowIndex).getName();
-      case 1:
-        return annotations.get(rowIndex).getValue();
-      case 2:
-        return annotations.get(rowIndex).getPolicy();
-    }
-    return null;
+    return  (columnIndex == 0)
+        ? annotations.get(rowIndex).getName()
+        : annotations.get(rowIndex).getValue();
   }
 
   @Override
