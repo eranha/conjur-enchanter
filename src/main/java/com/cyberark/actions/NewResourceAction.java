@@ -77,7 +77,7 @@ public class NewResourceAction extends AbstractAction {
     );
 
     String title = String.format(
-        "%s - Add %s",
+        "%s - %s",
         Consts.APP_NAME, resourceTypeTitle
     );
 
@@ -290,17 +290,17 @@ public class NewResourceAction extends AbstractAction {
         .orElse(null);
   }
 
-  private void setPermissions(ResourceModel model, PrivilegesPanel privilegesPane) throws ResourceAccessException {
+  private void setPermissions(ResourceModel resource, PrivilegesPanel privilegesPane) throws ResourceAccessException {
     Map<ResourceIdentifier, Set<String>> privileges = privilegesPane.getPrivileges();
     if (!privileges.isEmpty()) {
-      if (model.getIdentifier().getType() != ResourceType.webservice
-          && model.getIdentifier().getType() != ResourceType.variable) {
-        // model is the role that is gaining access to the resource.
-        getResourcesService().permit(model, privileges);
+      if (resource.getIdentifier().getType() != ResourceType.webservice
+          && resource.getIdentifier().getType() != ResourceType.variable) {
+        // resource is a role that is gaining access to the resource.
+        getResourcesService().permit(resource, privileges);
       } else {
-        // in case of variable and webservice resources the model is the resource
+        // in case of variable and webservice resources the resource is the resource
         // permit each resource entry in the map with the corresponding privileges
-        getResourcesService().permit(privileges, model);
+        getResourcesService().permit(privileges, resource);
       }
     }
   }
@@ -353,7 +353,7 @@ public class NewResourceAction extends AbstractAction {
     // Permissions
     pages.add(getSetResourceGrantsPage(resourceType, resources, pageInfo));
     // Privileges
-    pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+    pages.add(getPrivilegesPage(pageInfo, resourceType, resources));
 
     return pages;
   }
@@ -372,7 +372,7 @@ public class NewResourceAction extends AbstractAction {
     // Restrictions
     pages.add(getRestrictionsPage(pageInfo));
     // Privileges
-    pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+    pages.add(getPrivilegesPage(pageInfo, resourceType, resources));
 
     return pages;
   }
