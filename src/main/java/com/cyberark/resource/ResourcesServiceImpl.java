@@ -455,7 +455,6 @@ class ResourcesServiceImpl implements ResourcesService {
           getAccessToken(),
           policy);
     } catch (IOException e) {
-      e.printStackTrace();
       throw new ResourceAccessException(e);
     }
   }
@@ -566,30 +565,36 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
-  public void permit(ResourceModel resource, Map<ResourceIdentifier, Set<String>> roleToPrivileges)
+  public void permit(ResourceModel role, Map<ResourceIdentifier, Set<String>> privileges)
       throws ResourceAccessException {
-    logger.trace("enter::permit(resource={}, roleToPrivileges={})", resource, roleToPrivileges);
+    logger.trace("enter::permit(resource={}, roleToPrivileges={})", role, privileges);
+
     PolicyBuilder policyBuilder = new PolicyBuilder();
 
-    roleToPrivileges.forEach(
-        (role, privileges) -> policyBuilder.permit(role, resource.getIdentifier(), privileges)
+    privileges.forEach(
+        (r, p) -> policyBuilder.permit(role.getIdentifier(), r, p)
     );
 
-    patchPolicy(policyBuilder.toPolicy(), ROOT_POLICY);
-    logger.trace("exit::permit(resource={}, roleToPrivileges={})", resource, roleToPrivileges);
+    String policy = policyBuilder.toPolicy();
+    loadPolicy(policy, ROOT_POLICY);
+
+    logger.trace("exit::permit(resource={}, roleToPrivileges={})", role, privileges);
   }
 
   @Override
   public void permit(Map<ResourceIdentifier, Set<String>> privileges, ResourceModel resource)
       throws ResourceAccessException {
     logger.trace("enter::permit(privileges={}, resource={})", privileges, resource);
+
     PolicyBuilder policyBuilder = new PolicyBuilder();
 
-    privileges.forEach((r, p) ->
-      policyBuilder.permit(r, resource.getIdentifier(), p)
+    privileges.forEach((role, p) ->
+      policyBuilder.permit(role, resource.getIdentifier(), p)
     );
 
-    loadPolicy(policyBuilder.toPolicy(), ROOT_POLICY);
+    String policy = policyBuilder.toPolicy();
+    loadPolicy(policy, ROOT_POLICY);
+
     logger.trace("exit::permit(privileges={}, resource={})", privileges, resource);
   }
 
