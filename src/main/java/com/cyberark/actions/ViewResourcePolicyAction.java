@@ -28,7 +28,7 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
 
   @Override
   public void actionPerformed(ResourceModel resource) {
-    String policy = null;
+    String policy;
     PolicyBuilder policyBuilder = new PolicyBuilder();
     List<Membership> membership = new ArrayList<>();
     List<Membership> members = new ArrayList<>();
@@ -49,34 +49,13 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
     List<ResourceIdentifier> memberRoles = members.stream()
         .map(i -> ResourceIdentifier.fromString(i.getMember())).collect(Collectors.toList());
 
-    if (resource.getIdentifier().getType() == ResourceType.policy) {
-      PolicyModel model = (PolicyModel) resource;
+    policy = ResourceUtil.getResourcePolicy(resource);
 
-      if (model.getPolicyVersions().length > 0) {
-        // get the latest policy version
-        Optional<PolicyVersion> policyVersion = Arrays.stream(model.getPolicyVersions())
-            .max(Comparator.comparingInt(PolicyVersion::getVersion))
-            .stream()
-            .findFirst();
-        policy = policyVersion.map(PolicyVersion::getPolicyText).orElse(null);
-      }
-    } else {
-      policy = policyBuilder.resource(resource.getIdentifier())
-          .annotations(resource.getAnnotations())
-          .permissions(resource.getIdentifier(), resource.getPermissions())
-      .toPolicy();
-    }
-
-    PolicyBuilder policyPermissionsBuilder = new PolicyBuilder();
-
-    if (Util.isSetResource(type)) {
-      // list members in a single grant
-      policyPermissionsBuilder.grants(resource.getIdentifier(), memberRoles);
-    }
-
-    // for each role this resource is granted, create a single grant
-    String permissions = policyPermissionsBuilder
-        .grants(grantedRoles, resource.getIdentifier()).toPolicy();
+    String permissions = ResourceUtil.getResourcePermissions(
+        resource.getIdentifier(),
+        memberRoles,
+        grantedRoles
+    );
 
     InputDialog.showDialog(getMainForm(),
         String.format("%s - %s - Resource Policy", Consts.APP_NAME, resource.getIdentifier().getId())
