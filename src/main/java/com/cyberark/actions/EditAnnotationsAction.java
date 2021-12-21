@@ -8,6 +8,7 @@ import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.Annotation;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
+import com.cyberark.models.ResourceType;
 import com.cyberark.models.table.AnnotationsTableModel;
 
 import javax.swing.table.TableModel;
@@ -56,6 +57,15 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
       } catch (ResourceAccessException e) {
         showErrorDialog(e);
       }
+    }
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    if (enabled && getSelectedResource().getIdentifier().getType() == ResourceType.policy) {
+      super.setEnabled(false);
+    } else {
+      super.setEnabled(enabled);
     }
   }
 
