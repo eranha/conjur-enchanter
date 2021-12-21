@@ -3,13 +3,13 @@ package com.cyberark.actions;
 public enum ActionType {
   NewItem,
   EditItem,
-  EditAnnotations,
   DeleteItem,
+  EditAnnotations,
   DuplicateItem,
   EditPermissions,
   ReloadView,
   ViewPolicy,
-  UpdatePassword,
   RotateApiKey,
+  UpdatePassword,
   RotateSecret
 }
