@@ -36,7 +36,11 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
         String password = JOptionPane.showInputDialog(getMainForm(), "Type in new password.");
 
         if (password != null) {
-          getResourcesService().updateUserPassword(resource, password.toCharArray(), apiKey.toCharArray());
+          getResourcesService().updateUserPassword(
+              resource,
+              password.toCharArray(),
+              apiKey.toCharArray()
+          );
 
           // Update password also replaces the user’s API key with a new securely generated random value.
           // Fetch the new API key by using Login and prompt it to the user

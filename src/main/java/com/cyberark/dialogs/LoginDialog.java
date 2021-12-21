@@ -49,10 +49,10 @@ public class LoginDialog extends JDialog implements ActionListener {
 
   public void addComponentsToContainer() {
     JPanel formPanel = new JPanel();
-    JPasswordField passwordField = new JPasswordField("CyberArk123!");
-    JTextField userTextField = new JTextField("admin");
-    JTextField urlTextField = new JTextField("https://localhost");
-    JTextField accountTextField = new JTextField("org");
+    JPasswordField passwordField = new JPasswordField();
+    JTextField userTextField = new JTextField();
+    JTextField urlTextField = new JTextField();
+    JTextField accountTextField = new JTextField();
     GridBagConstraints constraints = new GridBagConstraints();
     int gridy = 0;
     Insets zeroInsets = new Insets(0, 0, 0, 0);

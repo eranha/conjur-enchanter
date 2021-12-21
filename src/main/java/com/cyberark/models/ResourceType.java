@@ -7,5 +7,6 @@ public enum ResourceType {
   user,
   group,
   variable,
+  host_factory,
   webservice
 }

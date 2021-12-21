@@ -475,6 +475,7 @@ class ResourcesServiceImpl implements ResourcesService {
     PolicyBuilder policyBuilder = new PolicyBuilder();
     policyBuilder
         .resource(model.getIdentifier())
+        .annotations(model.getAnnotations())
         .restrictions(model.getRestrictedTo());
 
     String response = loadPolicy(policyBuilder.toPolicy(), model.getPolicy());
@@ -506,10 +507,45 @@ class ResourcesServiceImpl implements ResourcesService {
     }
 
     StringBuilder policy = buildPolicyString(type, model, members);
+
     logger.debug("Policy:\n{}", policy);
     String response = loadPolicy(policy.toString(), model.getPolicy() != null ? model.getPolicy() : ROOT_POLICY);
     logger.trace("exit::addResource:: response: {}", response);
     return response;
+  }
+
+  private StringBuilder buildPolicyString(
+      ResourceType type,
+      ResourceModel model,
+      List<ResourceIdentifier> members) {
+    StringBuilder policy = new StringBuilder();
+    policy.append(String.format("- !%s\n", type));
+    policy.append(String.format("  id: %s\n", model.getIdentifier().getId()));
+
+    if (model.getOwner() != null) {
+      ResourceIdentifier owner = ResourceIdentifier.fromString(model.getOwner());
+      policy.append(String.format("  owner: !%s %s\n", owner.getType(), owner.getId()));
+    }
+
+    if (model.getAnnotations().length > 0) {
+      policy.append("  annotations:\n");
+
+      for (Annotation annotation : model.getAnnotations()) {
+        policy.append(String.format("    %s: \"%s\"\n", annotation.getName(), annotation.getValue()));
+      }
+    }
+
+    if (members.size() > 0) {
+      policy.append("- !grant").append(System.lineSeparator());
+      policy.append(String.format("  role: !%s %s%n", type, model.getIdentifier().getId()));
+      policy.append("  members:").append(System.lineSeparator());
+
+      for (ResourceIdentifier i : members) {
+        policy.append(String.format("    - !%s %s%n", i.getType(), i.getId()));
+      }
+    }
+
+    return policy;
   }
 
   @Override
@@ -752,37 +788,6 @@ class ResourcesServiceImpl implements ResourcesService {
       e.printStackTrace();
       throw new ResourceAccessException(e);
     }
-  }
-
-  private StringBuilder buildPolicyString(ResourceType type, ResourceModel model, List<ResourceIdentifier> members) {
-    StringBuilder policy = new StringBuilder();
-    policy.append(String.format("- !%s\n", type));
-    policy.append(String.format("  id: %s\n", model.getIdentifier().getId()));
-
-    if (model.getOwner() != null) {
-      ResourceIdentifier owner = ResourceIdentifier.fromString(model.getOwner());
-      policy.append(String.format("  owner: !%s %s\n", owner.getType(), owner.getId()));
-    }
-
-    if (model.getAnnotations().length > 0) {
-      policy.append("  annotations:\n");
-
-      for (Annotation annotation : model.getAnnotations()) {
-        policy.append(String.format("    %s: \"%s\"\n", annotation.getName(), annotation.getValue()));
-      }
-    }
-
-    if (members.size() > 0) {
-      policy.append("- !grant").append(System.lineSeparator());
-      policy.append(String.format("  role: !%s %s%n", type, model.getIdentifier().getId()));
-      policy.append("  members:").append(System.lineSeparator());
-
-      for (ResourceIdentifier i : members) {
-        policy.append(String.format("    - !%s %s%n", i.getType(), i.getId()));
-      }
-    }
-
-    return policy;
   }
 
   private char[] getAccessToken() throws ResourceAccessException {

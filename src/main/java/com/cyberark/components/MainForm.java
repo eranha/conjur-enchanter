@@ -170,8 +170,13 @@ public class MainForm extends JFrame {
     JMenu newMenu = new JMenu("New");
     fileMenu.add(newMenu);
 
-    Arrays.stream(ResourceType.values()).forEach(
-        t -> newMenu.add(new JMenuItem(actionMap.getAction(t)))
+    // TODO Add HOST_FACTORY if applicable
+    Arrays.stream(ResourceType.values())
+        .map(actionMap::getAction)
+        .filter(Objects::nonNull)
+        .forEach(
+          action -> newMenu.add(new JMenuItem(action)
+        )
     );
 
     JMenuItem exit = new JMenuItem("Exit");
@@ -295,10 +300,13 @@ public class MainForm extends JFrame {
     Arrays.stream(ResourceType.values()).forEach(
         t -> {
           Action action = actionMap.getAction(t);
-          action.putValue(Action.SMALL_ICON, Icons.getInstance().getIcon(t, 16, LIGHT_COLOR));
-          AbstractButton b = new ToolBarButton(action).getButton();
-          b.setHorizontalAlignment(SwingConstants.LEFT);
-          menu.add(b, BorderLayout.WEST);
+          if (action != null) {
+            // TODO Add HOST_FACTORY if applicable
+            action.putValue(Action.SMALL_ICON, Icons.getInstance().getIcon(t, 16, LIGHT_COLOR));
+            AbstractButton b = new ToolBarButton(action).getButton();
+            b.setHorizontalAlignment(SwingConstants.LEFT);
+            menu.add(b, BorderLayout.WEST);
+          }
         }
     );
 

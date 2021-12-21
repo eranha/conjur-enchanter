@@ -92,7 +92,10 @@ public class Icons {
       case variable:
         return getIcon(SECRETS_ICON_UNICODE, size, foreground);
       case webservice:
-        return getIcon(WEBSERVICES_ICON_UNICODE, size, foreground);    }
+        return getIcon(WEBSERVICES_ICON_UNICODE, size, foreground);
+      case host_factory:
+        return getIcon(ICON_HOST_ROTATOR, size, foreground);
+    }
     return null;
   }
 
