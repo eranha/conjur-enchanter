@@ -17,12 +17,16 @@ import java.security.cert.X509Certificate;
  */
 public class ConjurEnchanter {
   private static final Logger logger = LogManager.getLogger(ConjurEnchanter.class);
+  public static final String IGNORE_CERTS = "IGNORE_CONJUR_CERTS";
 
   public static void main(String[] args) {
     logger.info("Starting Enchanter...");
     logger.info("Checking if the application is set to trust all certificates");
-    String ignoreCertSystemSetting = System.getProperty("ignore.certs");
-    logger.info("System settings: 'ignore.certs'='{}'", ignoreCertSystemSetting);
+
+    String ignoreCertSystemSetting = System.getenv(IGNORE_CERTS);
+    logger.info(String.format("System settings: '%s'='{}'", IGNORE_CERTS), ignoreCertSystemSetting);
+
+    System.out.println(System.getenv());
 
     if (ignoreCertSystemSetting == null || Boolean.parseBoolean(ignoreCertSystemSetting)) {
       setupToIgnoreCertificates();
