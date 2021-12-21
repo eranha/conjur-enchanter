@@ -22,12 +22,46 @@ public class RestApiResourceProvider implements ResourceApiProvider {
 
   @Override
   public String get(URL url, String user, char[] password) throws IOException {
-    return readResponse(openConnection(url, "GET", getAuthorizationHeader(user, password)));
+    HttpURLConnection conn;
+    int responseCode = -1;
+    String response;
+
+    try {
+      conn = openConnection(url, "GET", getAuthorizationHeader(user, password));
+      responseCode = conn.getResponseCode();
+      response = readResponse(conn);
+    } catch (IOException ex) {
+      throw new ApiCallException(
+          "Connections Error",
+          url,
+          ex,
+          responseCode
+      );
+    }
+
+    return response;
   }
 
   @Override
   public String put(URL url, String user, char[] password, String body) throws IOException {
-    return readResponse(openConnection(url, "PUT", getAuthorizationHeader(user, password), body));
+    String response;
+    HttpURLConnection conn;
+    int responseCode = -1;
+
+    try {
+      conn = openConnection(url, "PUT", getAuthorizationHeader(user, password), body);
+      responseCode = conn.getResponseCode();
+      response = readResponse(conn);
+    } catch (IOException ex) {
+      throw new ApiCallException(
+          "Connections Error",
+          url,
+          ex,
+          responseCode
+      );
+    }
+
+    return response;
   }
 
   @Override
@@ -36,9 +70,23 @@ public class RestApiResourceProvider implements ResourceApiProvider {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("Authorization", formatAuthorizationHeader(
         token));
-    HttpURLConnection connection = openConnection(url, "GET", headers);
-    String response = readResponse(connection);
-    fireApiCallEvent(url, "GET", headers, null, connection.getResponseCode(), response);
+    HttpURLConnection conn;
+    int responseCode = -1;
+    String response;
+
+    try {
+      conn = openConnection(url, "GET", headers);
+      response = readResponse(conn);
+    } catch (IOException ex) {
+      throw new ApiCallException(
+          "Connections Error",
+          url,
+          ex,
+          responseCode
+      );
+    }
+
+    fireApiCallEvent(url, "GET", headers, null, conn.getResponseCode(), response);
     logger.trace("get(url={}) exit return response length: {}", url, response.length());
     return response;
   }
@@ -89,23 +137,21 @@ public class RestApiResourceProvider implements ResourceApiProvider {
   private String request(URL url, String requestMethod, HashMap<String, String> headers, String body)
       throws IOException {
 
-    HttpURLConnection conn = null;
+    HttpURLConnection conn;
     String response;
+    int responseCode = -1;
 
     try {
       conn = openConnection(url, requestMethod, headers, body);
-    } catch (IOException ex) {
-      throw new ApiCallException("Error opening connection to: {}",
-          url,
-          ex,
-          conn.getResponseCode()
-      );
-    }
-
-    try {
+      responseCode = conn.getResponseCode();
       response = readResponse(conn);
     } catch (IOException ex) {
-      throw new ApiCallException("Error reading response from: {}", url, ex, conn.getResponseCode());
+      throw new ApiCallException(
+          "Connection Error",
+          url,
+          ex,
+          responseCode
+      );
     }
 
     fireApiCallEvent(url, requestMethod, headers, body, conn.getResponseCode(), response);
