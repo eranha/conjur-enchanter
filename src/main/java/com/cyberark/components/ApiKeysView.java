@@ -7,6 +7,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 
 public class ApiKeysView extends JPanel {
@@ -35,7 +37,9 @@ public class ApiKeysView extends JPanel {
 
     final Highlighter.HighlightPainter painter =
         new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
-    getApiKeysPositions(indented).forEach(
+    final ArrayList<Point> points = getApiKeysPositions(indented);
+
+    points.forEach(
         p -> {
           try {
             jt.getHighlighter().addHighlight(p.x, p.y, painter);
@@ -47,6 +51,22 @@ public class ApiKeysView extends JPanel {
           jt.moveCaretPosition(p.x);
         }
     );
+
+    jt.addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        jt.getHighlighter().removeAllHighlights();
+
+        if (points.size() > 0) {
+          jt.select(points.get(0).x, points.get(0).y);
+        }
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+
+      }
+    });
   }
 
   private ArrayList<Point> getApiKeysPositions(String indented) {
