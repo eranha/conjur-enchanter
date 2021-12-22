@@ -123,15 +123,15 @@ public class PolicyEditorPane extends JPanel {
           Rectangle viewRect;
 
           try {
-            //viewRect = policyTextArea.modelToView2D(p.x).getBounds();
-            //policyTextArea.scrollRectToVisible(viewRect);
+            // viewRect = policyTextArea.modelToView2D(p.x).getBounds();
+            // policyTextArea.scrollRectToVisible(viewRect);
             highlighter.addHighlight(p.x, p.y, painter);
           } catch (BadLocationException e) {
             e.printStackTrace();
           }
-
-          //policyTextArea.setCaretPosition(pos);
-          //policyTextArea.moveCaretPosition(pos);
+          // together with caret events this is an endless loop
+          // policyTextArea.setCaretPosition(pos);
+          // policyTextArea.moveCaretPosition(pos);
         }
     );
   }
@@ -141,8 +141,6 @@ public class PolicyEditorPane extends JPanel {
     setPreferredSize(new Dimension(480,320));
     JLabel fileContentLabel = new JLabel("Text:");
     JLabel branchLabel = new JLabel("Branch:");
-
-
 
     initPolicyTextArea();
     initPolicyBranchTree();

@@ -61,9 +61,9 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
         policyEditorPane.highlightTextInPolicy(set);
         policyEditorPane.setPolicyTextAreaTooltipText("<html>In <b>POST</b> mode, if the policy contains deletion " +
             "statements, such as !delete, !revoke,<br>or !deny, they are treated as errors.");
-      } else {
-        policyEditorPane.highlightPlaceHoldersInPolicy();
       }
+    } else {
+      policyEditorPane.highlightPlaceHoldersInPolicy();
     }
   }
 
@@ -82,7 +82,6 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
     policyEditorPane.addPolicyTextAreaFocusListener(new FocusListener() {
       @Override
       public void focusGained(FocusEvent e) {
-        policyEditorPane.removeAllPolicyTextHighlights();
       }
 
       @Override
@@ -196,6 +195,7 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
   @Override
   public void setPolicyText(String policyText) {
     policyEditorPane.setPolicyText(policyText);
+    validatePolicyText();
   }
 
   @Override

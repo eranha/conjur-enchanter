@@ -2,6 +2,7 @@ package com.cyberark.actions;
 
 import com.cyberark.Application;
 import com.cyberark.Consts;
+import com.cyberark.Util;
 import com.cyberark.components.ApiKeysView;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.event.EventPublisher;
@@ -22,6 +23,11 @@ import java.awt.event.KeyEvent;
 import static com.cyberark.Consts.APP_NAME;
 
 public class NewPolicyAction extends NewResourceAction {
+  public static final String POLICY_PUT_LOAD_WARNING = "<html>Note: In <b>PUT</b> policy load mode, " +
+      "objects, grants, and privileges that <br>exist in the " +
+      "database but are not specified in the policy file are " +
+      "<span style='background-color: yellow'>deleted</span>.<br><br>" +
+      "Are you sure you want to continue?</html>";
   private final MessageView messageView;
 
   public NewPolicyAction(ResourcesService resourcesService,
@@ -47,33 +53,36 @@ public class NewPolicyAction extends NewResourceAction {
     try {
       PolicyFormView view = viewFactory.getPolicyView();
 
-      if (view.showDialog(Application.getInstance().getMainForm(),
-          String.format("%s - Load Policy", APP_NAME)) == InputDialog.OK_OPTION) {
-        String policyText = view.getPolicyText();
-        String policyBranch = view.getBranch();
+      while (true) {
+        if (view.showDialog(
+            Application.getInstance().getMainForm(),
+            String.format("%s - Load Policy", APP_NAME), () -> Util.stringIsNotNullOrEmpty(view.getPolicyText())
+        ) == InputDialog.OK_OPTION) {
+          String policyText = view.getPolicyText();
+          String policyBranch = view.getBranch();
 
-        if (policyText != null && policyText.trim().length() > 0) {
-          response = getResourcesService().loadPolicy(
-              view.getPolicyApiMode(),
-              policyText,
-              policyBranch == null
-                ? Consts.ROOT
-                : policyBranch
-          );
+          if (view.getPolicyApiMode() == Consts.PolicyApiMode.Put) {
+            Object[] options = {"Yes",
+                "No", "Cancel"};
+            int selection = JOptionPane.showOptionDialog(getMainForm(),
+                new JLabel(POLICY_PUT_LOAD_WARNING),
+                "Confirm Operation",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 
-          if (response.contains("api_key")) {
-            promptToCopyApiKey(response);
-          } else {
-            viewFactory.getMessageView().showMessageDialog(response);
+            if (selection == JOptionPane.CANCEL_OPTION) {
+              view.setPolicyText(policyText);
+              view.setBranch(policyBranch);
+              continue; // user cancelled, show the form again
+            } else if (selection != JOptionPane.YES_OPTION) {
+              break;
+            }
           }
 
-          EventPublisher.getInstance().fireEvent(
-              new ActionEvent(
-                  this,
-                  Events.NEW_ITEM,
-                  ResourceType.policy.toString())
-          );
+          loadPolicy(viewFactory, view, policyText, policyBranch);
         }
+
+        break;
       }
     } catch (ResourceAccessException ex) {
       ex.printStackTrace();
@@ -88,6 +97,32 @@ public class NewPolicyAction extends NewResourceAction {
           )
         );
       }
+    }
+  }
+
+  private void loadPolicy(ViewFactory viewFactory, PolicyFormView view, String policyText, String policyBranch) throws ResourceAccessException {
+    String response;
+    if (policyText != null && policyText.trim().length() > 0) {
+      response = getResourcesService().loadPolicy(
+          view.getPolicyApiMode(),
+          policyText,
+          policyBranch == null
+            ? Consts.ROOT
+            : policyBranch
+      );
+
+      if (response.contains("api_key")) {
+        promptToCopyApiKey(response);
+      } else {
+        viewFactory.getMessageView().showMessageDialog(response);
+      }
+
+      EventPublisher.getInstance().fireEvent(
+          new ActionEvent(
+              this,
+              Events.NEW_ITEM,
+              ResourceType.policy.toString())
+      );
     }
   }
 
