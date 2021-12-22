@@ -9,6 +9,8 @@ import com.cyberark.views.ViewFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
@@ -59,6 +61,8 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
         policyEditorPane.highlightTextInPolicy(set);
         policyEditorPane.setPolicyTextAreaTooltipText("<html>In <b>POST</b> mode, if the policy contains deletion " +
             "statements, such as !delete, !revoke,<br>or !deny, they are treated as errors.");
+      } else {
+        policyEditorPane.highlightPlaceHoldersInPolicy();
       }
     }
   }
@@ -74,6 +78,18 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
 
     Container contentPanel = this;
     contentPanel.setLayout(new GridBagLayout());
+
+    policyEditorPane.addPolicyTextAreaFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        policyEditorPane.removeAllPolicyTextHighlights();
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        validatePolicyText();
+      }
+    });
 
     // line - file path
     add(apiModeLabel, //gbc);
@@ -96,7 +112,7 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
     add(fileLabel,
         new GridBagConstraints(
             0, 1, 1, 1, 0, 0,
-            GridBagConstraints.CENTER, GridBagConstraints.NONE,
+            GridBagConstraints.WEST, GridBagConstraints.NONE,
             labelInsets, 0, 0
         )
     );
