@@ -314,7 +314,10 @@ class ViewControllerImpl implements ViewController {
 
   @Override
   public void clearAllViews() {
-    dashboardView.clearData();
+    if (dashboardView != null) {
+      dashboardView.clearData();
+    }
+
     resourceViewController.clearData();
   }
 
