@@ -69,8 +69,6 @@ public class ResourceTree extends JTree {
 
   private String getResourceIdExcludingPath(String id) {
     if (id.indexOf('/') < 0) return id;
-    String s = id.substring(id.lastIndexOf('/') + 1);
-    System.out.println(s);
-    return s;
+    return id.substring(id.lastIndexOf('/') + 1);
   }
 }

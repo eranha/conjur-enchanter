@@ -52,7 +52,6 @@ public class ShowResourceTreeAction extends AbstractAction {
 
     search.getDocument().addDocumentListener(new DefaultDocumentListener(event -> {
       DefaultMutableTreeNode node = null;
-      System.out.println(event);
       try {
         node = tree[0].findFirst(event.getDocument().getText(0, event.getDocument().getLength()));
       } catch (BadLocationException ex) {
@@ -60,10 +59,8 @@ public class ShowResourceTreeAction extends AbstractAction {
       }
       if (node != null) {
         TreePath path = new TreePath(node.getPath());
-        System.out.println("path: " + path);
         tree[0].setSelectionPath(path);
       } else {
-        System.out.println("clear");
         tree[0].clearSelection();
       }
     }));
