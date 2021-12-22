@@ -40,17 +40,6 @@ public class AuditEvent implements DataModel {
     this.msgid = msgid;
     this.sdata = sdata;
     this.message = message;
-
-//    if (timestamp.indexOf('+') > -1) {
-//      try {
-//        int index = timestamp.lastIndexOf('+');
-//        String date  = timestamp.substring(0, index-1);
-//        Date d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
-//        System.out.printf("");
-//      } catch (ParseException e) {
-//        e.printStackTrace();
-//      }
-//    }
   }
 
   @Override
