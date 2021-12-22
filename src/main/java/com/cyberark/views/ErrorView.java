@@ -17,7 +17,7 @@ public class ErrorView {
     int responseCode = ex.getResponseCode();
     String errorMessageKeyScope = responseCode > 403 ? "policy" : "error";
     String errorMessageKey = errors.get(responseCode);
-    String errorMessage = errors.get(responseCode);
+    String errorMessage;
 
     if (responseCode > 0) {
       String errorPattern = Errors.getErrorMessage("error.pattern");
@@ -53,7 +53,8 @@ public class ErrorView {
       ApiCallException cause = (ApiCallException) ex.getCause();
       showApiCallErrorMessage(cause);
     } else {
-      showErrorMessage(ex.getMessage());
+      ex.printStackTrace();
+      showErrorMessage(ex.toString());
     }
   }
 
