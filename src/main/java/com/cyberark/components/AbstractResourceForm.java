@@ -10,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.function.Supplier;
 
 abstract class AbstractResourceForm extends JPanel implements ResourceFormView {
   protected PropertyChangeListener propertyChangeListener;
@@ -43,12 +44,17 @@ abstract class AbstractResourceForm extends JPanel implements ResourceFormView {
   }
 
   public int showDialog(Window owner, String title) {
+    return showDialog(owner, title, () -> false);
+  }
+
+  public int showDialog(Window owner, String title, Supplier<Boolean> enableOkButton) {
+
     InputDialog dlg = new InputDialog(
         owner,
         title,
         true,
         this,
-        false);
+        enableOkButton.get());
     dlg.addWindowFocusListener(new WindowAdapter() {
       @Override
       public void windowGainedFocus(WindowEvent e) {
