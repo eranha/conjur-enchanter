@@ -1,28 +1,25 @@
 package com.cyberark.views;
 
-import com.cyberark.Util;
-import com.cyberark.actions.ActionType;
 import com.cyberark.actions.ViewNavigationAction;
 import com.cyberark.components.DataTable;
 import com.cyberark.components.RoleTableCellRenderer;
 import com.cyberark.components.TitlePanel;
-import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.*;
+import com.cyberark.models.DashboardViewModel;
+import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.ResourceType;
+import com.cyberark.models.ViewModel;
 import com.cyberark.models.audit.AuditEvent;
 import com.cyberark.models.audit.AuditTableModel;
-import com.cyberark.resource.ResourceServiceFactory;
 
-import javax.print.DocFlavor;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.cyberark.Consts.CYBR_BLUE;
@@ -54,9 +51,12 @@ public class DashboardView extends JPanel implements View {
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     table.setDefaultRenderer(ResourceIdentifier.class, new RoleTableCellRenderer());
 
-    JPanel buttonsPanel = new JPanel(new GridLayout(1, ResourceType.values().length, 8,8));
+    JPanel buttonsPanel = new JPanel(new GridLayout(1, ResourceType.values().length - 1, 8,8));
     buttonsPanel.setBorder(BorderFactory.createEmptyBorder(8,8,8,8));
-    Arrays.stream(ResourceType.values()).forEach(i -> buttonsPanel.add(createButton(i, actionListener)));
+    Arrays.stream(
+        ResourceType.values())
+        .filter(t -> t != ResourceType.host_factory)
+        .forEach(i -> buttonsPanel.add(createButton(i, actionListener)));
 
     add(buttonsPanel, BorderLayout.NORTH);
     TitlePanel panel = new TitlePanel("Recent Activity", new JScrollPane(table), CYBR_BLUE);
