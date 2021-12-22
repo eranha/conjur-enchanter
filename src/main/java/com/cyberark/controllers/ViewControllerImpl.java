@@ -22,10 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.cyberark.Util.getViewType;
 
@@ -249,9 +249,14 @@ class ViewControllerImpl implements ViewController {
 
     Map<ResourceType, Integer> map = new HashMap<>();
 
-    for (ResourceType type : ResourceType.values()) {
+    Stream<ResourceType> resourceTypeStream = Arrays
+        .stream(ResourceType.values())
+        .filter(t -> t != ResourceType.host_factory);
+
+    for (ResourceType type : resourceTypeStream.collect(Collectors.toList())) {
       map.put(type, getResourceCount(type));
     }
+
 
     logger.trace("getResourceCountMap::exit:: return {}", map);
     return map;
