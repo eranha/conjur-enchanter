@@ -26,8 +26,6 @@ public class ConjurEnchanter {
     String ignoreCertSystemSetting = System.getenv(IGNORE_CERTS);
     logger.info(String.format("System settings: '%s'='{}'", IGNORE_CERTS), ignoreCertSystemSetting);
 
-    System.out.println(System.getenv());
-
     if (ignoreCertSystemSetting == null || Boolean.parseBoolean(ignoreCertSystemSetting)) {
       setupToIgnoreCertificates();
     }
