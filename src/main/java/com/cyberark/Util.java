@@ -10,8 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import static com.cyberark.Consts.RESOURCES_INFO_PROPERTIES;
-
 /**
  * Utility functions
  */
@@ -133,7 +131,7 @@ public class Util {
         return ViewType.Webserivices;
     }
 
-    throw new IllegalArgumentException();
+    throw new IllegalArgumentException(String.format("Resource type %s has no view", type));
   }
 
   /**
