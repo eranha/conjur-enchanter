@@ -38,6 +38,8 @@ public class Icons {
   public static final char ICON_CIRCLE = '\uf111';
 
   public static final int DEFAULT_FONT_SIZE = 24;
+  public static final char ICON_OK = '\ue815';
+  public static final char ICON_CANCEL = '\ue816';
   private static Icons instance;
   private final Map<Character, IconCode> cache = new HashMap<>();
 
