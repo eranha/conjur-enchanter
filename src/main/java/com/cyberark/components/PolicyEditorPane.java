@@ -37,7 +37,7 @@ public class PolicyEditorPane extends JPanel {
   private String policyBranch;
   private PropertyChangeListener propertyChangeListener;
   private JLabel policyTextTip;
-  private List<Point> highlights = new ArrayList<>();
+  private final List<Point> highlights = new ArrayList<>();
 
 
   public PolicyEditorPane(List<PolicyModel> policyModels, String policyText) {
@@ -235,7 +235,7 @@ public class PolicyEditorPane extends JPanel {
     JPanel panel = new JPanel(new BorderLayout());
     JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-    panel.add(new JLabel("Policy Statement Shortcuts:"), BorderLayout.WEST);
+    panel.add(new JLabel("Policy Statement:"), BorderLayout.WEST);
     panel.add(btnPanel, BorderLayout.CENTER);
     panel.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
 
@@ -254,15 +254,25 @@ public class PolicyEditorPane extends JPanel {
 
     btnPanel.add(buttonHostFactory);
 
-    JButton buttonGrant = new JButton(Icons.getInstance().getIcon(Icons.LOCK_ICON_UNICODE, 16, DARK_BG));
+    JButton buttonGrant = new JButton(Icons.getInstance().getIcon(Icons.ICON_UP_OPEN, 16, DARK_BG));
     buttonGrant.addActionListener(e -> appendLineToPolicy(grantFragment()));
     buttonGrant.setToolTipText("<html>Add a <b>Grant</b> Policy Statement</html>");
     btnPanel.add(buttonGrant);
 
-    JButton buttonPermission = new JButton(Icons.getInstance().getIcon(Icons.ICON_MOVE, 16, DARK_BG));
+    JButton buttonRevoke = new JButton(Icons.getInstance().getIcon(Icons.ICON_DOWN_OPEN, 16, DARK_BG));
+    buttonRevoke.addActionListener(e -> appendLineToPolicy(revokeFragment()));
+    buttonRevoke.setToolTipText("<html>Add a <b>Revoke</b> Policy Statement</html>");
+    btnPanel.add(buttonRevoke);
+
+    JButton buttonPermission = new JButton(Icons.getInstance().getIcon(Icons.ICON_OK, 16, DARK_BG));
     buttonPermission.addActionListener(e -> appendLineToPolicy(permissionFragment()));
     buttonPermission.setToolTipText("<html>Add a <b>Permit</b> Policy Statement</html>");
     btnPanel.add(buttonPermission);
+
+    JButton buttonDenyPermission = new JButton(Icons.getInstance().getIcon(Icons.ICON_CANCEL, 16, DARK_BG));
+    buttonDenyPermission.addActionListener(e -> appendLineToPolicy(denyPermissionFragment()));
+    buttonDenyPermission.setToolTipText("<html>Add a <b>Deny</b> Policy Statement</html>");
+    btnPanel.add(buttonDenyPermission);
 
     return panel;
   }
@@ -334,6 +344,32 @@ public class PolicyEditorPane extends JPanel {
     return String.format(
         fragment,
         System.lineSeparator(),
+        System.lineSeparator(),
+        System.lineSeparator()
+    );
+  }
+
+  private String denyPermissionFragment() {
+    String fragment = "- !deny%s" +
+        "  role: !<kind-of-role> <role-name>%s" +
+        "  privileges: [x, y, z]%s" +
+        "  role: !<kind-of-role> <role-name>";
+
+    return String.format(
+        fragment,
+        System.lineSeparator(),
+        System.lineSeparator(),
+        System.lineSeparator()
+    );
+  }
+
+  private String revokeFragment() {
+    String fragment = "- !revoke%s" +
+        "  role: !<kind-of-role> <role-name>%s" +
+        "  member: !<kind-of-role> <role-name>";
+
+    return String.format(
+        fragment,
         System.lineSeparator(),
         System.lineSeparator()
     );
