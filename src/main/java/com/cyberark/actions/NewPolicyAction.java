@@ -47,7 +47,6 @@ public class NewPolicyAction extends NewResourceAction {
   }
 
   private void showPolicyForm() {
-    String response;
     ViewFactory viewFactory = ViewFactory.getInstance();
 
     try {
@@ -84,7 +83,7 @@ public class NewPolicyAction extends NewResourceAction {
 
         break;
       }
-    } catch (ResourceAccessException ex) {
+    } catch (Throwable ex) {
       ex.printStackTrace();
 
       if (ex.getCause() instanceof ApiCallException) {
