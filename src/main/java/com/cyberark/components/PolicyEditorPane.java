@@ -15,6 +15,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -212,23 +213,24 @@ public class PolicyEditorPane extends JPanel {
     JMenuItem copy = new JMenuItem(policyTextArea.getSelectedText() == null ? "Copy" : "Copy Selection");
     JMenuItem clear = new JMenuItem("Clear All");
 
-    copy.addActionListener(ae -> {
-      String selectedText = policyTextArea.getSelectedText();
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      clipboard.setContents(
-          new StringSelection(
-              (selectedText == null
-                ? policyTextArea.getText().trim()
-                : selectedText)
-      ), null);
-    });
-
+    copy.addActionListener(ae -> copyPolicyText());
     clear.addActionListener(ae -> policyTextArea.setText(""));
 
     menu.add(copy);
     menu.add(clear);
 
     menu.show(policyTextArea, e.getX(),e.getY());
+  }
+
+  private void copyPolicyText() {
+    String selectedText = policyTextArea.getSelectedText();
+    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    clipboard.setContents(
+        new StringSelection(
+            (selectedText == null
+              ? policyTextArea.getText().trim()
+              : selectedText)
+    ), null);
   }
 
   private Component createPolicyStatementButtonsPanel() {
@@ -240,41 +242,59 @@ public class PolicyEditorPane extends JPanel {
     panel.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
 
     btnPanel.add(Box.createVerticalBox());
-    btnPanel.add(createPolicyButton(ResourceType.policy));
-    btnPanel.add(createPolicyButton(ResourceType.user));
-    btnPanel.add(createPolicyButton(ResourceType.host));
-    btnPanel.add(createPolicyButton(ResourceType.group));
-    btnPanel.add(createPolicyButton(ResourceType.layer));
-    btnPanel.add(createPolicyButton(ResourceType.variable));
-    btnPanel.add(createPolicyButton(ResourceType.webservice));
+    btnPanel.add(createPolicyResourceButton(ResourceType.policy));
+    btnPanel.add(createPolicyResourceButton(ResourceType.user));
+    btnPanel.add(createPolicyResourceButton(ResourceType.host));
+    btnPanel.add(createPolicyResourceButton(ResourceType.group));
+    btnPanel.add(createPolicyResourceButton(ResourceType.layer));
+    btnPanel.add(createPolicyResourceButton(ResourceType.variable));
+    btnPanel.add(createPolicyResourceButton(ResourceType.webservice));
 
     JButton buttonHostFactory = new JButton(Icons.getInstance().getIcon(Icons.ICON_HOST_ROTATOR, 16, DARK_BG));
     buttonHostFactory.addActionListener(e -> appendLineToPolicy(hostFactoryFragment()));
     buttonHostFactory.setToolTipText("<html>Add a <b>Host Factory</b> Policy Statement");
 
     btnPanel.add(buttonHostFactory);
+    final String tooltip = "<html>Add a <b>%s</b> Policy Statement</html>";
 
-    JButton buttonGrant = new JButton(Icons.getInstance().getIcon(Icons.ICON_UP_OPEN, 16, DARK_BG));
-    buttonGrant.addActionListener(e -> appendLineToPolicy(grantFragment()));
-    buttonGrant.setToolTipText("<html>Add a <b>Grant</b> Policy Statement</html>");
-    btnPanel.add(buttonGrant);
+    btnPanel.add(
+        createButton(Icons.ICON_PLUS, e -> appendLineToPolicy(grantFragment()), String.format(tooltip, "Grant"))
+    );
 
-    JButton buttonRevoke = new JButton(Icons.getInstance().getIcon(Icons.ICON_DOWN_OPEN, 16, DARK_BG));
-    buttonRevoke.addActionListener(e -> appendLineToPolicy(revokeFragment()));
-    buttonRevoke.setToolTipText("<html>Add a <b>Revoke</b> Policy Statement</html>");
-    btnPanel.add(buttonRevoke);
+    btnPanel.add(
+        createButton(Icons.ICON_MINUS, e -> appendLineToPolicy(revokeFragment()),String.format(tooltip, "Revoke"))
+    );
 
-    JButton buttonPermission = new JButton(Icons.getInstance().getIcon(Icons.ICON_OK, 16, DARK_BG));
-    buttonPermission.addActionListener(e -> appendLineToPolicy(permissionFragment()));
-    buttonPermission.setToolTipText("<html>Add a <b>Permit</b> Policy Statement</html>");
-    btnPanel.add(buttonPermission);
+    btnPanel.add(
+        createButton(Icons.ICON_THUMBS_UP, e -> appendLineToPolicy(permitFragment()),String.format(tooltip, "Permit"))
+    );
 
-    JButton buttonDenyPermission = new JButton(Icons.getInstance().getIcon(Icons.ICON_CANCEL, 16, DARK_BG));
-    buttonDenyPermission.addActionListener(e -> appendLineToPolicy(denyPermissionFragment()));
-    buttonDenyPermission.setToolTipText("<html>Add a <b>Deny</b> Policy Statement</html>");
-    btnPanel.add(buttonDenyPermission);
+    btnPanel.add(
+        createButton(Icons.ICON_THUMBS_DOWN, e -> appendLineToPolicy(denyFragment()),String.format(tooltip, "Deny"))
+    );
+
+    btnPanel.add(
+        createButton(Icons.ICON_CLONE, e -> copyPolicyText(),"Copy")
+    );
+
+    btnPanel.add(
+        createButton(Icons.ICON_TRASH, e -> policyTextArea.setText(""),"Clear All")
+    );
 
     return panel;
+  }
+
+  private Component createButton(char iconCode, ActionListener ae, String tooltip) {
+    JButton button = new JButton(
+      Icons.getInstance().getIcon(iconCode,
+          16,
+          DARK_BG)
+    );
+
+    button.addActionListener(ae);
+    button.setToolTipText(tooltip);
+
+    return button;
   }
 
   private void appendLineToPolicy(String line) {
@@ -286,7 +306,7 @@ public class PolicyEditorPane extends JPanel {
     highlightPlaceHoldersInPolicy();
   }
 
-  private JButton createPolicyButton(ResourceType type) {
+  private JButton createPolicyResourceButton(ResourceType type) {
     JButton button = new JButton(Icons.getInstance().getIcon(type, 16, DARK_BG));
     button.addActionListener(e -> appendResourceLineToPolicy(type));
     button.setToolTipText(
@@ -335,7 +355,7 @@ public class PolicyEditorPane extends JPanel {
     }
   }
 
-  private String permissionFragment() {
+  private String permitFragment() {
     String fragment = "- !permit%s" +
         "  role: !<kind-of-role> <role-name>%s" +
         "  privileges: [x, y, z]%s" +
@@ -349,7 +369,7 @@ public class PolicyEditorPane extends JPanel {
     );
   }
 
-  private String denyPermissionFragment() {
+  private String denyFragment() {
     String fragment = "- !deny%s" +
         "  role: !<kind-of-role> <role-name>%s" +
         "  privileges: [x, y, z]%s" +
