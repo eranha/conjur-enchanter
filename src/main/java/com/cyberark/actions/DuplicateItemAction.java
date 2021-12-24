@@ -7,6 +7,7 @@ import com.cyberark.components.PolicyDisplayPane;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
+import com.cyberark.views.Icons;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.swing.*;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.cyberark.Consts.DARK_BG;
 import static com.cyberark.components.PolicyDisplayPane.RESOURCE_ID;
 
 @SelectionBasedAction
@@ -28,6 +30,9 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
   public DuplicateItemAction(Supplier<T> selectedResource, String text) {
     super(text, ActionType.DuplicateItem, selectedResource);
     putValue(SHORT_DESCRIPTION, "Generate a policy of the selected resource");
+    putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_CLONE,
+        16,
+        DARK_BG));
     putValue(MNEMONIC_KEY, KeyEvent.VK_D);
     putValue(Action.ACCELERATOR_KEY,
         KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK));

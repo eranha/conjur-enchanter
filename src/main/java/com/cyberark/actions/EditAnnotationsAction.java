@@ -10,9 +10,12 @@ import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
 import com.cyberark.models.ResourceType;
 import com.cyberark.models.table.AnnotationsTableModel;
+import com.cyberark.views.Icons;
 
 import javax.swing.table.TableModel;
 import java.util.function.Supplier;
+
+import static com.cyberark.Consts.DARK_BG;
 
 public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T> {
   public EditAnnotationsAction(Supplier<T> selectedResource) {
@@ -21,6 +24,10 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
 
   protected EditAnnotationsAction(String text, ActionType type, Supplier<T> selectedResource) {
     super(text, type, selectedResource);
+    putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_EDIT,
+        16,
+        DARK_BG));
+    putValue(SHORT_DESCRIPTION, "Edit the resource annotations");
   }
 
   @Override

@@ -1,11 +1,14 @@
 package com.cyberark.actions;
 
 import com.cyberark.models.SecretModel;
+import com.cyberark.views.Icons;
 
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import static com.cyberark.Consts.DARK_BG;
 
 @SelectionBasedAction
 public class RotateSecretAction extends ActionBase<SecretModel> {
@@ -16,6 +19,9 @@ public class RotateSecretAction extends ActionBase<SecretModel> {
   }
   public RotateSecretAction(Supplier<SecretModel> selectedResource, String text) {
     super(text, ActionType.RotateSecret, selectedResource);
+    putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_ROTATE_SECRET,
+        16,
+        DARK_BG));
   }
 
   @Override

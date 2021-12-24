@@ -30,16 +30,20 @@ public class Icons {
   public static final char ICON_SPIN = '\ue801';
   public static final char ICON_HOST_ROTATOR = '\ue814';
   public static final char ICON_UP_OPEN = '\ue80e';
-  public static final char ICON_CUSTOM_TYPES = '\ue80f';
-  public static final char ICON_COG = '\ue817';
-  public static final char ICON_PUPPET = '\ue81a';
-  public static final char ICON_MOVE = '\ue812';
   public static final char ICON_DOWN_OPEN = '\ue813';
   public static final char ICON_CIRCLE = '\uf111';
 
   public static final int DEFAULT_FONT_SIZE = 24;
   public static final char ICON_OK = '\ue815';
   public static final char ICON_CANCEL = '\ue816';
+  public static final char ICON_PLUS = '\uF0FE';
+  public static final char ICON_MINUS = '\uF146';
+  public static final char ICON_THUMBS_UP = '\ue808';
+  public static final char ICON_THUMBS_DOWN = '\ue80b';
+  public static final char ICON_CLONE = '\uF24D';
+  public static final char ICON_TRASH = '\uF1f8';
+  public static final char ICON_ROTATE_SECRET = '\ue804';
+  public static final char ICON_EDIT = '\ue80a';
   private static Icons instance;
   private final Map<Character, IconCode> cache = new HashMap<>();
 
