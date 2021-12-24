@@ -27,11 +27,11 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
 
   public PolicyForm(List<PolicyModel> policyModels) {
     policyEditorPane = new PolicyEditorPane(policyModels, null);
-    policyEditorPane.setPropertyChangeListener(this::toggleOkButton);
+    policyEditorPane.setPropertyChangeListener(this::policyTextChnageEvent);
     initializeComponents();
   }
 
-  private void toggleOkButton(PropertyChangeEvent e) {
+  private void policyTextChnageEvent(PropertyChangeEvent e) {
     if (PolicyEditorPane.POLICY_TEXT.equals(e.getPropertyName()) && getDefaultButton() != null) {
       getDefaultButton().setEnabled(Util.stringIsNotNullOrEmpty(e.getNewValue()));
       validatePolicyText();
@@ -49,16 +49,18 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
       HashSet<String> set = new HashSet<>();
 
       list.forEach (i -> {
-            if (policyText.contains(i)) {
-              set.add(i);
-            }
+          if (policyText.contains(i)) {
+            set.add(i);
           }
+        }
       );
 
       if (set.size() > 0) {
-        policyEditorPane.highlightTextInPolicy(set);
+        policyEditorPane.highlightWordsInPolicy(set);
         policyEditorPane.setPolicyTextAreaTooltipText("<html>In <b>POST</b> mode, if the policy contains deletion " +
             "statements, such as !delete, !revoke,<br>or !deny, they are treated as errors.");
+      } else {
+        policyEditorPane.highlightPlaceHoldersInPolicy();
       }
     } else {
       policyEditorPane.highlightPlaceHoldersInPolicy();
