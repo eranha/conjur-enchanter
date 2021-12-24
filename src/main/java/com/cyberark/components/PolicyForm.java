@@ -69,7 +69,7 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
 
   private void initializeComponents() {
     setMinimumSize(new Dimension(240,160));
-    setPreferredSize(new Dimension(640,480));
+    setPreferredSize(new Dimension(800,600));
     JLabel fileLabel = new JLabel("File:");
     JLabel apiModeLabel = new JLabel("Mode:");
     filePathTextField = new JTextField(24);
