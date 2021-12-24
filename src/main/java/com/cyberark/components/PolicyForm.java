@@ -9,8 +9,6 @@ import com.cyberark.views.ViewFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
@@ -78,17 +76,6 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
 
     Container contentPanel = this;
     contentPanel.setLayout(new GridBagLayout());
-
-    policyEditorPane.addPolicyTextAreaFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(FocusEvent e) {
-      }
-
-      @Override
-      public void focusLost(FocusEvent e) {
-        validatePolicyText();
-      }
-    });
 
     // line - file path
     add(apiModeLabel, //gbc);

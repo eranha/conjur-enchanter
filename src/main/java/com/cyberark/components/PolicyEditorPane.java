@@ -16,15 +16,12 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.cyberark.Consts.CYBR_BLUE;
@@ -38,8 +35,9 @@ public class PolicyEditorPane extends JPanel {
   private String policyBranch;
   private PropertyChangeListener propertyChangeListener;
   private JLabel policyTextTip;
-  private final List<Point> highlights = new ArrayList<>();
-
+  private Map<Point, Object> highlights = new HashMap<>();
+  private final Highlighter.HighlightPainter painter =
+      new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
 
   public PolicyEditorPane(List<PolicyModel> policyModels, String policyText) {
     this.policyModels = policyModels;
@@ -51,10 +49,6 @@ public class PolicyEditorPane extends JPanel {
     policyTextArea.setToolTipText(text);
     policyTextTip.getParent().setVisible(text != null);
     policyTextTip.setText(text);
-  }
-
-  public void addPolicyTextAreaFocusListener(FocusListener listener) {
-    policyTextArea.addFocusListener(listener);
   }
 
   public void removeAllPolicyTextHighlights() {
@@ -71,7 +65,7 @@ public class PolicyEditorPane extends JPanel {
       if (chars[i] == '<' || chars[i] == '>') {
         if (currentPoint != null) {
           currentPoint.y = i + 1;
-          highlights.add(currentPoint);
+          highlights.put(currentPoint, new Object());
           currentPoint = null;
         }
 
@@ -98,7 +92,7 @@ public class PolicyEditorPane extends JPanel {
       int index = 0;
 
       while ((index = text.indexOf(s, index)) > -1 && index <= text.length()) {
-        highlights.add(new Point(index, index + s.length()));
+        highlights.put(new Point(index, index + s.length()), new Object());
         if (index + s.length() + 1 <= text.length()) {
           index += s.length() + 1;
         } else {
@@ -110,31 +104,29 @@ public class PolicyEditorPane extends JPanel {
     highlightTextInPolicy(highlights);
   }
 
-  private void highlightTextInPolicy(List<Point> positions) {
+  private void highlightTextInPolicy(Map<Point, Object> positions) {
     Highlighter highlighter = policyTextArea.getHighlighter();
-    Highlighter.HighlightPainter painter =
-        new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
 
+    Map<Point, Object> tmpHighlights = new HashMap<>();
     final int currentCaretPosition = policyTextArea.getCaretPosition();
+    final int selectionStart = policyTextArea.getSelectionStart();
+    final int selectionEnd = policyTextArea.getSelectionEnd();
 
-    positions.stream()
+    positions.keySet().stream()
         .filter(p -> currentCaretPosition < p.x || currentCaretPosition > p.y)
+        .filter(p -> !(selectionStart > p.x && selectionEnd < p.y))
         .forEach(
-        p -> {
-          Rectangle viewRect;
+            p -> {
+              Rectangle viewRect;
 
-          try {
-            // viewRect = policyTextArea.modelToView2D(p.x).getBounds();
-            // policyTextArea.scrollRectToVisible(viewRect);
-            highlighter.addHighlight(p.x, p.y, painter);
-          } catch (BadLocationException e) {
-            e.printStackTrace();
-          }
-          // together with caret events this is an endless loop
-          // policyTextArea.setCaretPosition(pos);
-          // policyTextArea.moveCaretPosition(pos);
-        }
-    );
+              try {
+                tmpHighlights.put(p, highlighter.addHighlight(p.x, p.y, painter));
+              } catch (BadLocationException e) {
+                e.printStackTrace();
+              }
+            }
+        );
+    highlights = tmpHighlights;
   }
 
   private void initializeComponents() {
@@ -527,11 +519,30 @@ public class PolicyEditorPane extends JPanel {
         }
       }
     });
+    final JTextArea jt = policyTextArea;
 
     policyTextArea.addCaretListener(e -> {
       if (!highlights.isEmpty()) {
-        policyTextArea.getHighlighter().removeAllHighlights();
-        highlightTextInPolicy(highlights);
+       highlights.forEach((p, t) -> {
+         if (e.getDot() >= p.x && e.getDot()  <= p.y ||
+             (p.x >= jt.getSelectionStart() && p.x <= jt.getSelectionEnd())) {
+           if (highlights.get(p) != null) {
+             policyTextArea.getHighlighter().removeHighlight(highlights.get(p));
+             highlights.put(p, null);
+           }
+         } else {
+           if (highlights.get(p) == null) {
+             try {
+               Object tag = policyTextArea.getHighlighter().addHighlight(p.x, p.y, painter);
+               highlights.put(p, tag);
+             } catch (BadLocationException badLocationException) {
+               badLocationException.printStackTrace();
+             }
+           }
+         }
+         System.out.println();
+       });
+        System.out.println(highlights);
       }
     });
   }
