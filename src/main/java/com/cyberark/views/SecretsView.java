@@ -30,7 +30,7 @@ public class SecretsView extends ResourceViewImpl<SecretModel> {
 
   @Override
   protected List<Action> getActions() {
-    List<Action> items = super.getMenuActions();
+    List<Action> items = super.getActions();
     items.add(new EditSecretAction(this::getSelectedResource));
     return items;
   }
