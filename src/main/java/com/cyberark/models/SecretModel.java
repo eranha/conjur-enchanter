@@ -8,7 +8,7 @@ public class SecretModel extends ResourceModel {
   private Secret[] secrets;
 
   @JsonIgnore
-  private char[] secret;
+  private char[] secret = new char[0];
 
   @JsonCreator
   public SecretModel(
