@@ -5,7 +5,6 @@ import com.cyberark.components.TextComparer;
 import com.cyberark.components.TitlePanel;
 import com.cyberark.models.PolicyModel;
 import com.cyberark.models.PolicyVersion;
-import com.cyberark.models.ViewModel;
 import com.cyberark.models.table.PolicyTableModel;
 import com.cyberark.models.table.PolicyVersionTableModel;
 import com.cyberark.models.table.ResourceTableModel;
@@ -26,8 +25,9 @@ public class PoliciesView extends ResourceViewImpl<PolicyModel> {
   }
 
   @Override
-  public void setModel(ViewModel model) {
-    super.setModel(model);
+  public void setResourceTableModel(ResourceTableModel<PolicyModel> model) {
+    super.setResourceTableModel(model);
+
     if (getModel().getRowCount() == 0) {
       PolicyVersionTableModel policyVersionsTableModel = new PolicyVersionTableModel(new PolicyVersion[0]);
       policyVersionsTable.setModel(policyVersionsTableModel);
