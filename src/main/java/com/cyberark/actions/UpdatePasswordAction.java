@@ -1,6 +1,7 @@
 package com.cyberark.actions;
 
 import com.cyberark.Util;
+import com.cyberark.components.PasswordGeneratorPane;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.ResourceType;
 import com.cyberark.models.RoleModel;
@@ -10,8 +11,6 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import static com.cyberark.Util.generatePassword;
 
 @SelectionBasedAction
 public class UpdatePasswordAction extends ActionBase<RoleModel> {
@@ -34,14 +33,22 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
               "Are you sure you want to continue?</html>")
       ) == JOptionPane.YES_OPTION) {
 
-        String password = JOptionPane.showInputDialog(getMainForm(),
-            new JLabel(
-                "<html>" +
-                     "Type in a new password or submit the <b>random generated</b> password.<br>" +
-                     "Choose a password that includes: 12-128 characters, 2 uppercase letters, <br>" +
-                     "2 lowercase letters,1 digit and 1 special character.<br></html>"
-            ),
-            generatePassword());
+        String tooltip = "<html>" +
+             "Type in a new password or submit the <b>random generated</b> password.<br>" +
+             "Choose a password that includes: 12-128 characters, 2 uppercase letters, <br>" +
+             "2 lowercase letters,1 digit and 1 special character.<br></html>";
+
+        PasswordGeneratorPane.PasswordGeneratorDialogResult result = PasswordGeneratorPane.showDialog(
+            getMainForm(),
+            "Set Secret Value",
+            JOptionPane.OK_CANCEL_OPTION,
+            Util.generatePassword(),
+            tooltip
+        );
+
+        String password = result.getResult() == JOptionPane.OK_OPTION
+            ? new String(result.getPassword())
+            : null;
 
         if (Util.stringIsNotNullOrEmpty(password)) {
           String apiKey = getResourcesService().rotateApiKey(

@@ -1,17 +1,13 @@
 package com.cyberark.actions;
 
 import com.cyberark.Util;
+import com.cyberark.components.PasswordGeneratorPane;
 import com.cyberark.models.SecretModel;
-import com.cyberark.views.Icons;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import static com.cyberark.Consts.DARK_BG;
-import static com.cyberark.Util.generatePassword;
 
 @SelectionBasedAction
 public class EditSecretAction extends EditItemAction<SecretModel> {
@@ -26,41 +22,18 @@ public class EditSecretAction extends EditItemAction<SecretModel> {
 
   @Override
   public void actionPerformed(SecretModel secretModel) {
-    JPanel panel = new JPanel(new BorderLayout());
-    JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-    JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-//    panel.setBorder(
-//        BorderFactory.createTitledBorder(new EmptyBorder(0,0,0,0),
-//        "Enter new value:")
-//    );
-    JTextField textField = new JTextField(new String(secretModel.getSecret()), 24);
-    JButton generatePassword = new JButton(Icons.getInstance().getIcon(Icons.ICON_ROTATE_SECRET, 16, DARK_BG));
-    generatePassword.setToolTipText("Generate random secure string");
-    topPanel.add(Box.createHorizontalStrut(4));
-    topPanel.add(new JLabel("<html>Enter new value or click the button on the right" +
-        "<br>to generate a random secure string:<html>"));
-    panel.add(topPanel, BorderLayout.NORTH);
-    panel.add(bottomPanel, BorderLayout.CENTER);
-    bottomPanel.add(textField);
-    bottomPanel.add(Box.createHorizontalStrut(8));
-    bottomPanel.add(generatePassword);
-
-    generatePassword.addActionListener(e -> {
-      textField.setText(generatePassword());
-      textField.requestFocus();
-      textField.selectAll();
-    });
-
-    int result = JOptionPane.showConfirmDialog(
+    PasswordGeneratorPane.PasswordGeneratorDialogResult result = PasswordGeneratorPane.showDialog(
         getMainForm(),
-        panel,
         "Set Secret Value",
-        JOptionPane.OK_CANCEL_OPTION
+        JOptionPane.OK_CANCEL_OPTION,
+        new String(secretModel.getSecret())
     );
 
-    if(result == JOptionPane.OK_OPTION && Util.stringIsNotNullOrEmpty(textField.getText().trim())) {
+    String password = new String(result.getPassword());
+
+    if(result.getResult() == JOptionPane.OK_OPTION && Util.stringIsNotNullOrEmpty(password.trim())) {
       try {
-        getResourcesService().setSecret(secretModel, textField.getText().trim());
+        getResourcesService().setSecret(secretModel, password.trim());
         fireEvent(secretModel);
       } catch (Exception ex) {
         showErrorDialog(ex, errorCodes);
