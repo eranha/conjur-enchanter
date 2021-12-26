@@ -203,4 +203,57 @@ public class Util {
 
     return resourceAsStream;
   }
+
+  public static String generatePassword() {
+    int length = 32;
+    String uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    String lowers = "abcdefghijklmnopqrstuvwxyz";
+    String digits = "0123456789";
+    String special = "!@@#$%^&*(){}[]?/`~\\|':;\"";
+
+    StringBuilder password = null;
+    StringBuilder charset = new StringBuilder();
+
+    charset
+        .append(uppers)
+        .append(lowers)
+        .append(digits)
+        .append(special);
+    boolean atLeastOneDigit = false;
+    boolean atLeastOneSpecial = false;
+    int uppersCount = 0;
+    int lowersCount = 0;
+    boolean allConditionsAreMet = false;
+
+    while (!allConditionsAreMet) {
+      password = new StringBuilder();
+
+      for (int i = 0, n = charset.length(); i < length; ++i) {
+        char ch = charset.charAt((int)Math.floor(Math.random() * n));
+
+        if (Character.isLetter(ch)) {
+          if (Character.isLowerCase(ch)) {
+            lowersCount++;
+          } else {
+            uppersCount++;
+          }
+        } else if (Character.isDigit(ch)) {
+          atLeastOneDigit = true;
+        } else if (
+            Arrays
+                .stream(special.split(""))
+                .anyMatch(s -> s.charAt(0) == ch)
+        ) {
+          atLeastOneSpecial = true;
+        }
+
+        password.append(ch);
+      }
+
+      allConditionsAreMet = atLeastOneDigit && atLeastOneSpecial && lowersCount >= 2 && uppersCount >= 2;
+
+    }
+
+    return password.toString();
+  }
 }
