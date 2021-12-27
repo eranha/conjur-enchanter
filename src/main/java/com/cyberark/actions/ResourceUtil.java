@@ -43,14 +43,12 @@ public class ResourceUtil {
     if (Util.isSetResource(resource.getType())) {
       // list members in a single grant
       policyBuilder.grants(resource, memberRoles);
+    } else {
+      // for each role this resource is granted, create a single grant
+      policyBuilder
+          .grants(grantedRoles, resource);
     }
-
-    // for each role this resource is granted, create a single grant
-    String permissions = policyBuilder
-        .grants(grantedRoles, resource).toPolicy();
 
     return policyBuilder.toPolicy();
   }
-
-
 }

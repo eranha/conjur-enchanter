@@ -82,6 +82,11 @@ public interface ResourcesService extends Consts {
   void permit(Map<ResourceIdentifier, Set<String>> privileges, ResourceModel resource)
       throws ResourceAccessException;
 
+  /**
+   * Returns a map of policy id to its flat list of resources.
+   * @return a map of policy id to its flat list of resources.
+   * @throws ResourceAccessException In case of an error.
+   */
   Map<ResourceIdentifier, List<ResourceIdentifier>> getPolicyResources() throws ResourceAccessException;
 
   List<Membership> getMembers(ResourceIdentifier resource) throws ResourceAccessException;

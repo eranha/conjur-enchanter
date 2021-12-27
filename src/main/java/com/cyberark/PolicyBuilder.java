@@ -216,4 +216,8 @@ public class PolicyBuilder {
         ? inputString
         : " ".repeat(Math.max(0, indent)) + inputString;
   }
+
+  public PolicyBuilder policy(ResourceIdentifier policy) {
+    return policy(policy.getId());
+  }
 }

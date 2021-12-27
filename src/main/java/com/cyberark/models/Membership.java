@@ -31,4 +31,13 @@ public class Membership {
   public String getPolicy() {
     return policy;
   }
+
+  @Override
+  public String toString() {
+    return "Membership{" +
+        "role='" + role + '\'' +
+        ", member='" + member + '\'' +
+        ", policy='" + policy + '\'' +
+        '}';
+  }
 }

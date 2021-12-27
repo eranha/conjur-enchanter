@@ -1,15 +1,18 @@
 package com.cyberark.actions;
 
 import com.cyberark.Consts;
-import com.cyberark.PolicyBuilder;
 import com.cyberark.Util;
 import com.cyberark.components.ResourcePolicyView;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.*;
+import com.cyberark.models.Membership;
+import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.ResourceModel;
+import com.cyberark.models.ResourceType;
 
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -29,7 +32,6 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
   @Override
   public void actionPerformed(ResourceModel resource) {
     String policy;
-    PolicyBuilder policyBuilder = new PolicyBuilder();
     List<Membership> membership = new ArrayList<>();
     List<Membership> members = new ArrayList<>();
     ResourceType type = resource.getIdentifier().getType();
@@ -59,7 +61,9 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
 
     InputDialog.showDialog(getMainForm(),
         String.format("%s - %s - Resource Policy", Consts.APP_NAME, resource.getIdentifier().getId())
-        , true, new ResourcePolicyView(resource,
-            policy, permissions), InputDialog.OK_OPTION);
+        , true, new ResourcePolicyView(
+            resource,
+            policy,
+            permissions), InputDialog.OK_OPTION);
   }
 }

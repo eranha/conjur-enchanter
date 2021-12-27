@@ -1,26 +1,24 @@
 package com.cyberark.actions;
 
 import com.cyberark.Application;
-import com.cyberark.components.DefaultDocumentListener;
-import com.cyberark.components.ResourceTree;
+import com.cyberark.PolicyBuilder;
+import com.cyberark.Util;
+import com.cyberark.components.ResourceTreeBrowser;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.*;
 import com.cyberark.resource.ResourceServiceFactory;
+import com.cyberark.resource.ResourcesService;
 import com.cyberark.views.ErrorView;
-import com.cyberark.views.Icons;
 
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-
-import static com.cyberark.Consts.DARK_BG;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ShowResourceTreeAction extends AbstractAction {
   public ShowResourceTreeAction() {
@@ -31,57 +29,126 @@ public class ShowResourceTreeAction extends AbstractAction {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    final ResourceTree[] tree = new ResourceTree[1];
-    Map<ResourceIdentifier, List<ResourceIdentifier>> resources;
+    Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources;
+    HashMap<ResourceType, Map<ResourceIdentifier, ResourceModel>> resourceTypeToResources = new HashMap<>();
 
     try {
-      resources = ResourceServiceFactory
+      Application.getInstance().getMainForm().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+      ResourcesService resourcesService = ResourceServiceFactory
           .getInstance()
-          .getResourcesService()
+          .getResourcesService();
+      policyToResources = resourcesService
           .getPolicyResources();
-      tree[0] = new ResourceTree(resources);
-    } catch (ResourceAccessException ex) {
-      ex.printStackTrace();
-      ErrorView.showErrorMessage(ex);
-      return;
-    }
 
-    JPanel panel = new JPanel(new BorderLayout());
-    JScrollPane scrollPane = new JScrollPane(tree[0]);
-    JTextField search = new JTextField();
+      ResourceIdentifier rootPolicy = policyToResources.keySet().stream()
+          .filter(r -> r.getId().equals("root")).findFirst().orElseThrow();
 
-    search.getDocument().addDocumentListener(new DefaultDocumentListener(event -> {
-      DefaultMutableTreeNode node = null;
-      try {
-        node = tree[0].findFirst(event.getDocument().getText(0, event.getDocument().getLength()));
-      } catch (BadLocationException ex) {
-        ex.printStackTrace();
-      }
-      if (node != null) {
-        TreePath path = new TreePath(node.getPath());
-        tree[0].setSelectionPath(path);
-      } else {
-        tree[0].clearSelection();
-      }
-    }));
+      getResourceTypeResourceMap(resourceTypeToResources, resourcesService);
 
-    JPanel searchPane = new JPanel(new BorderLayout());
-    searchPane.add(search, BorderLayout.CENTER);
-    searchPane.add(new JLabel(Icons.getInstance().getIcon(Icons.SEARCH_ICON_UNICODE, 16, DARK_BG)),
-        BorderLayout.EAST);
-    searchPane.setBorder(BorderFactory.createEmptyBorder(0,0, 8,4));
-    panel.add(searchPane, BorderLayout.NORTH);
+      PolicyBuilder policyBuilder = new PolicyBuilder();
+      getPolicy(rootPolicy, policyBuilder, policyToResources, resourceTypeToResources);
 
-    JPanel treePanel = new JPanel(new BorderLayout());
-    treePanel.add(scrollPane, BorderLayout.CENTER);
-    treePanel.setBorder(BorderFactory.createEmptyBorder(0, 4,0,6));
-    panel.add(treePanel, BorderLayout.CENTER);
-    panel.setPreferredSize(new Dimension(480, 320));
     InputDialog.showDialog(
         Application.getInstance().getMainForm(),
          "Resources Browser",
         true,
-        panel,
+        new ResourceTreeBrowser(policyToResources, policyBuilder.toPolicy()),
         JOptionPane.OK_OPTION);
+    } catch (ResourceAccessException ex) {
+      ex.printStackTrace();
+      ErrorView.showErrorMessage(ex);
+    } finally {
+      Application.getInstance().getMainForm().setCursor(Cursor.getDefaultCursor());
+    }
+  }
+
+  private void getPolicy( ResourceIdentifier policy,
+                          PolicyBuilder policyBuilder,
+                          Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources,
+                          Map<ResourceType, Map<ResourceIdentifier, ResourceModel>> resourceTypeToResources ) {
+    policyBuilder.policy(policy);
+
+    policyToResources.get(policy).forEach(
+        r -> getResourcePolicy(
+            policyBuilder, r, resourceTypeToResources
+        ));
+
+    policyToResources.keySet()
+        .stream()
+        .map(r -> resourceTypeToResources.get(ResourceType.policy).get(r))
+        .filter(p -> p.getPolicy() != null && p.getPolicy().equals(policy.getFullyQualifiedId()))
+        .forEach(p -> getPolicy(p.getIdentifier(), policyBuilder, policyToResources, resourceTypeToResources));
+  }
+
+  private void getResourceTypeResourceMap(HashMap<ResourceType, Map<ResourceIdentifier, ResourceModel>> resources,
+                                          ResourcesService resourcesService) throws ResourceAccessException {
+    for (ResourceType t : ResourceType.values()) {
+      switch (t) {
+        case policy:
+          resources.put(t,
+              resourcesService
+                .getPolicies()
+                .stream()
+                .collect(Collectors.toMap(ResourceModel::getIdentifier, Function.identity()))
+           );
+          break;
+        case host:
+        case user:
+          resources.put(t,
+              resourcesService
+                .getRoles(t)
+                .stream()
+                .collect(Collectors.toMap(ResourceModel::getIdentifier, Function.identity()))
+              );
+          break;
+        case variable:
+          resources.put(t,
+              resourcesService
+                  .getVariables()
+                  .stream()
+                  .collect(Collectors.toMap(ResourceModel::getIdentifier, Function.identity()))
+          );
+          break;
+        default:
+          resources.put(t,
+              resourcesService
+                  .getResources(t)
+                  .stream()
+                  .collect(Collectors.toMap(ResourceModel::getIdentifier, Function.identity()))
+                  );
+        break;
+      }
+    }
+  }
+
+  private void getResourcePolicy(PolicyBuilder policyBuilder,
+                                 ResourceIdentifier resource,
+                                 Map<ResourceType, Map<ResourceIdentifier, ResourceModel>> resources
+                                 ) {
+    ResourceModel model = resources.get(resource.getType()).get(resource);
+    policyBuilder
+          .resource(resource)
+          .annotations(model.getAnnotations())
+          .permissions(resource, model.getPermissions());
+
+    List<Membership> members = new ArrayList<>();
+    ResourceType type = resource.getType();
+    ResourcesService resourcesService = ResourceServiceFactory
+        .getInstance()
+        .getResourcesService();
+
+    if (Util.isSetResource(type)) { // applicable only for group/layer
+      try {
+        members = resourcesService.getMembers(resource);
+      } catch (ResourceAccessException ex) {
+        ex.printStackTrace();
+      }
+
+      if (members.size() > 0) {
+        // list members in a single grant
+        policyBuilder.grants(resource, members.stream()
+            .map(i -> ResourceIdentifier.fromString(i.getMember())).collect(Collectors.toList()));
+      }
+    }
   }
 }

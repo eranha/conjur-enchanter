@@ -5,10 +5,11 @@ import com.cyberark.models.ResourceIdentifier;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class ResourceTree extends JTree {
   private final HashMap<ResourceIdentifier, DefaultMutableTreeNode> nodes = new HashMap<>();
@@ -58,17 +59,23 @@ public class ResourceTree extends JTree {
     return id == null ? null : nodes.get(id);
   }
 
-  @Override
-  public void setSelectionPath(TreePath path) {
-    super.setSelectionPath(path);
-    Rectangle bounds = getPathBounds(path);
-    // set the height to the visible height to force the node to top
-    Objects.requireNonNull(bounds).height = getVisibleRect().height;
-    scrollRectToVisible(bounds);
-  }
-
   private String getResourceIdExcludingPath(String id) {
     if (id.indexOf('/') < 0) return id;
     return id.substring(id.lastIndexOf('/') + 1);
+  }
+
+  public TreeNode getRootNode() {
+    return root;
+  }
+
+  public void selectNode(DefaultMutableTreeNode node) {
+    TreePath path = new TreePath(node.getPath());
+    setSelectionPath(path);
+    // set the height to the visible height to force the node to top
+    Rectangle bounds = getPathBounds(path);
+    if (Objects.nonNull(bounds)) {
+      bounds.height = getVisibleRect().height;
+      scrollRectToVisible(bounds);
+    }
   }
 }

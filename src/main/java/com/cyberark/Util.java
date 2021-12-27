@@ -177,7 +177,10 @@ public class Util {
    * @return boolean indication
    */
   public static boolean isRoleResource(ResourceType type) {
-    return type != ResourceType.variable && type != ResourceType.webservice && type != ResourceType.policy;
+    return type == ResourceType.host ||
+        type == ResourceType.user ||
+        type == ResourceType.layer ||
+        type == ResourceType.group;
   }
 
   /**
