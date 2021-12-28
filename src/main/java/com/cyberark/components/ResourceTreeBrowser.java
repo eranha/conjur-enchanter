@@ -2,6 +2,7 @@ package com.cyberark.components;
 
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
+import com.cyberark.models.ResourceType;
 import com.cyberark.views.Icons;
 
 import javax.swing.*;
@@ -21,23 +22,24 @@ import static com.cyberark.Consts.DARK_BG;
 import static javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION;
 
 public class ResourceTreeBrowser extends JPanel {
-  private final String policy;
   private final Highlighter.HighlightPainter painter =
       new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
   private final  Map<ResourceIdentifier, List<Point>> resourceIndices = new HashMap<>();
+  private final Map<ResourceIdentifier, String> policyToText;
+  private final Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources;
   private JTextArea policyTextArea;
 
   public ResourceTreeBrowser(
       List<ResourceModel> policies,
       Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources,
-      String policy) {
+      Map<ResourceIdentifier, String> policyToText) {
     super(new BorderLayout());
-    this.policy = policy;
-    initializeComponents(policies, policyToResources);
+    this.policyToText = policyToText;
+    this.policyToResources = policyToResources;
+    initializeComponents(policies);
   }
 
-  private void initializeComponents(List<ResourceModel> policies,
-                                    Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources) {
+  private void initializeComponents(List<ResourceModel> policies) {
     ResourceTree resourceTree = new ResourceTree(policies, policyToResources);
     JPanel contentPane = new JPanel(new BorderLayout());
 
@@ -64,7 +66,6 @@ public class ResourceTreeBrowser extends JPanel {
 
     JPanel textPanel = new JPanel(new BorderLayout());
     policyTextArea = new JTextArea(5,20);
-    policyTextArea.setText(policy);
     textPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0, 8));
     textPanel.add(new JScrollPane(policyTextArea), BorderLayout.CENTER);
 
@@ -84,10 +85,26 @@ public class ResourceTreeBrowser extends JPanel {
 
       if (Objects.nonNull(selectedNode)) {
         ResourceIdentifier resource = (ResourceIdentifier) selectedNode.getUserObject();
+        ResourceIdentifier policy = (resource.getType() == ResourceType.policy)
+            ? resource
+            : getResourcePolicy(resource);
+
+        String policyText =  policyToText.get(policy);
+
+        policyTextArea.setText(policyText);
         policyTextArea.getHighlighter().removeAllHighlights();
-        highlightResource(resource, policy);
+        highlightResource(resource, policyText);
       }
     }
+  }
+
+  private ResourceIdentifier getResourcePolicy(ResourceIdentifier resource) {
+    return policyToResources
+        .keySet()
+        .stream()
+        .filter(k -> policyToResources.get(k).contains(resource))
+        .findFirst()
+        .orElseThrow();
   }
 
   private void highlightResource(ResourceIdentifier resource, String policy) {

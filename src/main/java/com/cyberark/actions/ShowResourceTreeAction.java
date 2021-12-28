@@ -40,22 +40,21 @@ public class ShowResourceTreeAction extends AbstractAction {
       policyToResources = resourcesService
           .getPolicyResources();
 
-      ResourceIdentifier rootPolicy = policyToResources.keySet().stream()
-          .filter(r -> r.getId().equals("root")).findFirst().orElseThrow();
-
       getResourceTypeResourceMap(resourceTypeToResources, resourcesService);
 
-      PolicyBuilder policyBuilder = new PolicyBuilder();
-      getPolicy(rootPolicy, policyBuilder, policyToResources, resourceTypeToResources);
+      Map<ResourceIdentifier, String> policyToTextMap = getPolicyToTextMap(
+          policyToResources,
+          resourceTypeToResources
+      );
 
-    // TODO change the policy view to a policy level base view
     InputDialog.showDialog(
         Application.getInstance().getMainForm(),
          "Resources Browser",
         true,
         new ResourceTreeBrowser(
             new ArrayList<>(resourceTypeToResources.get(ResourceType.policy).values()),
-            policyToResources, policyBuilder.toPolicy()),
+            policyToResources,
+            policyToTextMap),
         JOptionPane.OK_OPTION);
     } catch (ResourceAccessException ex) {
       ex.printStackTrace();
@@ -65,22 +64,22 @@ public class ShowResourceTreeAction extends AbstractAction {
     }
   }
 
-  private void getPolicy( ResourceIdentifier policy,
-                          PolicyBuilder policyBuilder,
-                          Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources,
-                          Map<ResourceType, Map<ResourceIdentifier, ResourceModel>> resourceTypeToResources ) {
-    policyBuilder.policy(policy);
+  private Map<ResourceIdentifier, String> getPolicyToTextMap(
+                                  Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources,
+                                  Map<ResourceType, Map<ResourceIdentifier, ResourceModel>> resourceTypeToResources ) {
 
-    policyToResources.get(policy).forEach(
-        r -> getResourcePolicy(
-            policyBuilder, r, resourceTypeToResources
-        ));
+    Map<ResourceIdentifier, String> policyToText = new HashMap<>();
 
-    policyToResources.keySet()
-        .stream()
-        .map(r -> resourceTypeToResources.get(ResourceType.policy).get(r))
-        .filter(p -> p.getPolicy() != null && p.getPolicy().equals(policy.getFullyQualifiedId()))
-        .forEach(p -> getPolicy(p.getIdentifier(), policyBuilder, policyToResources, resourceTypeToResources));
+    policyToResources
+        .forEach((policy, resources) ->
+            {
+              StringBuilder policyText = new StringBuilder();
+              resources.forEach(r -> policyText.append(getResourcePolicy(r, resourceTypeToResources)));
+              policyToText.put(policy, policyText.toString());
+            }
+        );
+
+    return policyToText;
   }
 
   private void getResourceTypeResourceMap(HashMap<ResourceType, Map<ResourceIdentifier, ResourceModel>> resources,
@@ -124,13 +123,13 @@ public class ShowResourceTreeAction extends AbstractAction {
     }
   }
 
-  private void getResourcePolicy(PolicyBuilder policyBuilder,
-                                 ResourceIdentifier resource,
-                                 Map<ResourceType, Map<ResourceIdentifier, ResourceModel>> resources
-                                 ) {
+  private String getResourcePolicy(ResourceIdentifier resource,
+                                 Map<ResourceType, Map<ResourceIdentifier, ResourceModel>> resources) {
+    PolicyBuilder policyBuilder = new PolicyBuilder();
     ResourceModel model = resources.get(resource.getType()).get(resource);
+    String id = resource.getId();
     policyBuilder
-          .resource(resource)
+          .resource(ResourceIdentifier.deriveFrom(resource, id.substring(id.lastIndexOf('/') + 1)))
           .annotations(model.getAnnotations())
           .permissions(resource, model.getPermissions());
 
@@ -155,5 +154,6 @@ public class ShowResourceTreeAction extends AbstractAction {
             .map(i -> ResourceIdentifier.fromString(i.getMember())).collect(Collectors.toList()));
       }
     }
+    return policyBuilder.toPolicy();
   }
 }
