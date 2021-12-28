@@ -129,7 +129,7 @@ public class ShowResourceTreeAction extends AbstractAction {
     ResourceModel model = resources.get(resource.getType()).get(resource);
     String id = resource.getId();
     policyBuilder
-          .resource(ResourceIdentifier.deriveFrom(resource, id.substring(id.lastIndexOf('/') + 1)))
+          .resource(resource)
           .annotations(model.getAnnotations())
           .permissions(resource, model.getPermissions());
 
