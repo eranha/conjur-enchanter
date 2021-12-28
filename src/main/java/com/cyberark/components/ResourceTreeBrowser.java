@@ -1,69 +1,50 @@
 package com.cyberark.components;
 
 import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.ResourceModel;
 import com.cyberark.views.Icons;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.cyberark.Consts.DARK_BG;
 import static javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION;
 
 public class ResourceTreeBrowser extends JPanel {
-  private JTextArea policyTextArea = new JTextArea();
+  private final String policy;
   private final Highlighter.HighlightPainter painter =
       new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
+  private final  Map<ResourceIdentifier, List<Point>> resourceIndices = new HashMap<>();
+  private JTextArea policyTextArea;
 
-  public ResourceTreeBrowser(Map<ResourceIdentifier, List<ResourceIdentifier>> resources,
-                             String policy) {
-    initializeComponents(resources, policy);
+  public ResourceTreeBrowser(
+      List<ResourceModel> policies,
+      Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources,
+      String policy) {
+    super(new BorderLayout());
+    this.policy = policy;
+    initializeComponents(policies, policyToResources);
   }
 
-  private void initializeComponents(Map<ResourceIdentifier, List<ResourceIdentifier>> resources, String policy) {
-    ResourceTree resourceTree = new ResourceTree(resources);
-    JPanel panel = new JPanel(new BorderLayout());
-    JScrollPane scrollPane = new JScrollPane(resourceTree);
-    JTextField search = new JTextField();
-    policyTextArea = new JTextArea(5,20);
-    policyTextArea.setText(policy);
+  private void initializeComponents(List<ResourceModel> policies,
+                                    Map<ResourceIdentifier, List<ResourceIdentifier>> policyToResources) {
+    ResourceTree resourceTree = new ResourceTree(policies, policyToResources);
+    JPanel contentPane = new JPanel(new BorderLayout());
 
     resourceTree.getSelectionModel().setSelectionMode(SINGLE_TREE_SELECTION);
-    resourceTree.getSelectionModel().addTreeSelectionListener(e -> {
-      DefaultMutableTreeNode selectedNode =
-          (DefaultMutableTreeNode)resourceTree.getLastSelectedPathComponent();
-      if (Objects.nonNull(selectedNode)) {
-        ResourceIdentifier resource = (ResourceIdentifier) selectedNode.getUserObject();
-        int index = policy.indexOf(String.format("id: %s%n", resource.getId()));
-        policyTextArea.getHighlighter().removeAllHighlights();
-        if (index > -1 && index <= policyTextArea.getText().length()) {
-          Highlighter highlighter = policyTextArea.getHighlighter();
+    resourceTree.getSelectionModel().addTreeSelectionListener(this::handleTreeSelectionEvent);
 
-          policyTextArea.setCaretPosition(index);
-          Rectangle2D viewRect;
-          try {
-            highlighter.addHighlight(index + 4, index + 4 + resource.getId().length(), painter);
-            viewRect = policyTextArea.modelToView2D(index);
-            if (Objects.nonNull(viewRect)) {
-              policyTextArea.scrollRectToVisible(viewRect.getBounds());
-            }
-          } catch (BadLocationException ex) {
-            ex.printStackTrace();
-          }
-        }
-      }
-    });
-
-    setLayout(new BorderLayout());
-
+    JTextField search = new JTextField();
     initSearchTextField(resourceTree, search);
 
     JPanel searchPane = new JPanel(new BorderLayout());
@@ -71,28 +52,88 @@ public class ResourceTreeBrowser extends JPanel {
     searchPane.add(new JLabel(Icons.getInstance().getIcon(Icons.SEARCH_ICON_UNICODE, 16, DARK_BG)),
         BorderLayout.EAST);
     searchPane.setBorder(BorderFactory.createEmptyBorder(0,0, 8,4));
-    panel.add(searchPane, BorderLayout.NORTH);
+    contentPane.add(searchPane, BorderLayout.NORTH);
 
     JPanel treePanel = new JPanel(new BorderLayout());
+    JScrollPane scrollPane = new JScrollPane(resourceTree);
     treePanel.add(scrollPane, BorderLayout.CENTER);
     treePanel.setBorder(BorderFactory.createEmptyBorder(0, 4,0,6));
-    panel.add(treePanel, BorderLayout.CENTER);
-    panel.setPreferredSize(new Dimension(640, 480));
-    panel.setMaximumSize(new Dimension(640, 480));
+    contentPane.add(treePanel, BorderLayout.CENTER);
+    contentPane.setPreferredSize(new Dimension(640, 480));
+    contentPane.setMaximumSize(new Dimension(640, 480));
+
     JPanel textPanel = new JPanel(new BorderLayout());
+    policyTextArea = new JTextArea(5,20);
+    policyTextArea.setText(policy);
     textPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0, 8));
     textPanel.add(new JScrollPane(policyTextArea), BorderLayout.CENTER);
-    JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel, textPanel);
+
+    JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, contentPane, textPanel);
     splitPane.setDividerLocation(280);
     splitPane.setBorder(BorderFactory.createEmptyBorder());
     add(splitPane, BorderLayout.CENTER);
     resourceTree.setSelectionPath(new TreePath(resourceTree.getRootNode()));
   }
 
+  private void handleTreeSelectionEvent(TreeSelectionEvent e) {
+    TreePath selectionPath = ((TreeSelectionModel) e.getSource()).getSelectionPath();
+
+    if (Objects.nonNull(selectionPath)) {
+      DefaultMutableTreeNode selectedNode =
+          (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+
+      if (Objects.nonNull(selectedNode)) {
+        ResourceIdentifier resource = (ResourceIdentifier) selectedNode.getUserObject();
+        policyTextArea.getHighlighter().removeAllHighlights();
+        highlightResource(resource, policy);
+      }
+    }
+  }
+
+  private void highlightResource(ResourceIdentifier resource, String policy) {
+    resourceIndices.computeIfAbsent(resource, v -> getIndices(resource.getId(), policy));
+
+    for (Point highlight : resourceIndices.get(resource)) {
+      Highlighter highlighter = policyTextArea.getHighlighter();
+
+      policyTextArea.setCaretPosition(highlight.x);
+
+      // scroll to text
+      Rectangle2D viewRect;
+
+      try {
+        highlighter.addHighlight(highlight.x, highlight.y, painter);
+        viewRect = policyTextArea.modelToView2D(highlight.x);
+
+        if (Objects.nonNull(viewRect)) {
+          policyTextArea.scrollRectToVisible(viewRect.getBounds());
+        }
+      } catch (BadLocationException ex) {
+        ex.printStackTrace();
+      }
+    }
+  }
+
+  private List<Point> getIndices(String query, String text) {
+    ArrayList<Point> indices = new ArrayList<>();
+    int index = 0;
+
+    while (index != -1 && index < text.length()) {
+      index = text.indexOf(String.format(" %s%n", query), index);
+
+      if (index > -1) {
+        indices.add(new Point(index + 1, index + 1 + query.length()));
+        index += query.length() + 1;
+      }
+    }
+
+    return indices;
+  }
 
   private void initSearchTextField(ResourceTree resourceTree, JTextField searchTextField) {
     searchTextField.getDocument().addDocumentListener(new DefaultDocumentListener(event -> {
       DefaultMutableTreeNode node = null;
+
       try {
 
         String search = event.getDocument().getText(0, event.getDocument().getLength());

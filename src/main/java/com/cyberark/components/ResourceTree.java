@@ -1,6 +1,7 @@
 package com.cyberark.components;
 
 import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.ResourceModel;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -16,46 +17,64 @@ public class ResourceTree extends JTree {
   private DefaultMutableTreeNode root;
   private final HashSet<ResourceIdentifier> resourceIds = new HashSet<>();
 
-  public ResourceTree(Map<ResourceIdentifier, List<ResourceIdentifier>> model) {
+  public ResourceTree(List<ResourceModel> policies, Map<ResourceIdentifier, List<ResourceIdentifier>> model) {
     setCellRenderer(new ResourceTreeTreeCellRenderer());
+    addPolicyNodes(policies);
 
-    model.forEach((id, value) -> {
-      resourceIds.add(id);
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(id);
-      nodes.put(id, node);
-      if (id.getId().equals("root")) {
-        root = node;
-      }
+    // add resource child nodes of each policy
+    model.forEach((policy, value) -> {
+      DefaultMutableTreeNode parentPolicyNode = nodes.get(policy);
+
       value.forEach(i -> {
         DefaultMutableTreeNode child = new DefaultMutableTreeNode(i);
-        node.add(child);
+        parentPolicyNode.add(child);
         resourceIds.add(i);
         nodes.put(i, child);
       });
-    });
-
-    model.keySet().forEach(id -> {
-      String policy = id.getId();
-
-      if (policy.split("/").length == 1) {
-        if (!policy.equals("root")) {
-          root.add(nodes.get(id));
-        }
-      } else {
-        String fullyQualifiedId = id.getFullyQualifiedId();
-        ResourceIdentifier parent = ResourceIdentifier.fromString(
-            fullyQualifiedId.substring(0, fullyQualifiedId.lastIndexOf('/')));
-        nodes.get(parent).add(nodes.get(id));
-      }
     });
 
     DefaultTreeModel treeModel = new DefaultTreeModel(root);
     setModel(treeModel);
   }
 
+  private void addPolicyNodes(List<ResourceModel> policies) {
+    ResourceModel rootPolicy = policies
+        .stream()
+        .filter(m -> m.getPolicy() == null)
+        .findFirst()
+        .orElseThrow();
+
+    addPolicyNode(rootPolicy, policies);
+  }
+
+  private void addPolicyNode(ResourceModel policyModel, List<ResourceModel> policies) {
+    // add the treeNode
+    ResourceIdentifier identifier = policyModel.getIdentifier();
+    DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(identifier);
+
+    resourceIds.add(identifier);
+    nodes.put(identifier, treeNode);
+
+    if (policyModel.getPolicy() == null) {
+      root = treeNode;
+    } else {
+      ResourceIdentifier parentPolicy = ResourceIdentifier.fromString(policyModel.getPolicy());
+      nodes.get(parentPolicy).add(treeNode);
+    }
+
+    // filter and add children
+    policies
+        .stream()
+        .filter(m -> policyModel.getId().equals(m.getPolicy()))
+        .forEach(p -> addPolicyNode(p, policies));
+  }
+
   public DefaultMutableTreeNode findFirst(String str) {
     ResourceIdentifier id = resourceIds.stream()
-        .filter(i -> getResourceIdExcludingPath(i.getId()).startsWith(str)).findFirst().orElse(null);
+        .filter(i -> getResourceIdExcludingPath(i.getId())
+        .startsWith(str))
+        .findFirst()
+        .orElse(null);
     return id == null ? null : nodes.get(id);
   }
 

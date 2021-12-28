@@ -48,11 +48,14 @@ public class ShowResourceTreeAction extends AbstractAction {
       PolicyBuilder policyBuilder = new PolicyBuilder();
       getPolicy(rootPolicy, policyBuilder, policyToResources, resourceTypeToResources);
 
+    // TODO change the policy view to a policy level base view
     InputDialog.showDialog(
         Application.getInstance().getMainForm(),
          "Resources Browser",
         true,
-        new ResourceTreeBrowser(policyToResources, policyBuilder.toPolicy()),
+        new ResourceTreeBrowser(
+            new ArrayList<>(resourceTypeToResources.get(ResourceType.policy).values()),
+            policyToResources, policyBuilder.toPolicy()),
         JOptionPane.OK_OPTION);
     } catch (ResourceAccessException ex) {
       ex.printStackTrace();
@@ -139,7 +142,9 @@ public class ShowResourceTreeAction extends AbstractAction {
 
     if (Util.isSetResource(type)) { // applicable only for group/layer
       try {
-        members = resourcesService.getMembers(resource);
+        members = resourcesService.getMembers(resource).stream()
+            .filter(r -> !(ResourceIdentifier.fromString(r.getMember())).getId().equals("admin"))
+            .collect(Collectors.toList());
       } catch (ResourceAccessException ex) {
         ex.printStackTrace();
       }
