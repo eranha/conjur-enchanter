@@ -30,7 +30,7 @@ public class RestApiResourceProvider implements ResourceApiProvider {
       conn = openConnection(url, "GET", getAuthorizationHeader(user, password));
       responseCode = conn.getResponseCode();
       response = readResponse(conn);
-    } catch (IOException ex) {
+    } catch (Throwable ex) {
       throw new ApiCallException(
           "Connections Error",
           url,
@@ -52,7 +52,7 @@ public class RestApiResourceProvider implements ResourceApiProvider {
       conn = openConnection(url, "PUT", getAuthorizationHeader(user, password), body);
       responseCode = conn.getResponseCode();
       response = readResponse(conn);
-    } catch (IOException ex) {
+    } catch (Throwable ex) {
       throw new ApiCallException(
           "Connections Error",
           url,
@@ -77,7 +77,7 @@ public class RestApiResourceProvider implements ResourceApiProvider {
     try {
       conn = openConnection(url, "GET", headers);
       response = readResponse(conn);
-    } catch (IOException ex) {
+    } catch (Throwable ex) {
       throw new ApiCallException(
           "Connections Error",
           url,
@@ -124,7 +124,7 @@ public class RestApiResourceProvider implements ResourceApiProvider {
     try {
       HttpURLConnection huc = (HttpURLConnection) url.openConnection();
       responseCode = huc.getResponseCode();
-    } catch (IOException e) {
+    } catch (Throwable e) {
       throw new IOException(String.format("Connection error: %s", e.getMessage()));
     }
 
@@ -145,7 +145,7 @@ public class RestApiResourceProvider implements ResourceApiProvider {
       conn = openConnection(url, requestMethod, headers, body);
       responseCode = conn.getResponseCode();
       response = readResponse(conn);
-    } catch (IOException ex) {
+    } catch (Throwable ex) {
       throw new ApiCallException(
           "Connection Error",
           url,
