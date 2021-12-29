@@ -5,10 +5,7 @@ import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.models.audit.AuditEvent;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public interface ResourcesService extends Consts {
@@ -118,4 +115,6 @@ public interface ResourcesService extends Consts {
    * @throws ResourceAccessException If the operation fails
    */
   void rotateSecret(SecretModel secretModel) throws ResourceAccessException;
+
+  List<HostFactory> getHostFactories() throws ResourceAccessException;
 }

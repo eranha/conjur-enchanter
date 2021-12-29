@@ -136,6 +136,19 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
+  public List<HostFactory> getHostFactories() throws ResourceAccessException {
+    try {
+      String json = resourceProvider.get(new URL(getResourcesEndpoint(ResourceType.host_factory)), getAccessToken());
+      return Arrays.stream(readValue(json, HostFactory[].class))
+          .sorted((Comparator.comparing(ResourceModel::getId)))
+          .collect(Collectors.toList());
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new ResourceAccessException(e);
+    }
+  }
+
+  @Override
   public List<ResourceModel> getResources(ResourceType type) throws ResourceAccessException {
     logger.trace("getResources({}) enter", type);
 
