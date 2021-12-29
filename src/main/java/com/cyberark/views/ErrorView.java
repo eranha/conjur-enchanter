@@ -6,6 +6,7 @@ import com.cyberark.exceptions.ApiCallException;
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ErrorView {
   public static void showApiCallErrorMessage(ApiCallException ex) {
@@ -49,8 +50,10 @@ public class ErrorView {
   }
 
   public static void showErrorMessage(Exception ex) {
-    if (ex.getCause() instanceof ApiCallException) {
-      ApiCallException cause = (ApiCallException) ex.getCause();
+    ApiCallException cause = getApiCallException(ex);
+
+    if (Objects.nonNull(cause)) {
+      ex.printStackTrace();
       showApiCallErrorMessage(cause);
     } else {
       ex.printStackTrace();
@@ -58,11 +61,26 @@ public class ErrorView {
     }
   }
 
+  private static ApiCallException getApiCallException(Exception ex) {
+    Throwable t = ex.getCause();
+
+    while (t != null) {
+      if (t instanceof ApiCallException) {
+        return (ApiCallException) t;
+      }
+
+      t = t.getCause();
+    }
+
+    return null;
+  }
+
   public static void showErrorMessage(String msg) {
     ViewFactory viewFactory = ViewFactory.getInstance();
+    JTextArea jt = new JTextArea(msg, 8, 36);
 
     viewFactory.getMessageView().showMessageDialog(
-        msg,
+        new JScrollPane(jt),
         "Error",
         JOptionPane.ERROR_MESSAGE);
   }
