@@ -94,7 +94,21 @@ public class ShowResourceTreeAction extends AbstractAction {
                 .collect(Collectors.toMap(ResourceModel::getIdentifier, Function.identity()))
            );
           break;
+        case host_factory:
+          resources.put(t,
+              resourcesService
+                  .getHostFactories()
+                  .stream()
+                  .collect(Collectors.toMap(ResourceModel::getIdentifier, Function.identity()))
+          );
+          break;
         case host:
+          resources.put(t,
+              resourcesService
+                  .getRoles(t)
+                  .stream()
+                  .collect(Collectors.toMap(ResourceModel::getIdentifier, Function.identity()))
+          );
         case user:
           resources.put(t,
               resourcesService
