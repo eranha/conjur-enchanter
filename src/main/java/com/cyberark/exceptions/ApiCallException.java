@@ -7,7 +7,7 @@ public class ApiCallException extends IOException {
   private final URL url;
   private int responseCode;
 
-  public ApiCallException(String message, URL url, IOException cause, int responseCode) {
+  public ApiCallException(String message, URL url, Throwable cause, int responseCode) {
     super(message, cause);
     this.url = url;
     setResponseCode(responseCode);
