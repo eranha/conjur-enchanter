@@ -73,6 +73,10 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
     return model.get(rowIndex);
   }
 
+  public T getItemAt(int index) {
+    return model.get(index);
+  }
+
   @Override
   public int getResourceModelIndex(final ResourceModel resourceModel) {
     if (model != null) {

@@ -13,8 +13,9 @@ public interface Endpoints {
   String MEMBERSHIPS = "%s/roles/%s/%s/%s?memberships";
   String MEMBERS = "%s/roles/%s/%s/%s?members";
   String ROTATE_API_KEY = "%s/authn/%s/api_key?role=%s:%s";
-  //String AUDIT = "%s/audit?limit=50";///audit/roles/org%3Auser%3Afoo?limit=10
-  //  //api/audit/roles/org%3Auser%3Abob?limit=10
   String AUDIT = "%s/audit?limit=500";
   String UPDATE_PASSWORD = "%s/authn/%s/password";
+  String HOST_FACTORY_HOSTS = "%s/host_factories/hosts";
+  String HOST_FACTORY_TOKENS = "%s/host_factory_tokens";
+  String DELETE_HOST_FACTORY_TOKENS = "%s/host_factory_tokens/%s";
 }

@@ -8,5 +8,6 @@ public enum ViewType {
   Users,
   Groups,
   Secrets,
-  Webserivices
+  Webserivices,
+  HostFactories
 }

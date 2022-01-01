@@ -6,13 +6,11 @@ import com.cyberark.exceptions.ApiCallException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 
@@ -169,8 +167,10 @@ public class RestApiResourceProvider implements ResourceApiProvider {
   private HttpURLConnection openConnection(URL url,
                                           String requestMethod,
                                           HashMap<String, String> headers,
-                                          String body) throws IOException {
+                                          String payload) throws IOException {
     logger.trace("openConnection({}, {}) enter", url, requestMethod);
+    logger.debug("body:");
+    logger.debug(payload);
 
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -185,10 +185,10 @@ public class RestApiResourceProvider implements ResourceApiProvider {
       conn.setRequestMethod(requestMethod);
     }
 
-    if (body != null) {
+    if (payload != null) {
       conn.setDoOutput(true);
-      try (OutputStream os = conn.getOutputStream()) {
-        os.write(body.getBytes());
+      try (OutputStream os = new DataOutputStream(conn.getOutputStream())) {
+        os.write(payload.getBytes(StandardCharsets.UTF_8));
       }
     }
 

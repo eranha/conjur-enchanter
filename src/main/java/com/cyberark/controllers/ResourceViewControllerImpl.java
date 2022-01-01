@@ -3,11 +3,9 @@ package com.cyberark.controllers;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.exceptions.ResourceAccessException;
+import com.cyberark.models.HostFactory;
 import com.cyberark.models.SecretModel;
-import com.cyberark.models.table.DefaultResourceTableModel;
-import com.cyberark.models.table.PolicyTableModel;
-import com.cyberark.models.table.RoleTableModel;
-import com.cyberark.models.table.SecretTableModel;
+import com.cyberark.models.table.*;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
 import com.cyberark.views.*;
@@ -62,7 +60,11 @@ public class ResourceViewControllerImpl implements ResourceViewController {
             getSecretsViewModel()
         );
         break;
-      case Webserivices:
+      case HostFactories:
+        getHostFactoriesView().setResourceTableModel(
+            getHostFactoriesViewModel()
+        );
+        break;      case Webserivices:
       case Layers:
       case Groups:
         getResourcesView(type).setResourceTableModel(
@@ -72,6 +74,13 @@ public class ResourceViewControllerImpl implements ResourceViewController {
         );
         break;
     }
+  }
+
+  private ResourceTableModel<HostFactory> getHostFactoriesViewModel() throws ResourceAccessException {
+    logger.trace("getHostFactoriesViewModel::enter::");
+    ResourceTableModel<HostFactory> model = new DefaultResourceTableModel<>(getResourceService().getHostFactories());
+    logger.trace("getSecretsViewModel::exit:: return: {}", model);
+    return model;
   }
 
   /**
@@ -132,6 +141,10 @@ public class ResourceViewControllerImpl implements ResourceViewController {
     return (SecretsView) views.get(ViewType.Secrets);
   }
 
+  private HostFactoriesView getHostFactoriesView() {
+    return (HostFactoriesView) views.get(ViewType.HostFactories);
+  }
+
   public ResourceView createResourceView(ViewType type) {
     ResourceView resourceView;
 
@@ -141,6 +154,9 @@ public class ResourceViewControllerImpl implements ResourceViewController {
         break;
       case Secrets:
         resourceView = new SecretsView();
+        break;
+      case HostFactories:
+        resourceView = new HostFactoriesView();
         break;
       case Users:
       case Hosts:

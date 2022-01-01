@@ -56,24 +56,27 @@ public class InputDialog extends JDialog {
 
     getRootPane().setDefaultButton(okButton);
     getContentPane().setLayout(new BorderLayout());
+
     JPanel contentPane = new JPanel(new BorderLayout());
     contentPane.setBorder(BorderFactory.createEmptyBorder(16,16,8,10));
     contentPane.add(content, BorderLayout.CENTER);
     getContentPane().add(contentPane, BorderLayout.CENTER);
     getContentPane().add(controlPanel, BorderLayout.SOUTH);
     controlPanel.setBorder(BorderFactory.createEmptyBorder(8,0,8,8));
-    controlPanel.add(okButton);
     controlPanel.add(cancelButton);
+    controlPanel.add(okButton);
 
     okButton.addActionListener(e -> {
       result = OK_OPTION;
       setVisible(false);
     });
+
     cancelButton.addActionListener(e -> setVisible(false));
 
     getRootPane().registerKeyboardAction(e -> setVisible(false),
         KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
         JComponent.WHEN_IN_FOCUSED_WINDOW);
+
 
     if (optionType == JOptionPane.OK_OPTION) {
       cancelButton.setVisible(false);

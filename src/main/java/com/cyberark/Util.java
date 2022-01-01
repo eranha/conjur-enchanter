@@ -3,12 +3,15 @@ package com.cyberark;
 import com.cyberark.models.ResourceType;
 import com.cyberark.views.ViewType;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility functions
@@ -129,6 +132,8 @@ public class Util {
         return ViewType.Groups;
       case webservice:
         return ViewType.Webserivices;
+      case host_factory:
+        return ViewType.HostFactories;
     }
 
     throw new IllegalArgumentException(String.format("Resource type %s has no view", type));
@@ -155,6 +160,8 @@ public class Util {
         return ResourceType.group;
       case Webserivices:
         return ResourceType.webservice;
+      case HostFactories:
+        return ResourceType.host_factory;
     }
 
     throw new IllegalArgumentException();
@@ -258,5 +265,16 @@ public class Util {
     }
 
     return password.toString();
+  }
+
+  public static Map<String, String> toMap(String json) {
+    ObjectMapper mapper = new ObjectMapper();
+    TypeReference<HashMap<String, String>> typeRef
+        = new TypeReference<>() {};
+    try {
+      return mapper.readValue(json, typeRef);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 }

@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 
 import static com.cyberark.Consts.DARK_BG;
 
+@SelectionBasedAction
 public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T> {
   public EditAnnotationsAction(Supplier<T> selectedResource) {
     this("Edit Annotations...", ActionType.EditAnnotations, selectedResource);
@@ -28,6 +29,7 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
         16,
         DARK_BG));
     putValue(SHORT_DESCRIPTION, "Edit the resource annotations");
+    setEnabled(false);
   }
 
   @Override

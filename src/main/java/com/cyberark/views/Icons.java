@@ -78,7 +78,10 @@ public class Icons {
       case Secrets:
         return getIcon(SECRETS_ICON_UNICODE, size, foreground);
       case Webserivices:
-        return getIcon(WEBSERVICES_ICON_UNICODE, size, foreground);    }
+        return getIcon(WEBSERVICES_ICON_UNICODE, size, foreground);
+      case HostFactories:
+        return getIcon(ICON_HOST_ROTATOR, size, foreground);
+    }
     return null;
   }
 

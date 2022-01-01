@@ -21,6 +21,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -193,11 +194,14 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
 
   protected List<Action> getMenuActions() {
     List<Action> actions = new ArrayList<>();
-    Action action = getNewResourceTypeAction();
-    action.putValue(Action.NAME, "New...");
-    actions.add(
-        action
-    );
+    Action newResourceAction = getNewResourceTypeAction();
+
+    if (Objects.nonNull(newResourceAction)) {
+      newResourceAction.putValue(Action.NAME, "New...");
+      actions.add(
+          newResourceAction
+      );
+    }
 
     if (Util.isSetResource(Util.getResourceType(view))) {
       actions.add(new EditSetResourceAction(this::getSelectedResource, "Edit Members..."));
@@ -220,8 +224,11 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
    */
   protected List<Action> getActions() {
     List<Action> actions = new ArrayList<>();
+    Action newResource = getNewResourceTypeAction();
 
-    actions.add(getNewResourceTypeAction());
+    if (Objects.nonNull(newResource)) {
+      actions.add(getNewResourceTypeAction());
+    }
 
     if (Util.isSetResource(Util.getResourceType(view))) {
       actions.add(new EditSetResourceAction(this::getSelectedResource));

@@ -117,4 +117,10 @@ public interface ResourcesService extends Consts {
   void rotateSecret(SecretModel secretModel) throws ResourceAccessException;
 
   List<HostFactory> getHostFactories() throws ResourceAccessException;
+
+  String createHostFactoryTokens(HostFactoryTokensFormModel model) throws ResourceAccessException;
+
+  String createHostFactoryHost(String hostName, String token) throws ResourceAccessException;
+
+  void revokeHostFactoryToken(String token) throws ResourceAccessException;
 }

@@ -149,6 +149,102 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
+  public String createHostFactoryTokens(HostFactoryTokensFormModel model) throws ResourceAccessException {
+    if (model == null) {
+      throw new IllegalArgumentException("model");
+    }
+
+    logger.trace("createHostFactoryTokens({}) enter", model.getHostFactoryId());
+    StringBuilder builder = new StringBuilder();
+
+    builder
+        .append("expiration=").append(
+        URLEncoder.encode(model.getExpirationUtcCDate().replace(' ', 'T'),
+            StandardCharsets.UTF_8))
+        .append(URLEncoder.encode("+00:00", StandardCharsets.UTF_8))
+        .append("&count=").append(model.getNumberOfTokens())
+        .append ("&host_factory=").append(URLEncoder.encode(model.getHostFactoryId(), StandardCharsets.UTF_8));
+
+    if (Objects.nonNull(model.getRestrictions())) {
+      for (String ip : model.getRestrictions()) {
+        builder.append("&cidr[]=").append(URLEncoder.encode(ip, StandardCharsets.UTF_8));
+      }
+    }
+
+    String payload = builder.toString();
+
+    String response;
+    HashMap<String, String> headers = new HashMap<>();
+    headers.put("Authorization", String.format("Token token=\"%s\"",
+        Base64.getEncoder().encodeToString(new String(getAccessToken()).getBytes())));
+    headers.put("Content-Type", "application/x-www-form-urlencoded");//charset
+    headers.put("Charset", StandardCharsets.UTF_8.toString());
+
+    try {
+      String url = String.format(
+          Endpoints.HOST_FACTORY_TOKENS,
+          app.getCredentials().url);
+
+      response = resourceProvider.post(
+        new URL(url),
+        headers,
+        payload
+      );
+    } catch (IOException e) {
+      e.printStackTrace();
+      logger.error(e);
+      throw new ResourceAccessException(e);
+    }
+    logger.trace("createHostFactoryTokens({}) exit", model.getHostFactoryId());
+    return response;
+  }
+
+  @Override
+  public String createHostFactoryHost(String hostName, String token) throws ResourceAccessException {
+    logger.trace("createHostFactoryHost({}) enter", hostName);
+    String response;
+
+    try {
+      String url = String.format(
+          Endpoints.HOST_FACTORY_HOSTS,
+          app.getCredentials().url);
+      HashMap<String, String> headers = new HashMap<>();
+      headers.put("Authorization", String.format("Token token=\"%s\"", token));
+      response = resourceProvider.post(new URL(url), headers, String.format("id=%s", hostName));
+
+    } catch (IOException e) {
+      e.printStackTrace();
+      logger.error(e);
+      throw new ResourceAccessException(e);
+    }
+    logger.trace("createHostFactoryHost({}) exit", hostName);
+
+    return response;
+  }
+
+  @Override
+  public void revokeHostFactoryToken(String token) throws ResourceAccessException {
+    logger.trace("revokeHostFactoryToken({}) enter", token);
+
+    if (token == null) {
+        throw new IllegalArgumentException("token");
+    }
+
+    try {
+      String url = String.format(
+          Endpoints.DELETE_HOST_FACTORY_TOKENS,
+          app.getCredentials().url, token);
+
+      resourceProvider.request(new URL(url), "DELETE", getAccessToken(), null);
+    } catch (IOException e) {
+      e.printStackTrace();
+      logger.error(e);
+      throw new ResourceAccessException(e);
+    }
+    logger.trace("revokeHostFactoryToken({}) exit", token);
+  }
+
+  @Override
   public List<ResourceModel> getResources(ResourceType type) throws ResourceAccessException {
     logger.trace("getResources({}) enter", type);
 

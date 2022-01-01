@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class HostFactory extends ResourceModel {
 
   private final String[] layers;
-  private final String[] tokens;
+  private final HostFactoryToken[] tokens;
 
   @JsonCreator
 public HostFactory(@JsonProperty("created_at") String createdAt,
@@ -16,7 +16,7 @@ public HostFactory(@JsonProperty("created_at") String createdAt,
                      @JsonProperty("permissions") Permission[] permissions,
                      @JsonProperty("annotations") Annotation[] annotations,
                      @JsonProperty("layers") String[] layers,
-                     @JsonProperty("tokens") String[] tokens) {
+                     @JsonProperty("tokens") HostFactoryToken[] tokens) {
     super(createdAt, id, owner, policy, permissions, annotations);
     this.layers = layers;
     this.tokens = tokens;
@@ -26,7 +26,7 @@ public HostFactory(@JsonProperty("created_at") String createdAt,
     return layers;
   }
 
-  public String[] getTokens() {
+  public HostFactoryToken[] getTokens() {
     return tokens;
   }
 }
