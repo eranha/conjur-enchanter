@@ -191,6 +191,19 @@ public class PolicyBuilder {
     return this;
   }
 
+  public PolicyBuilder layers(String[] layers) {
+    if (layers != null && layers.length > 0) {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < layers.length; i++) {
+        builder.append(String.format(i < layers.length - 1 ? "!layer %s, " : "!layer %s", layers[i]));
+      }
+
+      append("  layers: [ %s ]", builder.toString());
+    }
+
+    return this;
+  }
 
   public PolicyBuilder revoke(List<ResourceIdentifier> members, ResourceIdentifier role) {
     members.forEach(i -> revoke(i, role));
@@ -220,4 +233,6 @@ public class PolicyBuilder {
   public PolicyBuilder policy(ResourceIdentifier policy) {
     return policy(policy.getId());
   }
+
+
 }

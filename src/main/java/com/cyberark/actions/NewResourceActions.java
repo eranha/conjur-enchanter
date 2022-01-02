@@ -2,7 +2,6 @@ package com.cyberark.actions;
 
 import com.cyberark.models.ResourceType;
 import com.cyberark.resource.ResourceServiceFactory;
-import com.cyberark.resource.ResourcesService;
 import com.cyberark.views.ViewFactory;
 
 import javax.swing.*;
@@ -44,6 +43,10 @@ public class NewResourceActions {
         ResourceType.webservice,
         KeyEvent.VK_W,
         KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK)));
+    actions.put(ResourceType.host_factory, new NewResourceAction(
+        ResourceType.host_factory,
+        KeyEvent.VK_T,
+        KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK)));
   }
 
   public Action getAction(ResourceType type) {

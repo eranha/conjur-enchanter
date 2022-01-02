@@ -1,15 +1,10 @@
 package com.cyberark.wizard;
 
-import com.cyberark.components.ItemsSelector;
-import com.cyberark.models.ResourceIdentifier;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.cyberark.wizard.WizardView.WizardNavigationCommand.*;
 
@@ -52,7 +47,8 @@ public class Wizard {
     view = new WizardView(icon, title, this::handleNavigationEvent, pages);
     view.toggleNavigationCommand(Back, false);
     view.toggleNavigationCommand(Next, pages.size() > 1 &&
-        pages.stream().skip(pageIndex).noneMatch(p->p.isMandatory()));
+        pages.stream().skip(pageIndex).noneMatch(Page::isMandatory));
+
     toggleFinishButton();
 
     if (pages.size() > 0) {
@@ -101,6 +97,10 @@ public class Wizard {
   private void toggleFinishButton() {
     view.toggleNavigationCommand(Finish,
         canFinish.test(null) && pages.stream()
-            .skip(pageIndex).noneMatch(p -> p.isMandatory()));
+            .skip(pageIndex).noneMatch(Page::isMandatory));
+  }
+
+  public void toggleFinishButton(boolean flag) {
+    view.toggleNavigationCommand(Finish, flag);
   }
 }

@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +80,7 @@ public class ResourceForm extends AbstractResourceForm {
             "human users and automated processing. Conjur API calls can retrieve annotation values from the <br>" +
             "Conjur database.<html/>"
     );
+    tableAnnotations.setBorder(BorderFactory.createEmptyBorder(0,4,0,5));
     addComponentRow(gridy, "Annotations:",
         tableAnnotations,
         GridBagConstraints.NORTH,
@@ -276,5 +278,11 @@ public class ResourceForm extends AbstractResourceForm {
   @Override
   public ResourceType getResourceType() {
     return resourceType;
+  }
+
+
+  public static void main(String[] args) {
+    InputDialog.showDialog(null, "", true, new ResourceForm(ResourceType.host_factory,
+        new ArrayList<>(), new ArrayList<>()));
   }
 }

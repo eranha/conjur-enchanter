@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HostFactory extends ResourceModel {
 
-  private final String[] layers;
-  private final HostFactoryToken[] tokens;
+  private String[] layers = new String[0];
+  private HostFactoryToken[] tokens = new HostFactoryToken[0];
 
   @JsonCreator
-public HostFactory(@JsonProperty("created_at") String createdAt,
+  public HostFactory(@JsonProperty("created_at") String createdAt,
                      @JsonProperty("id") String id,
                      @JsonProperty("owner") String owner,
                      @JsonProperty("policy") String policy,
@@ -22,11 +22,18 @@ public HostFactory(@JsonProperty("created_at") String createdAt,
     this.tokens = tokens;
   }
 
+  public HostFactory() {
+  }
+
   public String[] getLayers() {
     return layers;
   }
 
   public HostFactoryToken[] getTokens() {
     return tokens;
+  }
+
+  public void setLayers(String[] layers) {
+    this.layers = layers;
   }
 }

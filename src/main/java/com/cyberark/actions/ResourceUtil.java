@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ResourceUtil {
   static String getResourcePolicy(ResourceModel resource) {
@@ -26,10 +27,17 @@ public class ResourceUtil {
         policy = policyVersion.map(PolicyVersion::getPolicyText).orElse(null);
       }
     } else {
-      policy = policyBuilder.resource(resource.getIdentifier())
+      policyBuilder.resource(resource.getIdentifier())
           .annotations(resource.getAnnotations())
-          .permissions(resource.getIdentifier(), resource.getPermissions())
-          .toPolicy();
+          .permissions(resource.getIdentifier(), resource.getPermissions());
+
+      if (resource.getIdentifier().getType() == ResourceType.host_factory) {
+        String[] layers = Arrays.stream(((HostFactory) resource).getLayers())
+            .map(l -> ResourceIdentifier.fromString(l).getId()).collect(Collectors.toList()).toArray(String[]::new);
+        policyBuilder.layers(layers);
+      }
+
+      policy = policyBuilder.toPolicy();
     }
 
     return policy;

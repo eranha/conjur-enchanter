@@ -110,7 +110,7 @@ public interface ResourcesService extends Consts {
 
   /**
    * Immediately expires the secret value and rotates the existing secret value of the secret
-   * corresponding to the secretMOdel argument.
+   * corresponding to the secretModel argument.
    * @param secretModel The secret to rotate
    * @throws ResourceAccessException If the operation fails
    */
@@ -123,4 +123,6 @@ public interface ResourcesService extends Consts {
   String createHostFactoryHost(String hostName, String token) throws ResourceAccessException;
 
   void revokeHostFactoryToken(String token) throws ResourceAccessException;
+
+  String addHostFactory(HostFactory model)  throws ResourceAccessException;
 }

@@ -32,9 +32,11 @@ import java.util.List;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.cyberark.Consts.*;
 
+// TODO this class requires refactoring
 public class NewResourceAction extends AbstractAction {
 
   private static final List<ResourceType> ROLE_RESOURCE_TYPE = Arrays.stream(
@@ -46,11 +48,13 @@ public class NewResourceAction extends AbstractAction {
   ).collect(Collectors.toList());
 
   private final ResourceType resourceType;
+  private Wizard wizard;
 
   private enum PageType {
     General,
     Privileges,
     Grants,
+    Layers,
     Restrictions
   }
 
@@ -87,32 +91,43 @@ public class NewResourceAction extends AbstractAction {
       pageInfo.load(getWizardPagesInfoProperties());
 
       List<Page> pages = getWizardPages(
-          resourceType, getResourcesService().getResourceIdentifiers(),
+          resourceType,
+          getResourcesService().getResourceIdentifiers(),
           pageInfo);
 
-      Component component = getPageComponent(PageType.General, pages);
-      ResourceFormView resourceView = (component instanceof ResourceFormView)
-          ? (ResourceFormView)component
-          : null;
-
-      // Return true if the user provides an id to the resource
-      // used to toggle the Wizard OK button
-      Predicate<Void> wizardCanFinish = v -> resourceView == null || Util.stringIsNotNullOrEmpty(resourceView.getId());
-
-      Wizard whiz = new Wizard(
+      wizard = new Wizard(
           Icons.getInstance().getIcon(resourceType, 48, DARK_BG),
           title,
           System.out::println,
           pages,
-          wizardCanFinish);
+          getWizardCanFinish(pages));
 
-      if (whiz.showWizard(getMainForm()) == Wizard.OK_OPTION) {
+      if (wizard.showWizard(getMainForm()) == Wizard.OK_OPTION) {
         onNewResourceWizardFinish(resourceType, pages);
       }
     } catch (ResourceAccessException | IOException ex) {
       ex.printStackTrace();
       ErrorView.showErrorMessage(ex);
     }
+  }
+
+  private Predicate<Void> getWizardCanFinish(List<Page> pages) {
+    Component component = getPageComponent(PageType.General, pages);
+    ResourceFormView resourceView = (component instanceof ResourceFormView)
+        ? (ResourceFormView)component
+        : null;
+
+   final List<Boolean> conditions = new ArrayList<>();
+
+    conditions.add(resourceView == null || Util.stringIsNotNullOrEmpty(resourceView.getId()));
+
+    if (resourceType == ResourceType.host_factory) {
+      conditions.add( getSelectedRoles(PageType.Layers, pages).size() > 0 );
+    }
+
+    // Return true if the user provides an id to the resource
+    // used to toggle the Wizard OK button
+    return  v -> conditions.stream().allMatch(b -> b);
   }
 
   private InputStream getWizardPagesInfoProperties() throws FileNotFoundException {
@@ -200,6 +215,9 @@ public class NewResourceAction extends AbstractAction {
       case webservice:
         pages = getNewResourcePages(resourceType, resources, pageInfo);
         break;
+      case host_factory:
+        pages = getHostFactoryPages(resourceType, resources, pageInfo);
+        break;
       case user:
       case host:
         pages = getNewRolePages(resourceType, resources, pageInfo);
@@ -238,6 +256,15 @@ public class NewResourceAction extends AbstractAction {
     String response = null;
 
     switch (resourceType) {
+      case host_factory:
+        HostFactory hostFactory = (HostFactory)model;
+        Stream<String> layers = getSelectedRoles(PageType.Layers, pages)
+            .stream()
+            .map(ResourceIdentifier::getId);
+
+        hostFactory.setLayers(layers.toArray(String[]::new));
+        response = getResourcesService().addHostFactory(hostFactory);
+        break;
       case variable:
       case webservice:
         // nothing special here just add the resource
@@ -254,6 +281,7 @@ public class NewResourceAction extends AbstractAction {
         response = getResourcesService().addResource(resourceType, model, members);
         break;
     }
+
     return response;
   }
 
@@ -278,8 +306,13 @@ public class NewResourceAction extends AbstractAction {
   }
 
 
+
   private List<ResourceIdentifier> getGrants(List<Page> pages) {
-    ItemsSelector selector = (ItemsSelector) getPageComponent(PageType.Grants, pages);
+    return getSelectedRoles(PageType.Grants, pages);
+  }
+
+  private List<ResourceIdentifier> getSelectedRoles(PageType pageType, List<Page> pages) {
+    ItemsSelector selector = (ItemsSelector) getPageComponent(pageType, pages);
     return selector.getSelectedItems();
   }
 
@@ -309,6 +342,9 @@ public class NewResourceAction extends AbstractAction {
     ResourceModel model = null;
 
     switch (resourceType) {
+      case host_factory:
+        model = new HostFactory();
+        break;
       case variable:
         model = new SecretModel();
         break;
@@ -400,6 +436,38 @@ public class NewResourceAction extends AbstractAction {
 
     // Privileges
     pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+
+    return pages;
+  }
+
+
+  private List<Page> getHostFactoryPages(ResourceType resourceType,
+                                         List<ResourceIdentifier> resources,
+                                         Properties pageInfo) {
+    List<Page> pages = new ArrayList<>();
+
+    // General
+    pages.add(getGeneralPage(resourceType, resources, pageInfo));
+
+    // Layers
+    ItemsSelector layersSelector = new ItemsSelector(
+        filter(
+            resources, t -> t == ResourceType.layer
+        ),
+        new ArrayList<>()
+    );
+    pages.add(
+        new Page(
+            PageType.Layers.toString(),
+            "Layers",
+            pageInfo.getProperty("host_factory.layers"),
+            layersSelector
+        )
+    );
+
+    layersSelector.addSelectedItemsListener(e ->
+        wizard.toggleFinishButton(getWizardCanFinish(pages).test(null))
+    );
 
     return pages;
   }

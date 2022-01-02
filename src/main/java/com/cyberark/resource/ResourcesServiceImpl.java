@@ -245,6 +245,32 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
+  public String addHostFactory(HostFactory model) throws ResourceAccessException {
+    logger.trace("addHostFactory({}) enter", model);
+
+    String response;
+
+    if (model == null) {
+      throw new IllegalArgumentException("model");
+    }
+
+    PolicyBuilder policyBuilder = new PolicyBuilder();
+    String policy = policyBuilder
+        .resource(model.getIdentifier())//, ResourceIdentifier.fromString(model.getOwner()))
+        .layers(model.getLayers())
+        .annotations(model.getAnnotations())
+        .toPolicy();
+
+    response = loadPolicy(policy, Objects.isNull(model.getPolicy())
+        ? ROOT_POLICY
+        : ResourceIdentifier.fromString(model.getPolicy()).getId());
+
+    logger.trace("addHostFactory({}) exit return: {}", model, response);
+
+    return response;
+  }
+
+  @Override
   public List<ResourceModel> getResources(ResourceType type) throws ResourceAccessException {
     logger.trace("getResources({}) enter", type);
 

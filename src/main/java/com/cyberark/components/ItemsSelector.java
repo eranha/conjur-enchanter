@@ -3,10 +3,13 @@ package com.cyberark.components;
 import com.cyberark.models.ResourceIdentifier;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +24,25 @@ public class ItemsSelector extends JPanel {
   public ItemsSelector(List<ResourceIdentifier> items, List<ResourceIdentifier> selectedItems) {
     selectedItems.forEach(selectedItemsModel::addElement);
     initializeComponents(items);
+  }
+
+  public void addSelectedItemsListener(Consumer<ListDataEvent> listener) {
+    selectedItemsModel.addListDataListener(new ListDataListener() {
+      @Override
+      public void intervalAdded(ListDataEvent e) {
+        listener.accept(e);
+      }
+
+      @Override
+      public void intervalRemoved(ListDataEvent e) {
+        listener.accept(e);
+      }
+
+      @Override
+      public void contentsChanged(ListDataEvent e) {
+
+      }
+    });
   }
 
   private void initializeComponents(List<ResourceIdentifier> items) {

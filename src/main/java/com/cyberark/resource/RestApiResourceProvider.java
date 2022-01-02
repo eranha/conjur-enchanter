@@ -170,7 +170,7 @@ public class RestApiResourceProvider implements ResourceApiProvider {
                                           String payload) throws IOException {
     logger.trace("openConnection({}, {}) enter", url, requestMethod);
     logger.debug("body:");
-    logger.debug(payload);
+    logger.debug(System.lineSeparator() + payload);
 
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
