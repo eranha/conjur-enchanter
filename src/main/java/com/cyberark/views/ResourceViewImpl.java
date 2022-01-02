@@ -141,13 +141,21 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     Arrays.stream(ActionType.values())
     .forEach(type -> {
         Action action = menuItemActions.get(type);
+
+        if (action == null) {
+          logger.debug(
+              "ResourceViewImpl{}::constructComponentPopupMenu there is no action for action type: {}",
+              view, type
+          );
+
+          return;
+        }
+
         if (menuItemActions.size() > 2 && type == ActionType.DeleteItem) {
           popupMenu.addSeparator();
         }
 
-        if (menuItemActions.get(type) != null) {
-          popupMenu.add(new JMenuItem(action));
-        }
+        popupMenu.add(new JMenuItem(action));
 
         if (menuItemActions.size() > 3 && type == ActionType.DeleteItem) {
           popupMenu.addSeparator();
