@@ -161,7 +161,7 @@ public class MainForm extends JFrame {
   }
 
   private JMenuBar creatMenuBar() {
-    NewResourceActions actionMap = new NewResourceActions();
+    NewResourceActionFactory actionMap = new NewResourceActionFactory();
     JMenuBar menuBar = new JMenuBar();
 
     JMenu fileMenu = new JMenu("File");
@@ -277,7 +277,7 @@ public class MainForm extends JFrame {
   }
 
   private AbstractButton createNewItemButton() {
-    NewResourceActions actionMap = new NewResourceActions();
+    NewResourceActionFactory actionMap = new NewResourceActionFactory();
     final JToggleButton button = (JToggleButton) new ToolBarButton(new JToggleButton("New...")).getButton();
     button.addItemListener(e -> {
       if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -289,7 +289,7 @@ public class MainForm extends JFrame {
     return button;
   }
 
-  private void createAndShowNewItemsMenu(NewResourceActions actionMap,
+  private void createAndShowNewItemsMenu(NewResourceActionFactory actionMap,
                                          final JComponent component, final AbstractButton button) {
     JPopupMenu menu = new JPopupMenu();
 

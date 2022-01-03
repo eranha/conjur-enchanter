@@ -11,10 +11,10 @@ import java.util.HashMap;
 /**
  * Factory Class for new resource actions
  */
-public class NewResourceActions {
+public class NewResourceActionFactory {
   private final HashMap<ResourceType, Action> actions = new HashMap<>();
 
-  public NewResourceActions() {
+  public NewResourceActionFactory() {
     actions.put(ResourceType.policy, new NewPolicyAction(
         ResourceServiceFactory.getInstance().getResourcesService(),
         ViewFactory.getInstance().getMessageView()
