@@ -92,8 +92,8 @@ public class HostFactoryTokensForm extends JPanel {
     JSpinner minutesSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 60, 1));
 
     daysSpinner.addChangeListener(e -> model.setExpirationDays((Integer) daysSpinner.getValue()));
-    hoursSpinner.addChangeListener(e -> model.setExpirationHours((Integer) daysSpinner.getValue()));
-    minutesSpinner.addChangeListener(e -> model.setExpirationMinutes((Integer) daysSpinner.getValue()));
+    hoursSpinner.addChangeListener(e -> model.setExpirationHours((Integer) hoursSpinner.getValue()));
+    minutesSpinner.addChangeListener(e -> model.setExpirationMinutes((Integer) minutesSpinner.getValue()));
 
     panel.add(new JLabel("Days:"));
     panel.add(daysSpinner);
@@ -113,6 +113,7 @@ public class HostFactoryTokensForm extends JPanel {
 
   public HostFactoryTokensFormModel getModel() {
     model.setRestrictions(restrictionsModel.getItems());
+
     return model;
   }
 }

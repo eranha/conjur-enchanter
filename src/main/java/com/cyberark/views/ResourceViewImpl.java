@@ -55,25 +55,16 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
 
   protected void initializeComponents() {
     JSplitPane splitPane = new JSplitPane(SwingConstants.HORIZONTAL);
-    JSplitPane bottomSplitPane = new JSplitPane(SwingConstants.VERTICAL);
-
-    TitlePanel permissionsPanel = new TitlePanel("Permissions", new JScrollPane(permissionsTable), CYBR_BLUE);
-    TitlePanel annotationsPanel = new TitlePanel("Annotations", new JScrollPane(annotationsTable), CYBR_BLUE);
-    bottomSplitPane.setLeftComponent(permissionsPanel);
-    bottomSplitPane.setRightComponent(annotationsPanel);
-
-
-    permissionsTable.setDefaultRenderer(ResourceIdentifier.class, new RoleTableCellRenderer());
 
     splitPane.setTopComponent(new JScrollPane(resourceTable));
-    splitPane.setBottomComponent(bottomSplitPane);
+    splitPane.setBottomComponent(getInfoPanel());
+
     setContent(splitPane);
     resourceTable.getSelectionModel().addListSelectionListener(this::onResourceSelectedEvent);
     getResourceTable().addMouseListener(getResourceTableMouseListener());
     registerActions();
     setResourceTablePopupMenu();
     splitPane.setDividerLocation(300);
-    bottomSplitPane.setDividerLocation(360);
 
     InputMap inputMap = resourceTable.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     ActionMap actionMap = resourceTable.getActionMap();
@@ -82,6 +73,23 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
       inputMap.put((KeyStroke)getAction(ActionType.DeleteItem).getValue(Action.ACCELERATOR_KEY), DELETE);
       actionMap.put(DELETE, getAction(ActionType.DeleteItem));
     }
+  }
+
+  /**
+   * Returns Permissions and Annotations tables
+   * @return Permissions and Annotations tables
+   */
+  protected Component getInfoPanel() {
+    JSplitPane bottomSplitPane = new JSplitPane(SwingConstants.VERTICAL);
+    TitlePanel permissionsPanel = new TitlePanel("Permissions", new JScrollPane(permissionsTable), CYBR_BLUE);
+    TitlePanel annotationsPanel = new TitlePanel("Annotations", new JScrollPane(annotationsTable), CYBR_BLUE);
+
+    permissionsTable.setDefaultRenderer(ResourceIdentifier.class, new RoleTableCellRenderer());
+    bottomSplitPane.setLeftComponent(permissionsPanel);
+    bottomSplitPane.setRightComponent(annotationsPanel);
+    bottomSplitPane.setDividerLocation(360);
+
+    return bottomSplitPane;
   }
 
   private void setResourceTablePopupMenu() {
@@ -111,21 +119,19 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   private void onResourceSelectedEvent(ListSelectionEvent event) {
-    if (event.getValueIsAdjusting()) return;
-    if (event.getSource() instanceof ListSelectionModel) {
-      ListSelectionModel lsm = (ListSelectionModel) event.getSource();
+    if (event.getValueIsAdjusting()) {
+      return;
+    }
 
-      if (resourceTable.getModel() instanceof ResourceTableModel) {
-        var model = (ResourceTableModel<? extends ResourceModel>) resourceTable.getModel();
-        ResourceModel resourceModel = lsm.isSelectionEmpty()
-            ? null
-            : model.getResourceModel(lsm.getMinSelectionIndex());
+    if (resourceTable.getModel() instanceof ResourceTableModel) {
+      if (getResourceTable().getSelectedRow() > -1) {
+        T model = resourceTableModel.getResourceModel(getResourceTable().getSelectedRow());
 
         if (selectionListener != null) {
-          selectionListener.accept(resourceModel);
+          selectionListener.accept(model);
         }
 
-        populateResourceData(resourceModel);
+        populateResourceData(model);
       }
     }
   }
@@ -166,7 +172,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     return popupMenu;
   }
 
-  private void populateResourceData(ResourceModel resourceModel) {
+  protected void populateResourceData(T resourceModel) {
     permissionsTable.setModel(new PermissionsTableModel(
         resourceModel != null
             ? resourceModel.getPermissions()
