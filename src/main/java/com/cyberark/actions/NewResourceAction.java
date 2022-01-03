@@ -100,7 +100,7 @@ public class NewResourceAction extends AbstractAction {
           title,
           System.out::println,
           pages,
-          getWizardCanFinish(pages));
+          () -> canWizardFinish(pages));
 
       if (wizard.showWizard(getMainForm()) == Wizard.OK_OPTION) {
         onNewResourceWizardFinish(resourceType, pages);
@@ -111,7 +111,7 @@ public class NewResourceAction extends AbstractAction {
     }
   }
 
-  private Predicate<Void> getWizardCanFinish(List<Page> pages) {
+  private boolean canWizardFinish(List<Page> pages) {
     Component component = getPageComponent(PageType.General, pages);
     ResourceFormView resourceView = (component instanceof ResourceFormView)
         ? (ResourceFormView)component
@@ -127,7 +127,7 @@ public class NewResourceAction extends AbstractAction {
 
     // Return true if the user provides an id to the resource
     // used to toggle the Wizard OK button
-    return  v -> conditions.stream().allMatch(b -> b);
+    return  conditions.stream().allMatch(b -> b);
   }
 
   private InputStream getWizardPagesInfoProperties() throws FileNotFoundException {
@@ -241,7 +241,10 @@ public class NewResourceAction extends AbstractAction {
     response = addResource(resourceType, pages, model);
 
     // set permissions in a separate call
-    setPermissions(model, (PrivilegesPanel) getPageComponent(PageType.Privileges, pages));
+    PrivilegesPanel privilegesPane = (PrivilegesPanel) getPageComponent(PageType.Privileges, pages);
+    if (Objects.nonNull(privilegesPane)) {
+      setPermissions(model, privilegesPane);
+    }
 
     if (response != null) {
       showResponse(model.getIdentifier(), response);
@@ -305,8 +308,6 @@ public class NewResourceAction extends AbstractAction {
     return ResourceServiceFactory.getInstance().getResourcesService();
   }
 
-
-
   private List<ResourceIdentifier> getGrants(List<Page> pages) {
     return getSelectedRoles(PageType.Grants, pages);
   }
@@ -325,13 +326,14 @@ public class NewResourceAction extends AbstractAction {
 
   private void setPermissions(ResourceModel resource, PrivilegesPanel privilegesPane) throws ResourceAccessException {
     Map<ResourceIdentifier, Set<String>> privileges = privilegesPane.getPrivileges();
+
     if (!privileges.isEmpty()) {
-      if (resource.getIdentifier().getType() != ResourceType.webservice
-          && resource.getIdentifier().getType() != ResourceType.variable) {
+
+      if (ROLE_RESOURCE_TYPE.contains(resourceType)) {
         // resource is a role that is gaining access to the resource.
         getResourcesService().permit(resource, privileges);
       } else {
-        // in case of variable and webservice resources the resource is the resource
+        // in case of variable, webservice, hst factory resources the permissions are on the resource itself
         // permit each resource entry in the map with the corresponding privileges
         getResourcesService().permit(privileges, resource);
       }
@@ -465,9 +467,9 @@ public class NewResourceAction extends AbstractAction {
         )
     );
 
-    layersSelector.addSelectedItemsListener(e ->
-        wizard.toggleFinishButton(getWizardCanFinish(pages).test(null))
-    );
+    pages.add(getPrivilegesPage(pageInfo, resourceType, filter(resources, ROLE_RESOURCE_TYPE::contains)));
+
+    layersSelector.addSelectedItemsListener(e -> wizard.toggleFinishButton(canWizardFinish(pages)));
 
     return pages;
   }

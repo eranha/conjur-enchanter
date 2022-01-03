@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static com.cyberark.wizard.WizardView.WizardNavigationCommand.*;
 
@@ -21,13 +21,13 @@ public class Wizard {
   private final Icon icon;
   private int pageIndex;
   private WizardView view;
-  private Predicate<Void> canFinish;
+  private Supplier<Boolean> canFinish;
   private int result = CANCEL_OPTION;
 
   public Wizard(String title,
                 PageEventListener eventListener,
                 List<Page> pages,
-                Predicate<Void> canFinish) {
+                Supplier<Boolean>  canFinish) {
     this(null, title, eventListener, pages, canFinish);
   }
 
@@ -35,7 +35,7 @@ public class Wizard {
                 String title,
                 PageEventListener eventListener,
                 List<Page> pages,
-                Predicate<Void> canFinish) {
+                Supplier<Boolean>  canFinish) {
     this.icon = icon;
     this.title = title;
     this.eventListener = eventListener;
@@ -95,9 +95,12 @@ public class Wizard {
   }
 
   private void toggleFinishButton() {
-    view.toggleNavigationCommand(Finish,
-        canFinish.test(null) && pages.stream()
-            .skip(pageIndex).noneMatch(Page::isMandatory));
+    boolean flag = canFinish.get() &&
+        pages
+          .stream()
+          .skip(pageIndex)
+          .noneMatch(Page::isMandatory);
+    view.toggleNavigationCommand(Finish, flag);
   }
 
   public void toggleFinishButton(boolean flag) {
