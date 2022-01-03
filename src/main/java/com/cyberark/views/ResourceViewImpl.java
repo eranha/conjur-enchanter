@@ -45,7 +45,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   private Consumer<ResourceView> resourceDoubleClickedListener;
   private final ActionMap menuItemActions = new ActionMap();
 
-  private final NewResourceActions newResourceActions = new NewResourceActions();
+  private final NewResourceActionFactory newResourceActionFactory = new NewResourceActionFactory();
 
   public ResourceViewImpl(ViewType view) {
     super(view.toString(), CYBR_BLUE);
@@ -248,7 +248,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
   }
 
   private Action getNewResourceTypeAction() {
-    return newResourceActions.getAction(getResourceType());
+    return newResourceActionFactory.getAction(getResourceType());
   }
 
   /**
