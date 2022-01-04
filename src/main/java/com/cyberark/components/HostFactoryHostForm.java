@@ -1,19 +1,23 @@
 package com.cyberark.components;
 
+import com.cyberark.models.HostFactoryToken;
+import com.cyberark.models.table.TokensTableModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 import java.util.Objects;
 
 public class HostFactoryHostForm extends JPanel {
   private PropertyChangeListener listener;
-  private JList<String> tokensList;
+  private final JTable tokensTable = new JTable();
   private final JTextField hostName = new JTextField();
+  private final HostFactoryToken[] tokens;
 
-  public HostFactoryHostForm(List<String> tokens) {
-    initializeComponents(tokens);
+  public HostFactoryHostForm(HostFactoryToken[] tokens) {
+    this.tokens = tokens;
+    initializeComponents();
   }
 
   public void setPropertyChangeListener(PropertyChangeListener listener) {
@@ -25,11 +29,14 @@ public class HostFactoryHostForm extends JPanel {
   }
 
   public String getSelectedToken() {
-    return tokensList.getSelectedValue();
+    return tokensTable.getSelectedRow() > -1
+        ? tokens[tokensTable.getSelectedRow()].token
+        : null;
   }
 
-  private void initializeComponents(List<String>  tokens) {
+  private void initializeComponents() {
     setLayout(new GridBagLayout());
+    setPreferredSize(new Dimension(420, 240));
 
     add(new JLabel("Host Name:"),
       new GridBagConstraints(
@@ -69,14 +76,12 @@ public class HostFactoryHostForm extends JPanel {
       )
     );
 
-    DefaultListModel<String> tokensModel = new DefaultListModel<>();
-    tokens.forEach(tokensModel::addElement);
 
-    tokensList = new JList<>(tokensModel);
-    tokensList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    tokensList.addListSelectionListener(e -> fireEvent("selected.token", getSelectedToken()));
+    tokensTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    tokensTable.setModel(new TokensTableModel(tokens));
+    tokensTable.setDefaultRenderer(String.class, new TokensTableCellRenderer(tokens));
 
-    add(new JScrollPane(tokensList),
+    add(new JScrollPane(tokensTable),
       new GridBagConstraints(
           1, 2, 1, 1, 1, 1,
           GridBagConstraints.NORTHWEST,

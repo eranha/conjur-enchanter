@@ -6,12 +6,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.cyberark.Consts.ISO_8601_24H_FULL_FORMAT;
 
 /**
  * Utility functions
@@ -276,5 +281,15 @@ public class Util {
     } catch (JsonProcessingException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  public static String prettyDate(String time) {
+    SimpleDateFormat formatter1 = new SimpleDateFormat(ISO_8601_24H_FULL_FORMAT);
+    try {
+      return (new PrettyTime()).format(formatter1.parse(time));
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 }

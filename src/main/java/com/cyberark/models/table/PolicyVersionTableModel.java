@@ -1,5 +1,6 @@
 package com.cyberark.models.table;
 
+import com.cyberark.Util;
 import com.cyberark.models.PolicyVersion;
 
 import javax.swing.table.AbstractTableModel;
@@ -8,14 +9,14 @@ public class PolicyVersionTableModel extends AbstractTableModel {
   private final PolicyVersion[] policyVersions;
 
   private final String[] columnNames =  {
-      "id",
-      "version",
-      "role",
-      "created_at",
-      "policy_text",
-      "policy_sha256",
-      "finished_at",
-      "client_ip"};
+      "ID",
+      "Version",
+      "Role",
+      "Created",
+      "Finished",
+      "Policy Text",
+      "Policy SHA256",
+      "Client IP"};
 
   public PolicyVersionTableModel(PolicyVersion[] policyVersions) {
     this.policyVersions = policyVersions;
@@ -48,13 +49,13 @@ public class PolicyVersionTableModel extends AbstractTableModel {
       case 2:
         return model.getRole();
       case 3:
-        return model.getCreatedAt();
+        return Util.prettyDate(model.getCreatedAt());
       case 4:
-        return model.getPolicyText();
+        return Util.prettyDate(model.getFinishedAt());
       case 5:
-        return model.getPolicySha256();
+        return model.getPolicyText();
       case 6:
-        return model.getFinishedAt();
+        return model.getPolicySha256();
       case 7:
         return model.getClientIp();
     }

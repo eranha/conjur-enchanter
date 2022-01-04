@@ -11,6 +11,7 @@ public interface Consts {
   Color LABEL_FOREGROUND = Color.WHITE;
   Color LIGHT_COLOR = new Color(53, 197, 193);
   Color CYBR_BLUE = new Color(47, 115, 176);
+  String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
   /** Return value from class method if CANCEL is chosen. */
   int         OK_OPTION = 0;

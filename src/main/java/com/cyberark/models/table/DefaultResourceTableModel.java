@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 public class DefaultResourceTableModel<T extends ResourceModel> extends AbstractTableModel
     implements ResourceTableModel<T> {
   private final List<T> model;
-  private final String[] columnNames =  {"id", "owner", "policy", "created_at"};
+  private final String[] columnNames =  {"ID", "Owner", "Policy", "Created"};
   private String[][] grid;
 
   public DefaultResourceTableModel(List<T> model) {
@@ -56,7 +56,10 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-     return (model != null && grid != null) ? grid[rowIndex][columnIndex] : null;
+    if (columnIndex == 3) {
+      return Util.prettyDate(grid[rowIndex][columnIndex]);
+    }
+    return (model != null && grid != null) ? grid[rowIndex][columnIndex] : null;
   }
 
   @Override

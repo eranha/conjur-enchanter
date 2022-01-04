@@ -5,27 +5,25 @@ import com.cyberark.actions.hostfactory.CreateTokensAction;
 import com.cyberark.actions.hostfactory.RevokeTokensAction;
 import com.cyberark.components.DataTable;
 import com.cyberark.components.TitlePanel;
+import com.cyberark.components.TokensTableCellRenderer;
 import com.cyberark.models.HostFactory;
-import com.cyberark.models.HostFactoryToken;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.table.DefaultResourceTableModel;
 import com.cyberark.models.table.ResourceTableModel;
-import org.ocpsoft.prettytime.PrettyTime;
+import com.cyberark.models.table.TokensTableModel;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import static com.cyberark.Consts.CYBR_BLUE;
 
 public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   private DefaultListModel<String> layersModel;
-  private DefaultTableModel tokensTableModel;
+  private TokensTableModel tokensTableModel;
+  private DefaultListModel<String> hostsModel;
+  private JTable tokensTable;
 
   public HostFactoriesView() {
     super(ViewType.HostFactories);
@@ -48,48 +46,53 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   @Override
   protected void populateResourceData(HostFactory resourceModel) {
     super.populateResourceData(resourceModel);
+
     layersModel.clear();
+    hostsModel.clear();
 
-    Arrays.stream(getSelectedResource().getLayers()).map(
-        i -> ResourceIdentifier.fromString(i).getId()).forEach(layersModel::addElement);
+    TokensTableCellRenderer renderer = (TokensTableCellRenderer) tokensTable.getDefaultRenderer(String.class);
+    renderer.setTokens(resourceModel.getTokens());
 
-    tokensTableModel.setRowCount(0);
-    Arrays.stream(getSelectedResource().getTokens())
-        .forEach(t -> tokensTableModel.addRow(new Object[] {
-            t.token, getFormattedDate(t),
-            t.cidr.length > 0 ? Arrays.toString(t.cidr) : null
-        }));
-  }
+    Arrays.stream(getSelectedResource()
+        .getLayers()).map(
+          i -> ResourceIdentifier.fromString(i).getId()
+        )
+        .forEach(layersModel::addElement);
 
-  private String getFormattedDate(HostFactoryToken t) {
-    Instant exp = Instant.parse( t.expiration );
-    PrettyTime pt = new PrettyTime();
-    return pt.format(Date.from(exp));
+    getSelectedResource().getHosts().forEach(hostsModel::addElement);
+    tokensTableModel.setTokens(getSelectedResource().getTokens());
   }
 
   @Override
   protected Component getInfoPanel() {
     Component infoPane =  super.getInfoPanel();
     layersModel = new DefaultListModel<>();
-    tokensTableModel = new DefaultTableModel(
-        new Vector<>(Arrays.asList("Token", "Expiration", "CIDR")),
-        0) {
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        //all cells false
-        return false;
-      }
-    };
+    hostsModel = new DefaultListModel<>();
+    tokensTableModel = new TokensTableModel();
 
     JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    TitlePanel permissionsPanel = new TitlePanel("" +
+
+
+    TitlePanel layersPanel = new TitlePanel("" +
         "Layers",
         new JScrollPane(new JList<>(layersModel)), CYBR_BLUE);
+
+    TitlePanel hostsPanel = new TitlePanel("" +
+        "Hosts",
+        new JScrollPane(new JList<>(hostsModel)), CYBR_BLUE);
+
+    JSplitPane layersHostsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, layersPanel, hostsPanel);
+    layersHostsSplitPane.setDividerLocation(90);
+    tokensTable = new DataTable(tokensTableModel);
+    tokensTable.setDefaultRenderer(
+        String.class,
+        new TokensTableCellRenderer());
+
     TitlePanel annotationsPanel = new TitlePanel(
         "Tokens",
-        new JScrollPane(new DataTable(tokensTableModel)), CYBR_BLUE);
+        new JScrollPane(tokensTable), CYBR_BLUE);
 
-    rightSplitPane.setTopComponent(permissionsPanel);
+    rightSplitPane.setTopComponent(layersHostsSplitPane);
     rightSplitPane.setBottomComponent(annotationsPanel);
     rightSplitPane.setDividerLocation(180);
 

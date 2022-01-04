@@ -22,34 +22,12 @@ public class HostFactoryTokensForm extends JPanel {
 
     setLayout(new GridBagLayout());
     table.setPreferredSize(new Dimension(300, 100));
+    int gridy = 0;
 
-    add(new JLabel("Restrictions:"),
-      new GridBagConstraints(
-      0, 0, 1, 1, 0, 0,
-          GridBagConstraints.NORTHWEST,
-          GridBagConstraints.NONE,
-        new Insets(0,0,0,0), 0, 0
-      )
-    );
-    add(table,
-      new GridBagConstraints(
-          1, 0, 1, 1, 1, 1,
-          GridBagConstraints.CENTER,
-          GridBagConstraints.BOTH,
-          new Insets(0,4,0,5), 0, 0
-      )
-    );
-    add(Box.createVerticalStrut(8),
-        new GridBagConstraints(
-            0, 1, 1, 1, 0, 0,
-            GridBagConstraints.CENTER,
-            GridBagConstraints.NONE,
-            new Insets(0,0,0,0), 0, 0
-        )
-    );
+    // Number of Tokens
     add(new JLabel("Number of Tokens:"),
       new GridBagConstraints(
-        0, 2, 1, 1, 0, 0,
+        0, gridy, 1, 1, 0, 0,
         GridBagConstraints.WEST,
         GridBagConstraints.NONE,
         new Insets(0,0,0,16), 0, 0
@@ -63,23 +41,27 @@ public class HostFactoryTokensForm extends JPanel {
 
     add(numOfTokenSpinner,
       new GridBagConstraints(
-          1, 2, 1, 1, 0, 0,
+          1, gridy++, 1, 1, 0, 0,
           GridBagConstraints.WEST,
           GridBagConstraints.NONE,
           new Insets(0,0,0,0), 0, 0
       )
     );
+
+    // Spacer
     add(Box.createVerticalStrut(8),
         new GridBagConstraints(
-            0, 3, 1, 1, 0, 0,
+            0, gridy++, 1, 1, 0, 0,
             GridBagConstraints.CENTER,
             GridBagConstraints.NONE,
             new Insets(0,0,0,0), 0, 0
         )
     );
+
+    // Expiration
     add(new JLabel("Expiration:"),
         new GridBagConstraints(
-            0, 4, 1, 1, 0, 0,
+            0, 2, 1, 1, 0, 0,
             GridBagConstraints.WEST,
             GridBagConstraints.NONE,
             new Insets(0,0,0,16), 0, 0
@@ -103,11 +85,39 @@ public class HostFactoryTokensForm extends JPanel {
     panel.add(minutesSpinner);
     add(panel,
       new GridBagConstraints(
-          1, 4, 1, 1, 0, 0,
+          1, gridy++, 1, 1, 0, 0,
           GridBagConstraints.WEST,
           GridBagConstraints.NONE,
           new Insets(0,0,0,0), 0, 0
       )
+    );
+
+    // Spacer
+    add(Box.createVerticalStrut(8),
+        new GridBagConstraints(
+            0, gridy++, 1, 1, 0, 0,
+            GridBagConstraints.CENTER,
+            GridBagConstraints.NONE,
+            new Insets(0,0,0,0), 0, 0
+        )
+    );
+
+    // Restrictions
+    add(new JLabel("Restrictions:"),
+        new GridBagConstraints(
+            0, 4, 1, 1, 0, 0,
+            GridBagConstraints.NORTHWEST,
+            GridBagConstraints.NONE,
+            new Insets(0,0,0,0), 0, 0
+        )
+    );
+    add(table,
+        new GridBagConstraints(
+            1, gridy++, 1, 1, 1, 1,
+            GridBagConstraints.CENTER,
+            GridBagConstraints.BOTH,
+            new Insets(0,4,0,5), 0, 0
+        )
     );
   }
 

@@ -11,9 +11,9 @@ import com.cyberark.models.ResourceType;
 import com.cyberark.views.ViewFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @SelectionBasedAction
 public class CreateHostAction extends AbstractHostFactoryAction {
@@ -31,11 +31,17 @@ public class CreateHostAction extends AbstractHostFactoryAction {
       return;
     }
 
-    HostFactoryHostForm form = new HostFactoryHostForm(
-        Arrays.stream(model.getTokens())
-            .map(t -> t.token)
-            .collect(Collectors.toList())
-    );
+    if (Arrays.stream(model.getTokens())
+        .noneMatch(
+          t -> Instant.parse( t.expiration ).isAfter(Instant.now()))
+        ) {
+      ViewFactory.getInstance().getMessageView().showMessageDialog(
+       "All tokens are expired. Creates one or more tokens and retry."
+      );
+      return;
+    }
+
+    HostFactoryHostForm form = new HostFactoryHostForm(model.getTokens());
 
     InputDialog dialog = new InputDialog(
       getMainForm(),

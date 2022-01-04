@@ -23,7 +23,7 @@ public class RoleTableModel extends DefaultResourceTableModel<RoleModel> {
   public String getColumnName(int column) {
     return column < 4
         ? super.getColumnName(column)
-        : "restricted_to";
+        : "Restricted IPs";
   }
 
   @Override

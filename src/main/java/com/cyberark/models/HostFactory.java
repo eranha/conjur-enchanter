@@ -1,9 +1,15 @@
 package com.cyberark.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HostFactory extends ResourceModel {
+  @JsonIgnore
+  private List<String> hosts = new ArrayList<>();;
 
   private String[] layers = new String[0];
   private HostFactoryToken[] tokens = new HostFactoryToken[0];
@@ -35,5 +41,13 @@ public class HostFactory extends ResourceModel {
 
   public void setLayers(String[] layers) {
     this.layers = layers;
+  }
+
+  public List<String> getHosts() {
+    return hosts;
+  }
+
+  public void setHosts(List<String> hosts) {
+    this.hosts = hosts;
   }
 }
