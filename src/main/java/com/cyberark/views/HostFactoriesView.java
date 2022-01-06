@@ -1,8 +1,8 @@
 package com.cyberark.views;
 
-import com.cyberark.actions.hostfactory.CreateHostAction;
-import com.cyberark.actions.hostfactory.CreateTokensAction;
-import com.cyberark.actions.hostfactory.RevokeTokensAction;
+import com.cyberark.actions.resource.hostfactory.CreateHostAction;
+import com.cyberark.actions.resource.hostfactory.CreateTokensAction;
+import com.cyberark.actions.resource.hostfactory.RevokeTokensAction;
 import com.cyberark.components.DataTable;
 import com.cyberark.components.TitlePanel;
 import com.cyberark.components.TokensTableCellRenderer;

@@ -1,4 +1,4 @@
-package com.cyberark.actions.hostfactory;
+package com.cyberark.actions.resource.hostfactory;
 
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
