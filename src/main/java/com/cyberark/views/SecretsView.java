@@ -1,7 +1,7 @@
 package com.cyberark.views;
 
-import com.cyberark.actions.EditSecretAction;
-import com.cyberark.actions.RotateSecretAction;
+import com.cyberark.actions.resource.EditSecretAction;
+import com.cyberark.actions.resource.RotateSecretAction;
 import com.cyberark.models.*;
 import com.cyberark.models.table.ResourceTableModel;
 import com.cyberark.models.table.SecretTableModel;

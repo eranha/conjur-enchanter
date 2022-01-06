@@ -1,7 +1,7 @@
 package com.cyberark.actions.hostfactory;
 
 import com.cyberark.actions.ActionType;
-import com.cyberark.actions.SelectionBasedAction;
+import com.cyberark.actions.resource.SelectionBasedAction;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.HostFactory;

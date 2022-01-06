@@ -1,4 +1,4 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
 import com.cyberark.models.ResourceType;
 import com.cyberark.resource.ResourceServiceFactory;

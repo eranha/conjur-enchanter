@@ -1,5 +1,6 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
+import com.cyberark.actions.ActionType;
 import com.cyberark.models.SecretModel;
 import com.cyberark.views.Icons;
 

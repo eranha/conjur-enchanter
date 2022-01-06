@@ -2,6 +2,7 @@ package com.cyberark.views;
 
 import com.cyberark.Util;
 import com.cyberark.actions.*;
+import com.cyberark.actions.resource.*;
 import com.cyberark.components.DataTable;
 import com.cyberark.components.RoleTableCellRenderer;
 import com.cyberark.components.TitlePanel;

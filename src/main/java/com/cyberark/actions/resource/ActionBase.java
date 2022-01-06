@@ -1,7 +1,8 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
 import com.cyberark.Application;
 import com.cyberark.Util;
+import com.cyberark.actions.ActionType;
 import com.cyberark.controllers.ControllerFactory;
 import com.cyberark.controllers.ViewController;
 import com.cyberark.event.EventPublisher;

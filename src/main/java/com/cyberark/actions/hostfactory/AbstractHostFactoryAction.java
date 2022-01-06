@@ -1,8 +1,7 @@
 package com.cyberark.actions.hostfactory;
 
-import com.cyberark.actions.ActionBase;
+import com.cyberark.actions.resource.ActionBase;
 import com.cyberark.actions.ActionType;
-import com.cyberark.actions.SelectionBasedAction;
 import com.cyberark.models.HostFactory;
 
 import javax.swing.*;

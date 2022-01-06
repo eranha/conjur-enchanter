@@ -1,6 +1,7 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
 import com.cyberark.Consts;
+import com.cyberark.actions.ActionType;
 import com.cyberark.components.EditableTableImpl;
 import com.cyberark.components.Form;
 import com.cyberark.dialogs.InputDialog;

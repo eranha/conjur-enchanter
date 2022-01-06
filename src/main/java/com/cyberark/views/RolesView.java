@@ -1,8 +1,8 @@
 package com.cyberark.views;
 
-import com.cyberark.actions.EditRoleAction;
-import com.cyberark.actions.RotateApiKeyAction;
-import com.cyberark.actions.UpdatePasswordAction;
+import com.cyberark.actions.resource.EditRoleAction;
+import com.cyberark.actions.resource.RotateApiKeyAction;
+import com.cyberark.actions.resource.UpdatePasswordAction;
 import com.cyberark.models.table.ResourceTableModel;
 import com.cyberark.models.RoleModel;
 import com.cyberark.models.table.RoleTableModel;

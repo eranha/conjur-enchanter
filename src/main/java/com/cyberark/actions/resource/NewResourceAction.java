@@ -1,8 +1,9 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
 import com.cyberark.Application;
 import com.cyberark.Consts;
 import com.cyberark.Util;
+import com.cyberark.actions.ActionType;
 import com.cyberark.components.*;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.ResourceEvent;

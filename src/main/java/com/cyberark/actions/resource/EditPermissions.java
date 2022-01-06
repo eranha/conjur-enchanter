@@ -1,6 +1,7 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
 import com.cyberark.Util;
+import com.cyberark.actions.ActionType;
 import com.cyberark.components.Form;
 import com.cyberark.components.PrivilegesPanel;
 import com.cyberark.dialogs.InputDialog;

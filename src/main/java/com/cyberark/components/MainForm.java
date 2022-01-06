@@ -3,6 +3,7 @@ package com.cyberark.components;
 import com.cyberark.Application;
 import com.cyberark.Util;
 import com.cyberark.actions.*;
+import com.cyberark.actions.resource.NewResourceActionFactory;
 import com.cyberark.event.Events;
 import com.cyberark.event.ViewSelectedListener;
 import com.cyberark.models.ResourceType;

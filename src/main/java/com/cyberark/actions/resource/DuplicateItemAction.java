@@ -1,8 +1,9 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
 import com.cyberark.Consts;
 import com.cyberark.PolicyBuilder;
 import com.cyberark.Util;
+import com.cyberark.actions.ActionType;
 import com.cyberark.components.PolicyDisplayPane;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;

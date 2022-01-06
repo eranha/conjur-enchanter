@@ -2,7 +2,7 @@ package com.cyberark.actions.hostfactory;
 
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
-import com.cyberark.actions.SelectionBasedAction;
+import com.cyberark.actions.resource.SelectionBasedAction;
 import com.cyberark.components.HostFactoryTokensForm;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.models.HostFactory;

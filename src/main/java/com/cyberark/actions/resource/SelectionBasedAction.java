@@ -1,4 +1,4 @@
-package com.cyberark.actions;
+package com.cyberark.actions.resource;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
