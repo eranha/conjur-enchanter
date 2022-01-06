@@ -4,7 +4,7 @@ import com.cyberark.actions.ActionType;
 import com.cyberark.actions.resource.SelectionBasedAction;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.HostFactory;
+import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.views.ViewFactory;
 
 import javax.swing.*;

@@ -51,7 +51,7 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
             ? new String(result.getPassword())
             : null;
 
-        if (Util.stringIsNotNullOrEmpty(password)) {
+        if (Util.nonNullOrEmptyString(password)) {
           String apiKey = getResourcesService().rotateApiKey(
               getSelectedResource().getIdentifier().getType(),
               getSelectedResource());

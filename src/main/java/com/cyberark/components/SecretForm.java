@@ -58,11 +58,11 @@ public class SecretForm extends ResourceForm {
   public List<Annotation> getAnnotations() {
     List<Annotation> annotations = new ArrayList<>(Arrays.asList(annotationsTableModel.getAnnotations()));
 
-    if (Util.stringIsNotNullOrEmpty(getKind())) {
+    if (Util.nonNullOrEmptyString(getKind())) {
       annotations.add(new Annotation("conjur/kind", getKind(), null));
     }
 
-    if (Util.stringIsNotNullOrEmpty(getMimeType())) {
+    if (Util.nonNullOrEmptyString(getMimeType())) {
       annotations.add(new Annotation("conjur/mime_type", getMimeType(), null));
     }
 

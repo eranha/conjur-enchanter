@@ -3,6 +3,7 @@ package com.cyberark.actions.resource;
 import com.cyberark.PolicyBuilder;
 import com.cyberark.Util;
 import com.cyberark.models.*;
+import com.cyberark.models.hostfactory.HostFactory;
 
 import java.util.Arrays;
 import java.util.Comparator;

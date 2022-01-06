@@ -6,7 +6,7 @@ import com.cyberark.actions.resource.hostfactory.RevokeTokensAction;
 import com.cyberark.components.DataTable;
 import com.cyberark.components.TitlePanel;
 import com.cyberark.components.TokensTableCellRenderer;
-import com.cyberark.models.HostFactory;
+import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.table.DefaultResourceTableModel;
 import com.cyberark.models.table.ResourceTableModel;

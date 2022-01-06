@@ -2,10 +2,20 @@ package com.cyberark.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 public class Membership {
+  @Getter(AccessLevel.PUBLIC)
   private final String role;
+
+  @Getter(AccessLevel.PUBLIC)
   private final String member;
+
+  @Getter(AccessLevel.PUBLIC)
   private final String policy;
 
   @JsonCreator
@@ -18,26 +28,5 @@ public class Membership {
     this.role = role;
     this.member = member;
     this.policy = policy;
-  }
-
-  public String getRole() {
-    return role;
-  }
-
-  public String getMember() {
-    return member;
-  }
-
-  public String getPolicy() {
-    return policy;
-  }
-
-  @Override
-  public String toString() {
-    return "Membership{" +
-        "role='" + role + '\'' +
-        ", member='" + member + '\'' +
-        ", policy='" + policy + '\'' +
-        '}';
   }
 }

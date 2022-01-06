@@ -9,6 +9,7 @@ import com.cyberark.event.EventPublisher;
 import com.cyberark.event.ResourceEvent;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
+import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.table.StringTableModel;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
@@ -120,7 +121,7 @@ public class NewResourceAction extends AbstractAction {
 
    final List<Boolean> conditions = new ArrayList<>();
 
-    conditions.add(resourceView == null || Util.stringIsNotNullOrEmpty(resourceView.getId()));
+    conditions.add(resourceView == null || Util.nonNullOrEmptyString(resourceView.getId()));
 
     if (resourceType == ResourceType.host_factory) {
       conditions.add( getSelectedRoles(PageType.Layers, pages).size() > 0 );

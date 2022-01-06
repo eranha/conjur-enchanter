@@ -33,7 +33,7 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
 
   private void policyTextChnageEvent(PropertyChangeEvent e) {
     if (PolicyEditorPane.POLICY_TEXT.equals(e.getPropertyName()) && getDefaultButton() != null) {
-      getDefaultButton().setEnabled(Util.stringIsNotNullOrEmpty(e.getNewValue()));
+      getDefaultButton().setEnabled(Util.nonNullOrEmptyString(e.getNewValue()));
       validatePolicyText();
     }
   }

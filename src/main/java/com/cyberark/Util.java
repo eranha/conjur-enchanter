@@ -90,7 +90,7 @@ public class Util {
    * @param obj the object to evaluate
    * @return boolean indication
    */
-  public static boolean stringIsNotNullOrEmpty(Object obj) {
+  public static boolean nonNullOrEmptyString(Object obj) {
     return obj != null && obj.toString().length() > 0;
   }
 

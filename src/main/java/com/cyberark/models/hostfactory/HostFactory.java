@@ -1,17 +1,31 @@
-package com.cyberark.models;
+package com.cyberark.models.hostfactory;
 
+import com.cyberark.models.Annotation;
+import com.cyberark.models.Permission;
+import com.cyberark.models.ResourceModel;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
 public class HostFactory extends ResourceModel {
   @JsonIgnore
-  private List<String> hosts = new ArrayList<>();;
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
+  private List<String> hosts = new ArrayList<>();
 
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private String[] layers = new String[0];
+
+  @Getter(AccessLevel.PUBLIC)
   private HostFactoryToken[] tokens = new HostFactoryToken[0];
 
   @JsonCreator
@@ -26,28 +40,5 @@ public class HostFactory extends ResourceModel {
     super(createdAt, id, owner, policy, permissions, annotations);
     this.layers = layers;
     this.tokens = tokens;
-  }
-
-  public HostFactory() {
-  }
-
-  public String[] getLayers() {
-    return layers;
-  }
-
-  public HostFactoryToken[] getTokens() {
-    return tokens;
-  }
-
-  public void setLayers(String[] layers) {
-    this.layers = layers;
-  }
-
-  public List<String> getHosts() {
-    return hosts;
-  }
-
-  public void setHosts(List<String> hosts) {
-    this.hosts = hosts;
   }
 }

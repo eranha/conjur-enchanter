@@ -4,6 +4,9 @@ import com.cyberark.Consts;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.models.audit.AuditEvent;
+import com.cyberark.models.hostfactory.HostFactory;
+import com.cyberark.models.hostfactory.HostFactoryHostModel;
+import com.cyberark.models.hostfactory.HostFactoryTokensFormModel;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -120,7 +123,8 @@ public interface ResourcesService extends Consts {
 
   String createHostFactoryTokens(HostFactoryTokensFormModel model) throws ResourceAccessException;
 
-  String createHostFactoryHost(String hostName, String token) throws ResourceAccessException;
+  String
+  createHostFactoryHost(HostFactoryHostModel model) throws ResourceAccessException;
 
   void revokeHostFactoryToken(String token) throws ResourceAccessException;
 

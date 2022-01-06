@@ -2,13 +2,33 @@ package com.cyberark.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 public class ResourceModel implements DataModel {
+  @Getter(AccessLevel.PUBLIC)
   private String createdAt;
+
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private String id;
+
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private String owner;
+
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private String policy;
+
+  @Getter(AccessLevel.PUBLIC)
   private Permission[] permissions = new Permission[0];
+
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private Annotation[] annotations = new Annotation[0];
 
   public ResourceModel() {
@@ -36,45 +56,5 @@ public class ResourceModel implements DataModel {
 
   public ResourceIdentifier getIdentifier() {
     return ResourceIdentifier.fromString(id);
-  }
-
-  public String getCreatedAt() {
-    return createdAt;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public String getOwner() {
-    return owner;
-  }
-
-  public String getPolicy() {
-    return policy;
-  }
-
-  public Permission[] getPermissions() {
-    return permissions;
-  }
-
-  public Annotation[] getAnnotations() {
-    return annotations;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public void setOwner(String owner) {
-    this.owner = owner;
-  }
-
-  public void setPolicy(String policy) {
-    this.policy = policy;
-  }
-
-  public void setAnnotations(Annotation[] annotations) {
-    this.annotations = annotations;
   }
 }

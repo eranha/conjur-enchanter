@@ -1,21 +1,28 @@
 package com.cyberark.models;
 
 import com.cyberark.Util;
+import lombok.*;
 
 import java.util.Objects;
 
+@ToString
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class ResourceIdentifier {
+  @Getter(AccessLevel.PUBLIC)
+  @NonNull
   private final String account;
-  private final ResourceType type;
-  private final String id;
-  private final String fullyQualifiedId;
 
-  private ResourceIdentifier(String account, ResourceType type, String id, String fullyQualifiedId) {
-    this.account = account;
-    this.type = type;
-    this.id = id;
-    this.fullyQualifiedId = fullyQualifiedId;
-  }
+  @Getter(AccessLevel.PUBLIC)
+  @NonNull
+  private final ResourceType type;
+
+  @Getter(AccessLevel.PUBLIC)
+  @NonNull
+  private final String id;
+
+  @Getter(AccessLevel.PUBLIC)
+  @NonNull
+  private final String fullyQualifiedId;
 
   public static ResourceIdentifier fromString(String account, String type, String id) {
     if (type == null) {
@@ -80,18 +87,6 @@ public class ResourceIdentifier {
     throw new IllegalArgumentException(identifier);
   }
 
-  public String getAccount() {
-    return account;
-  }
-
-  public ResourceType getType() {
-    return type;
-  }
-
-  public String getId() {
-    return id;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -99,22 +94,9 @@ public class ResourceIdentifier {
     ResourceIdentifier that = (ResourceIdentifier) o;
     return account.equals(that.account) && type == that.type && id.equals(that.id);
   }
+
   @Override
   public int hashCode() {
     return Objects.hash(account, type, id);
-  }
-
-  @Override
-  public String toString() {
-    return "ResourceIdentifier{" +
-        "account='" + account + '\'' +
-        ", type=" + type +
-        ", id='" + id + '\'' +
-        ", fullyQualifiedId='" + fullyQualifiedId + '\'' +
-        '}';
-  }
-
-  public String getFullyQualifiedId() {
-    return fullyQualifiedId;
   }
 }

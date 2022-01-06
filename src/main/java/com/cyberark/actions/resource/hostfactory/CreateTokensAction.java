@@ -5,8 +5,8 @@ import com.cyberark.actions.ActionType;
 import com.cyberark.actions.resource.SelectionBasedAction;
 import com.cyberark.components.HostFactoryTokensForm;
 import com.cyberark.dialogs.InputDialog;
-import com.cyberark.models.HostFactory;
-import com.cyberark.models.HostFactoryTokensFormModel;
+import com.cyberark.models.hostfactory.HostFactory;
+import com.cyberark.models.hostfactory.HostFactoryTokensFormModel;
 
 import javax.swing.*;
 import java.util.function.Supplier;

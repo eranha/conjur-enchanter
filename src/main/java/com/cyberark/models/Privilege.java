@@ -1,27 +1,20 @@
 package com.cyberark.models;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 public class Privilege {
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private String privilege;
-  private boolean allow;
 
-  public Privilege(String privilege, Boolean allow) {
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
+  private boolean isAllow;
+
+  public Privilege(String privilege, Boolean isAllow) {
     this.privilege = privilege;
-    this.allow = allow;
-  }
-
-  public String getPrivilege() {
-    return privilege;
-  }
-
-  public boolean isAllow() {
-    return allow;
-  }
-
-  public void setPrivilege(String privilege) {
-    this.privilege = privilege;
-  }
-
-  public void setAllow(boolean allow) {
-    this.allow = allow;
+    this.isAllow = isAllow;
   }
 }

@@ -5,7 +5,8 @@ import com.cyberark.actions.ActionType;
 import com.cyberark.actions.resource.SelectionBasedAction;
 import com.cyberark.components.HostFactoryHostForm;
 import com.cyberark.dialogs.InputDialog;
-import com.cyberark.models.HostFactory;
+import com.cyberark.models.hostfactory.HostFactory;
+import com.cyberark.models.hostfactory.HostFactoryHostModel;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceType;
 import com.cyberark.views.ViewFactory;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
@@ -33,7 +35,7 @@ public class CreateHostAction extends AbstractHostFactoryAction {
 
     if (Arrays.stream(model.getTokens())
         .noneMatch(
-          t -> Instant.parse( t.expiration ).isAfter(Instant.now()))
+          t -> Instant.parse( t.getExpiration() ).isAfter(Instant.now()))
         ) {
       ViewFactory.getInstance().getMessageView().showMessageDialog(
        "All tokens are expired. Creates one or more tokens and retry."
@@ -41,7 +43,10 @@ public class CreateHostAction extends AbstractHostFactoryAction {
       return;
     }
 
-    HostFactoryHostForm form = new HostFactoryHostForm(model.getTokens());
+    HostFactoryHostForm form = new HostFactoryHostForm(
+      model.getTokens(),
+      String.format("%s-host-%s", model.getIdentifier().getId(), model.getHosts().size() + 1)
+    );
 
     InputDialog dialog = new InputDialog(
       getMainForm(),
@@ -52,16 +57,17 @@ public class CreateHostAction extends AbstractHostFactoryAction {
     );
 
     form.setPropertyChangeListener(e -> dialog.enableOkButton(
-        Util.stringIsNotNullOrEmpty(form.getHostName()) && Util.stringIsNotNullOrEmpty(form.getSelectedToken())
+        validateModel(form)
     ));
 
     if (dialog.showDialog() == InputDialog.OK_OPTION) {
       try {
-        String response = getResourcesService().createHostFactoryHost(form.getHostName(), form.getSelectedToken());
-        ResourceIdentifier id =ResourceIdentifier.fromString(
+        String response = getResourcesService()
+            .createHostFactoryHost(form.getModel());
+        ResourceIdentifier id = ResourceIdentifier.fromString(
             model.getIdentifier().getAccount(),
             ResourceType.host,
-            form.getHostName());
+            form.getModel().getHostName());
         JsonNode api_key = Util.getNode(response, "api_key");
         promptToCopyApiKeyToClipboard(api_key.asText(), id);
         fireEvent(model);
@@ -69,5 +75,16 @@ public class CreateHostAction extends AbstractHostFactoryAction {
         showErrorDialog(e, getErrorCodeMapping());
       }
     }
+  }
+
+  private boolean validateModel(HostFactoryHostForm form) {
+
+    try {
+      HostFactoryHostModel model = form.getModel();
+      Objects.requireNonNull(model.getHostFactoryToken());
+
+      return Util.nonNullOrEmptyString(model.getHostName()) &&
+          Util.nonNullOrEmptyString(model.getHostFactoryToken().getToken());
+    } catch (NullPointerException np) { return false; }
   }
 }

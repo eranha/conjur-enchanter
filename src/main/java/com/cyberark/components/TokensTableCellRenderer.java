@@ -1,6 +1,6 @@
 package com.cyberark.components;
 
-import com.cyberark.models.HostFactoryToken;
+import com.cyberark.models.hostfactory.HostFactoryToken;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class TokensTableCellRenderer extends DefaultTableCellRenderer {
                                                  int column) {
     Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-    if (parseDate(tokens[row].expiration).before(new Date(System.currentTimeMillis()))) {
+    if (parseDate(tokens[row].getExpiration()).before(new Date(System.currentTimeMillis()))) {
       comp.setForeground(Color.lightGray);
     } else {
       comp.setForeground(isSelected

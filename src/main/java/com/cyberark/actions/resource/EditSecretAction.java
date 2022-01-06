@@ -31,7 +31,7 @@ public class EditSecretAction extends EditItemAction<SecretModel> {
 
     String password = new String(result.getPassword());
 
-    if(result.getResult() == JOptionPane.OK_OPTION && Util.stringIsNotNullOrEmpty(password.trim())) {
+    if(result.getResult() == JOptionPane.OK_OPTION && Util.nonNullOrEmptyString(password.trim())) {
       try {
         getResourcesService().setSecret(secretModel, password.trim());
         fireEvent(secretModel);

@@ -1,6 +1,6 @@
 package com.cyberark.models.table;
 
-import com.cyberark.models.HostFactoryToken;
+import com.cyberark.models.hostfactory.HostFactoryToken;
 
 import javax.swing.table.AbstractTableModel;
 import java.time.Instant;
@@ -50,18 +50,18 @@ public class TokensTableModel extends AbstractTableModel {
     HostFactoryToken token = tokens[rowIndex];
     switch (columnIndex) {
       case 0:
-        return token.token;
+        return token.getToken();
       case 1:
-        return token.expiration;
+        return token.getExpiration();
       case 2:
-        return token.cidr.length > 0 ? Arrays.toString(token.cidr) : null;
+        return token.getCidr().length > 0 ? Arrays.toString(token.getCidr()) : null;
     }
     return null;
   }
 
   public void setTokens(HostFactoryToken[] tokens) {
     List<HostFactoryToken> list = Arrays.asList(tokens);
-    list.sort((x, y) -> Instant.parse(y.expiration).compareTo(Instant.parse(x.expiration)));
+    list.sort((x, y) -> Instant.parse(y.getExpiration()).compareTo(Instant.parse(x.getExpiration())));
     this.tokens = list.toArray(HostFactoryToken[]::new);
     fireTableDataChanged();
   }

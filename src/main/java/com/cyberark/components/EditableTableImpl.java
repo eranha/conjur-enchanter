@@ -1,6 +1,8 @@
 package com.cyberark.components;
 
 import com.cyberark.models.table.AbstractEditableTableModel;
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -8,8 +10,12 @@ import java.awt.*;
 import java.util.function.Function;
 
 public class EditableTableImpl<T> extends JPanel implements EditableTable {
+
+  @Getter(AccessLevel.PUBLIC)
   private JTable table;
-  private final AbstractEditableTableModel<T> model;
+
+  @Getter(AccessLevel.PUBLIC)
+  private AbstractEditableTableModel<T> model;
 
   public EditableTableImpl(AbstractEditableTableModel<T> model,
                            Function<TableModel, T> newRowSupplier) {
@@ -64,11 +70,7 @@ public class EditableTableImpl<T> extends JPanel implements EditableTable {
     add(tablePanel, BorderLayout.CENTER);
   }
 
-  public AbstractEditableTableModel<T> getModel() {
-    return model;
-  }
-
-  public JTable getTable() {
-    return table;
+  public void setModel(AbstractEditableTableModel<T> model) {
+    table.setModel(model);
   }
 }

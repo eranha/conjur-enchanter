@@ -3,11 +3,18 @@ package com.cyberark.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
+@ToString
+@NoArgsConstructor
 public class SecretModel extends ResourceModel {
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private Secret[] secrets;
 
   @JsonIgnore
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private char[] secret = new char[0];
 
   @JsonCreator
@@ -21,20 +28,5 @@ public class SecretModel extends ResourceModel {
       @JsonProperty("secrets") Secret[] secrets) {
    super(createdAt, id, owner, policy, permissions, annotations);
    this.secrets = secrets;
-  }
-
-  public SecretModel() {
-  }
-
-  public Secret[] getSecrets() {
-    return secrets;
-  }
-
-  public char[] getSecret() {
-    return secret;
-  }
-
-  public void setSecret(char[] secret) {
-    this.secret = secret;
   }
 }

@@ -55,7 +55,7 @@ public class NewPolicyAction extends NewResourceAction {
       while (true) {
         if (view.showDialog(
             Application.getInstance().getMainForm(),
-            String.format("%s - Load Policy", APP_NAME), () -> Util.stringIsNotNullOrEmpty(view.getPolicyText())
+            String.format("%s - Load Policy", APP_NAME), () -> Util.nonNullOrEmptyString(view.getPolicyText())
         ) == InputDialog.OK_OPTION) {
           String policyText = view.getPolicyText();
           String policyBranch = view.getBranch();

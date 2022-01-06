@@ -10,6 +10,9 @@ import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.models.audit.AuditEvent;
 import com.cyberark.models.audit.AuditEventSubject;
+import com.cyberark.models.hostfactory.HostFactory;
+import com.cyberark.models.hostfactory.HostFactoryHostModel;
+import com.cyberark.models.hostfactory.HostFactoryTokensFormModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -200,8 +203,8 @@ class ResourcesServiceImpl implements ResourcesService {
   }
 
   @Override
-  public String createHostFactoryHost(String hostName, String token) throws ResourceAccessException {
-    logger.trace("createHostFactoryHost({}) enter", hostName);
+  public String createHostFactoryHost(HostFactoryHostModel model) throws ResourceAccessException {
+    logger.trace("createHostFactoryHost({}) enter", model);
     String response;
 
     try {
@@ -209,15 +212,29 @@ class ResourcesServiceImpl implements ResourcesService {
           Endpoints.HOST_FACTORY_HOSTS,
           app.getCredentials().url);
       HashMap<String, String> headers = new HashMap<>();
-      headers.put("Authorization", String.format("Token token=\"%s\"", token));
-      response = resourceProvider.post(new URL(url), headers, String.format("id=%s", hostName));
+      headers.put("Authorization", String.format("Token token=\"%s\"", model.getHostFactoryToken().getToken()));
+      StringBuilder payload = new StringBuilder();
+      payload.append(String.format("id=%s", model.getHostName()));
+      if (Objects.nonNull(model.getAnnotations()) && model.getAnnotations().length > 0) {
+        payload.append("&");
+        Arrays.stream(model.getAnnotations()).forEach(
+          a -> payload.append(
+              String.format("annotations[%s]=%s&",
+                URLEncoder.encode(a.getName(), StandardCharsets.UTF_8),
+                URLEncoder.encode(a.getValue(), StandardCharsets.UTF_8)
+              )
+             )
+        );
+      }
+
+      response = resourceProvider.post(new URL(url), headers, payload.toString());
 
     } catch (IOException e) {
       e.printStackTrace();
       logger.error(e);
       throw new ResourceAccessException(e);
     }
-    logger.trace("createHostFactoryHost({}) exit", hostName);
+    logger.trace("createHostFactoryHost({}) exit", model.getHostName());
 
     return response;
   }

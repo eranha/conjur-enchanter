@@ -28,10 +28,10 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
       ResourceIdentifier id = row.getIdentifier();
       grid[i] = new String[] {
           id.getId(),
-          Util.stringIsNotNullOrEmpty(row.getOwner())
+          Util.nonNullOrEmptyString(row.getOwner())
               ? ResourceIdentifier.fromString(row.getOwner()).getId()
               : null,
-          Util.stringIsNotNullOrEmpty(row.getPolicy())
+          Util.nonNullOrEmptyString(row.getPolicy())
               ? ResourceIdentifier.fromString(row.getPolicy()).getId()
               : null,
           row.getCreatedAt()

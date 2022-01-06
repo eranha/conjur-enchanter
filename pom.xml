@@ -10,6 +10,8 @@
     <packaging>jar</packaging>
 
     <properties>
+        <org.apache.maven.plugins.version>3.3.0</org.apache.maven.plugins.version>
+        <org.jorg.projectlombok.version>1.18.22</org.jorg.projectlombok.version>
         <org.junit.jupiter.version>5.8.1</org.junit.jupiter.version>
         <com.fasterxml.jackson.core.version>2.13.0</com.fasterxml.jackson.core.version>
         <maven.compiler.source>11</maven.compiler.source>
@@ -55,6 +57,18 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>${org.apache.maven.plugins.version}</version>
+            <type>maven-plugin</type>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${org.jorg.projectlombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

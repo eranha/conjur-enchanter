@@ -88,7 +88,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
   private void rebuildPolicy(ResourceType type, String propertyName, Object newResourceName,
                              List<Membership> memberships, List<Membership> members) {
     if (RESOURCE_ID.equals(propertyName)
-        && Util.stringIsNotNullOrEmpty(newResourceName)) {
+        && Util.nonNullOrEmptyString(newResourceName)) {
       policyDisplayPane.setPolicyText(
         getPolicyText(
           getSelectedResource(),
@@ -175,7 +175,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
         if (getSelectedResource() instanceof RoleModel) {
           ResourceIdentifier identifier = getSelectedResource().getIdentifier();
 
-          if (Util.stringIsNotNullOrEmpty(response)) {
+          if (Util.nonNullOrEmptyString(response)) {
             promptToCopyApiKeyToClipboard(response, ResourceIdentifier.deriveFrom(
                 identifier, policyDisplayPane.getResourceId()));
           }

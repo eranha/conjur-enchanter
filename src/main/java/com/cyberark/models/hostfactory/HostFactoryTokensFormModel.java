@@ -1,4 +1,9 @@
-package com.cyberark.models;
+package com.cyberark.models.hostfactory;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -7,18 +12,24 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
+@lombok.RequiredArgsConstructor()
 public class HostFactoryTokensFormModel {
+  @Getter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PUBLIC)
   private String[] restrictions;
+
+  @NonNull
+  @Getter(AccessLevel.PUBLIC)
   private final String hostFactoryId;
+
   private Instant expiration;
+
+  @Getter(AccessLevel.PUBLIC)
   private int numberOfTokens = 1;
+
   private int expirationDays;
   private int expirationHours;
   private int expirationMinutes;
-
-  public HostFactoryTokensFormModel(String hostFactoryId) {
-    this.hostFactoryId = hostFactoryId;
-  }
 
   private void setExpiration() {
     Calendar cal = Calendar.getInstance();
@@ -30,14 +41,6 @@ public class HostFactoryTokensFormModel {
     this.expiration = cal.getTime().toInstant();
   }
 
-  public int getNumberOfTokens() {
-    return numberOfTokens;
-  }
-
-  public String[] getRestrictions() {
-    return restrictions;
-  }
-
   public String getExpirationUtcCDate() {
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     return dtf.format(LocalDateTime.ofInstant(getExpiration(), ZoneId.of("UTC") ));
@@ -46,10 +49,6 @@ public class HostFactoryTokensFormModel {
   private Instant getExpiration() {
     setExpiration();
     return expiration;
-  }
-
-  public void setRestrictions(String[] restrictions) {
-    this.restrictions = restrictions;
   }
 
   public void setNumberOfTokens(int numberOfTokens) {
@@ -72,15 +71,6 @@ public class HostFactoryTokensFormModel {
   public void setExpirationMinutes(int expirationMinutes) {
     this.expirationMinutes = expirationMinutes;
     setExpiration();
-  }
-
-  public String getHostFactoryId() {
-    return hostFactoryId;
-  }
-
-
-  public static void main(String[] args) {
-
   }
 
   public long getExpirationDuration() {

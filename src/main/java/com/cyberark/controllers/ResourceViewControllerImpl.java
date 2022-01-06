@@ -3,7 +3,10 @@ package com.cyberark.controllers;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.*;
+import com.cyberark.models.ResourceType;
+import com.cyberark.models.RoleModel;
+import com.cyberark.models.SecretModel;
+import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.table.*;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
@@ -86,9 +89,10 @@ public class ResourceViewControllerImpl implements ResourceViewController {
     hostFactories.forEach(hf ->
       hf.setHosts(
         hosts.stream()
-            .filter(h -> h.getOwner().equals(hf.getId()))
-            .map(i -> i.getIdentifier().getId())
-            .collect(Collectors.toList()))
+          .filter(h -> h.getOwner().equals(hf.getId()))
+          .map(i -> i.getIdentifier().getId())
+          .sorted(String::compareTo)
+          .collect(Collectors.toList()))
     );
 
     ResourceTableModel<HostFactory> model = new DefaultResourceTableModel<>(hostFactories);

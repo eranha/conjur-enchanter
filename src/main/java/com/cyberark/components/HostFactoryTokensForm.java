@@ -1,6 +1,6 @@
 package com.cyberark.components;
 
-import com.cyberark.models.HostFactoryTokensFormModel;
+import com.cyberark.models.hostfactory.HostFactoryTokensFormModel;
 import com.cyberark.models.table.StringTableModel;
 
 import javax.swing.*;
@@ -105,7 +105,7 @@ public class HostFactoryTokensForm extends JPanel {
     // Restrictions
     add(new JLabel("Restrictions:"),
         new GridBagConstraints(
-            0, 4, 1, 1, 0, 0,
+            0, gridy, 1, 1, 0, 0,
             GridBagConstraints.NORTHWEST,
             GridBagConstraints.NONE,
             new Insets(0,0,0,0), 0, 0
@@ -113,7 +113,7 @@ public class HostFactoryTokensForm extends JPanel {
     );
     add(table,
         new GridBagConstraints(
-            1, gridy++, 1, 1, 1, 1,
+            1, gridy, 1, 1, 1, 1,
             GridBagConstraints.CENTER,
             GridBagConstraints.BOTH,
             new Insets(0,4,0,5), 0, 0

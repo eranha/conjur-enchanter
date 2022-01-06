@@ -11,7 +11,6 @@ import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -175,7 +174,7 @@ public class ResourceForm extends AbstractResourceForm {
     }
 
     if (getDefaultButton() != null) {
-      getDefaultButton().setEnabled(Util.stringIsNotNullOrEmpty(text));
+      getDefaultButton().setEnabled(Util.nonNullOrEmptyString(text));
     }
   }
 
@@ -278,11 +277,5 @@ public class ResourceForm extends AbstractResourceForm {
   @Override
   public ResourceType getResourceType() {
     return resourceType;
-  }
-
-
-  public static void main(String[] args) {
-    InputDialog.showDialog(null, "", true, new ResourceForm(ResourceType.host_factory,
-        new ArrayList<>(), new ArrayList<>()));
   }
 }
