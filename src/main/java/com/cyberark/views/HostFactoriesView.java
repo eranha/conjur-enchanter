@@ -6,14 +6,18 @@ import com.cyberark.actions.resource.hostfactory.RevokeTokensAction;
 import com.cyberark.components.DataTable;
 import com.cyberark.components.TitlePanel;
 import com.cyberark.components.TokensTableCellRenderer;
-import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.ResourceIdentifier;
+import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.table.DefaultResourceTableModel;
 import com.cyberark.models.table.ResourceTableModel;
 import com.cyberark.models.table.TokensTableModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,9 +28,54 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   private TokensTableModel tokensTableModel;
   private DefaultListModel<String> hostsModel;
   private JTable tokensTable;
+  private Timer timer;
+  private Instant nextTokenToExpire;
 
   public HostFactoriesView() {
     super(ViewType.HostFactories);
+    timer.start();
+  }
+
+  @Override
+  public void setVisible(boolean aFlag) {
+    super.setVisible(aFlag);
+  }
+
+  @Override
+  protected void initializeComponents() {
+    super.initializeComponents();
+    timer = new Timer((int)Duration.of(1, ChronoUnit.SECONDS).toMillis(), this::checkForTokenExpiration);
+  }
+
+  private void checkForTokenExpiration(ActionEvent actionEvent) {
+    if (nextTokenToExpire != null && nextTokenToExpire.isAfter(Instant.now())) {
+      return;
+    }
+
+    HostFactory resource = getSelectedResource();
+
+    if (resource != null) {
+      Instant next = Arrays.stream(resource.getTokens())
+          .map(t -> Instant.parse(t.getExpiration()))
+          .filter(t -> t.isAfter(Instant.now()))  // filter out expired token
+          .min(Instant::compareTo)
+          .orElse(null);
+
+      if (next != null) {
+        if (nextTokenToExpire == null) {
+          nextTokenToExpire = next;
+        } else if (nextTokenToExpire.isBefore(Instant.now())) { // did the next_to_expire_token expired?
+          tokensTableModel.setTokens(getSelectedResource().getTokens());
+          nextTokenToExpire = null;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void setResourceTableModel(ResourceTableModel<HostFactory> model) {
+    super.setResourceTableModel(model);
+    nextTokenToExpire = null;
   }
 
   @Override
@@ -46,7 +95,7 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   @Override
   protected void populateResourceData(HostFactory resourceModel) {
     super.populateResourceData(resourceModel);
-
+    nextTokenToExpire = null;
     layersModel.clear();
     hostsModel.clear();
 
