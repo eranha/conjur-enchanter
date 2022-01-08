@@ -6,7 +6,7 @@ import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.components.*;
 import com.cyberark.event.EventPublisher;
-import com.cyberark.event.ResourceEvent;
+import com.cyberark.event.Events;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.models.hostfactory.HostFactory;
@@ -252,7 +252,7 @@ public class NewResourceAction extends AbstractAction {
       showResponse(model.getIdentifier(), response);
     }
 
-    EventPublisher.getInstance().fireEvent(new ResourceEvent<>(model));
+    EventPublisher.getInstance().fireEvent(new ActionEvent(model, Events.NEW_ITEM, ActionType.NewItem.toString()));
   }
 
   private String addResource(ResourceType resourceType,

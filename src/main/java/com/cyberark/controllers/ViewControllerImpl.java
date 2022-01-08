@@ -119,7 +119,11 @@ class ViewControllerImpl implements ViewController {
             : null;
 
     if (currentViewType != ViewType.Dashboard) {
-      if (resourceEvent == null && e.getID() == Events.NEW_ITEM) {
+      boolean isNewItemEvent = resourceEvent == null && e.getID() == Events.NEW_ITEM;
+      boolean currentViewIsPolicies = currentViewType == ViewType.Policies;
+
+      if (isNewItemEvent ||
+          currentViewIsPolicies /* almost all operations adds a new policy version */) {
         reloadView();
       } else if (resourceEvent != null) {
         reloadViewIfNewResourceInCurrentView(resourceEvent);
