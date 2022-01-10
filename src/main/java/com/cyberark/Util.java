@@ -29,7 +29,9 @@ public class Util {
    * @return type as string first letter in capital
    */
   public static String resourceTypeToTitle(ResourceType type) {
-    return String.format("%s%s", type.toString().substring(0, 1).toUpperCase(), type.toString().substring(1));
+    return type == ResourceType.host_factory
+        ? "Host Factory"
+        : String.format("%s%s", type.toString().substring(0, 1).toUpperCase(), type.toString().substring(1));
   }
 
   /**
