@@ -48,8 +48,14 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   }
 
   private void checkForTokenExpiration(ActionEvent actionEvent) {
-    if (nextTokenToExpire != null && nextTokenToExpire.isAfter(Instant.now())) {
-      return;
+    if (nextTokenToExpire != null) {
+      if (nextTokenToExpire.isAfter(Instant.now())) return;
+
+      if (Instant.now().isAfter(nextTokenToExpire)) { // did the next_to_expire_token expired?
+        // reload tokens table
+        tokensTableModel.setTokens(getSelectedResource().getTokens());
+        nextTokenToExpire = null;
+      }
     }
 
     HostFactory resource = getSelectedResource();
@@ -64,9 +70,6 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
       if (next != null) {
         if (nextTokenToExpire == null) {
           nextTokenToExpire = next;
-        } else if (nextTokenToExpire.isBefore(Instant.now())) { // did the next_to_expire_token expired?
-          tokensTableModel.setTokens(getSelectedResource().getTokens());
-          nextTokenToExpire = null;
         }
       }
     }
