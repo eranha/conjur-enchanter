@@ -89,6 +89,12 @@ class ViewControllerImpl implements ViewController {
   }
 
   private void logApiCall(ApiCallEvent e) {
+    // authentication clutters the log.
+    // skip the api call log entry
+    if (e.getUrl().getPath().endsWith("/authenticate")) {
+      return;
+    }
+
     StringBuilder builder = new StringBuilder();
 
     builder
