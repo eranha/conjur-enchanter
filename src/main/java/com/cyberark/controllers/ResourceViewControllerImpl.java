@@ -3,9 +3,7 @@ package com.cyberark.controllers;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.exceptions.ResourceAccessException;
-import com.cyberark.models.ResourceType;
-import com.cyberark.models.RoleModel;
-import com.cyberark.models.SecretModel;
+import com.cyberark.models.*;
 import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.table.*;
 import com.cyberark.resource.ResourceServiceFactory;
@@ -20,12 +18,14 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ResourceViewControllerImpl implements ResourceViewController {
   private static final Logger logger = LogManager.getLogger(ResourceViewControllerImpl.class);
   private final Map<ViewType, ResourceView> views = new HashMap<>();
   private ViewType currentViewType;
+  private Consumer<ResourceModel> resourceSelectedEventConsumer;
 
 
   @Override
@@ -184,10 +184,17 @@ public class ResourceViewControllerImpl implements ResourceViewController {
         break;
     }
 
-    resourceView.setSelectionListener(r -> toggleSelectionBasedAction(r != null));
+    resourceView.setSelectionListener(this::handleResourceSelectedEvent);
     resourceView.setTableRowDoubleClickedEventListener(this::fireEditActionPerformed);
 
     return resourceView;
+  }
+
+  private void handleResourceSelectedEvent(DataModel dataModel) {
+    toggleSelectionBasedAction(dataModel != null);
+    if (dataModel instanceof ResourceModel && resourceSelectedEventConsumer != null) {
+      resourceSelectedEventConsumer.accept((ResourceModel) dataModel);
+    }
   }
 
   private void toggleSelectionBasedAction(boolean enabled) {
@@ -207,6 +214,11 @@ public class ResourceViewControllerImpl implements ResourceViewController {
   @Override
   public void clearData() {
     views.values().forEach(View::clearData);
+  }
+
+  @Override
+  public void setSelectionListener(Consumer<ResourceModel> consumer) {
+    resourceSelectedEventConsumer = consumer;
   }
 
   private ResourceView getCurrentView() {

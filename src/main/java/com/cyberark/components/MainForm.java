@@ -6,6 +6,7 @@ import com.cyberark.actions.*;
 import com.cyberark.actions.resource.NewResourceActionFactory;
 import com.cyberark.event.Events;
 import com.cyberark.event.ViewSelectedListener;
+import com.cyberark.models.ResourceModel;
 import com.cyberark.models.ResourceType;
 import com.cyberark.views.Icons;
 import com.cyberark.views.ResourceView;
@@ -45,6 +46,7 @@ public class MainForm extends JFrame {
   private final JPanel contentPane = new JPanel(new BorderLayout());
   private final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
   private final JScrollPane scrollPane = new JScrollPane();
+  private final JMenu resourceMenu = new JMenu("Resource");
 
   public MainForm(ViewSelectedListener viewSelectedListener, ActionListener actionListener) {
     this.viewSelectedListener = viewSelectedListener;
@@ -183,6 +185,11 @@ public class MainForm extends JFrame {
     JMenuItem exit = new JMenuItem("Exit");
     exit.addActionListener(e -> System.exit(0));
     fileMenu.add(exit);
+
+
+    menuBar.add(resourceMenu);
+    resourceMenu.setEnabled(false);
+
 
     JMenu viewMenu = new JMenu("View");
     viewMenu.add(new ViewApiCallLog(this::toggleLogView));
@@ -369,7 +376,33 @@ public class MainForm extends JFrame {
     mainView.revalidate();
     mainView.repaint();
 
+    if (view instanceof ResourceView) {
+      buildResourceMenu((ResourceView) view);
+    } else {
+      resourceMenu.setEnabled(false);
+    }
+
     logger.trace("setView exit::setView {}", view);
+  }
+
+  private void buildResourceMenu(ResourceView resourceView) {
+    resourceMenu.removeAll();
+    ActionMap resourceActions = resourceView.getResourceActions();
+    Arrays.stream(ActionType.values())
+      .filter(t -> resourceActions.get(t) != null)
+      .forEach(type -> {
+        Action action = resourceActions.get(type);
+          if (resourceActions.size() > 2 && type == ActionType.DeleteItem) {
+            resourceMenu.addSeparator();
+          }
+
+          resourceMenu.add(new JMenuItem(action));
+
+          if (resourceActions.size() > 3 && type == ActionType.DeleteItem) {
+            resourceMenu.addSeparator();
+          }
+        }
+      );
   }
 
   private AbstractButton createToolBarButton(String text) {
@@ -414,5 +447,9 @@ public class MainForm extends JFrame {
 
   public void clearSearchText() {
     searchTextField.setText("");
+  }
+
+  public void onResourceSelected(ResourceModel resourceModel) {
+    resourceMenu.setEnabled(resourceModel != null);
   }
 }

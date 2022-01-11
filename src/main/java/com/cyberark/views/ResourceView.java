@@ -12,6 +12,9 @@ import java.util.function.Consumer;
  */
 public interface ResourceView extends View {
   Action getAction(ActionType type);
+
+  ActionMap getResourceActions();
+
   void toggleSelectionBasedActions(boolean enabled);
   void setSelectionListener(Consumer<DataModel> consumer);
   void setTableRowDoubleClickedEventListener(Consumer<ResourceView> consumer);

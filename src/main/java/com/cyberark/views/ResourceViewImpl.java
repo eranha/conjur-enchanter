@@ -137,6 +137,11 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     }
   }
 
+  @Override
+  public ActionMap getResourceActions() {
+    return menuItemActions;
+  }
+
   /**
    * Constructs this view resource table popup menu based on the DEFAULT_MENU_ITEMS_ORDER
    * adding first the items in DEFAULT_MENU_ITEMS_ORDER if applicable.

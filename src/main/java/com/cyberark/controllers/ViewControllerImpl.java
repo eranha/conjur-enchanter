@@ -38,6 +38,11 @@ class ViewControllerImpl implements ViewController {
   ViewControllerImpl() {
     EventPublisher.getInstance().addListener(this::onResourceEvent);
     EventPublisher.getInstance().addApplicationEventListener(this::onApplicationEvent);
+    resourceViewController.setSelectionListener(r -> {
+      if (getMainForm() != null) {
+        getMainForm().onResourceSelected(r);
+      }
+    });
   }
 
   private void onApplicationEvent(ApplicationEvent e) {
