@@ -8,6 +8,7 @@ import com.cyberark.components.TitlePanel;
 import com.cyberark.components.TokensTableCellRenderer;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.hostfactory.HostFactory;
+import com.cyberark.models.hostfactory.HostFactoryToken;
 import com.cyberark.models.table.DefaultResourceTableModel;
 import com.cyberark.models.table.ResourceTableModel;
 import com.cyberark.models.table.TokensTableModel;
@@ -27,13 +28,11 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   private DefaultListModel<String> layersModel;
   private TokensTableModel tokensTableModel;
   private DefaultListModel<String> hostsModel;
-  private JTable tokensTable;
-  private Timer timer;
+  private Timer tokenExpirationTimer;
   private Instant nextTokenToExpire;
 
   public HostFactoriesView() {
     super(ViewType.HostFactories);
-    timer.start();
   }
 
   @Override
@@ -44,7 +43,7 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   @Override
   protected void initializeComponents() {
     super.initializeComponents();
-    timer = new Timer((int)Duration.of(1, ChronoUnit.SECONDS).toMillis(), this::checkForTokenExpiration);
+    tokenExpirationTimer = new Timer((int)Duration.of(1, ChronoUnit.SECONDS).toMillis(), this::checkForTokenExpiration);
   }
 
   private void checkForTokenExpiration(ActionEvent actionEvent) {
@@ -55,6 +54,7 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
         // reload tokens table
         tokensTableModel.setTokens(getSelectedResource().getTokens());
         nextTokenToExpire = null;
+        tokenExpirationTimer.stop();
       }
     }
 
@@ -70,6 +70,7 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
       if (next != null) {
         if (nextTokenToExpire == null) {
           nextTokenToExpire = next;
+          tokenExpirationTimer.start();
         }
       }
     }
@@ -96,23 +97,37 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   }
 
   @Override
-  protected void populateResourceData(HostFactory resourceModel) {
-    super.populateResourceData(resourceModel);
+  protected void populateResourceData(HostFactory hostFactory) {
+    super.populateResourceData(hostFactory);
+    HostFactoryToken[] tokens = hostFactory.getTokens();
+    String[] layers = hostFactory.getLayers();
+
+    // reset models and timer
+    tokenExpirationTimer.stop();
     nextTokenToExpire = null;
     layersModel.clear();
     hostsModel.clear();
 
-    TokensTableCellRenderer renderer = (TokensTableCellRenderer) tokensTable.getDefaultRenderer(String.class);
-    renderer.setTokens(resourceModel.getTokens());
-
-    Arrays.stream(getSelectedResource()
-        .getLayers()).map(
-          i -> ResourceIdentifier.fromString(i).getId()
-        )
+    // populate layers model
+    Arrays.stream(layers)
+        .map(i -> ResourceIdentifier.fromString(i).getId())
         .forEach(layersModel::addElement);
 
-    getSelectedResource().getHosts().forEach(hostsModel::addElement);
-    tokensTableModel.setTokens(getSelectedResource().getTokens());
+    // populate hosts model
+    hostFactory.getHosts().forEach(hostsModel::addElement);
+
+    // populate tokens model
+    tokensTableModel.setTokens(tokens);
+
+    // start token expiration timer if one of the tokens expiration date is in future
+    if (tokensTableModel.getRowCount() > 0
+        && Arrays.stream(tokens).anyMatch(this::isTokenAboutToExpire)) {
+      tokenExpirationTimer.start();
+    }
+  }
+
+  private boolean isTokenAboutToExpire(HostFactoryToken t) {
+    return Instant.parse(t.getExpiration()).isAfter(Instant.now());
   }
 
   @Override
@@ -135,7 +150,7 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
 
     JSplitPane layersHostsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, layersPanel, hostsPanel);
     layersHostsSplitPane.setDividerLocation(90);
-    tokensTable = new DataTable(tokensTableModel);
+    JTable tokensTable = new DataTable(tokensTableModel);
     tokensTable.setDefaultRenderer(
         String.class,
         new TokensTableCellRenderer());

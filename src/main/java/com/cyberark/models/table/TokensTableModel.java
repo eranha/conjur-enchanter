@@ -65,4 +65,8 @@ public class TokensTableModel extends AbstractTableModel {
     this.tokens = list.toArray(HostFactoryToken[]::new);
     fireTableDataChanged();
   }
+
+  public HostFactoryToken getToken(int row) {
+    return tokens[row];
+  }
 }

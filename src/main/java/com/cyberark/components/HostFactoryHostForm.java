@@ -95,7 +95,7 @@ public class HostFactoryHostForm extends JPanel {
 
     tokensTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     tokensTable.setModel(new TokensTableModel(tokens));
-    tokensTable.setDefaultRenderer(String.class, new TokensTableCellRenderer(tokens));
+    tokensTable.setDefaultRenderer(String.class, new TokensTableCellRenderer());
     tokensTable.getSelectionModel().addListSelectionListener(e -> fireEvent("selected.token",
         tokensTable.getSelectedRow() > -1 ? Objects.requireNonNull(getSelectedToken()).getToken() : null));
 
