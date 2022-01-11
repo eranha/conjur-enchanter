@@ -19,6 +19,7 @@ public class RotateApiKeyAction extends ActionBase<RoleModel> {
     putValue(SHORT_DESCRIPTION,
         "Replaces API key with a new, securely random API key");
     putValue(MNEMONIC_KEY, KeyEvent.VK_N);
+    setEnabled(false);
   }
 
   @Override

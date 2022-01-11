@@ -22,6 +22,7 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
     putValue(SHORT_DESCRIPTION,
         "Changes a user’s password.");
     putValue(MNEMONIC_KEY, KeyEvent.VK_P);
+    setEnabled(false);
   }
 
   @Override
@@ -75,11 +76,10 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
 
   @Override
   public void setEnabled(boolean enabled) {
-    if (enabled && getSelectedResource().getIdentifier().getType() != ResourceType.user) {
-      super.setEnabled(false);
-    } else {
-      super.setEnabled(enabled);
-    }
+    RoleModel selectedResource = getSelectedResource();
+    boolean isUser = selectedResource != null &&
+                     selectedResource.getIdentifier().getType() == ResourceType.user;
+    super.setEnabled(enabled && isUser);
   }
 
   private static HashMap<Integer, String> getErrorCodeMapping() {
@@ -88,6 +88,4 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
     errors.put(404, "update.password");
     return errors;
   }
-
-
 }

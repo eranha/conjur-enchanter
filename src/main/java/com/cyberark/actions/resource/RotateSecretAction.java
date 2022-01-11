@@ -15,14 +15,12 @@ import static com.cyberark.Consts.DARK_BG;
 public class RotateSecretAction extends ActionBase<SecretModel> {
   private final static Map<Integer, String> errorCodes = getErrorCodeMapping();
 
-  public RotateSecretAction(Supplier<SecretModel> selectedResource) {
-    this(selectedResource,"Rotate");
-  }
   public RotateSecretAction(Supplier<SecretModel> selectedResource, String text) {
     super(text, ActionType.RotateSecret, selectedResource);
     putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_ROTATE_SECRET,
         16,
         DARK_BG));
+    setEnabled(false);
   }
 
   @Override

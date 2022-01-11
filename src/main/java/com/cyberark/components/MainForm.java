@@ -378,6 +378,7 @@ public class MainForm extends JFrame {
 
     if (view instanceof ResourceView) {
       buildResourceMenu((ResourceView) view);
+      resourceMenu.setEnabled(true);
     } else {
       resourceMenu.setEnabled(false);
     }
