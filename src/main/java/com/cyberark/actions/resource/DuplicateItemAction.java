@@ -12,6 +12,7 @@ import com.cyberark.views.Icons;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,13 +71,26 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
           getPolicyText(resource, id, members, memberships));
 
       policyDisplayPane.setPropertyChangeListener(
-          evt -> rebuildPolicy(
-            type,
-            evt.getPropertyName(),
-            evt.getNewValue(),
-            memberships,
-            members
-          )
+          evt -> {
+            Window ancestor = SwingUtilities.getWindowAncestor((Component) evt.getSource());
+            boolean validId = Util.nonNullOrEmptyString(String.valueOf(evt.getNewValue()));
+            if (ancestor instanceof JDialog) {
+              ((JDialog)ancestor)
+                  .getRootPane()
+                  .getDefaultButton()
+                  .setEnabled(validId);
+            }
+
+            if (validId) {
+              rebuildPolicy(
+                  type,
+                  evt.getPropertyName(),
+                  evt.getNewValue(),
+                  memberships,
+                  members
+              );
+            }
+          }
       );
 
       showPolicyForm(policyDisplayPane);

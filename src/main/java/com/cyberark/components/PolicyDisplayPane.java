@@ -22,8 +22,7 @@ public class PolicyDisplayPane extends JPanel {
 
   public PolicyDisplayPane(String name, List<PolicyModel> policyModels, String policyText) {
     this.policyModels = policyModels;
-    initializeComponents();
-    nameTextField.setText(name);
+    initializeComponents(name);
     policyTextArea.setText(policyText);
   }
 
@@ -31,9 +30,9 @@ public class PolicyDisplayPane extends JPanel {
     this.propertyChangeListener = propertyChangeListener;
   }
 
-  private void initializeComponents() {
-    JLabel nameLabel = new JLabel("Name:");
-    nameTextField = new JTextField();
+  private void initializeComponents(String name) {
+    JLabel nameLabel = new JLabel("ID*:");
+    nameTextField = new RequiredTextField(name);
     Container contentPanel = this;
     JCheckBox checkBox = new JCheckBox("Copy Permissions");
 

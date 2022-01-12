@@ -89,7 +89,7 @@ public class ResourceForm extends AbstractResourceForm {
   }
 
   protected void addResourceIdTextField(int gridy) {
-    addComponentRow(gridy, "ID:", textFieldId);
+    addComponentRow(gridy, "ID*:", textFieldId);
   }
 
   protected JPanel getPolicyPanel() {
@@ -135,17 +135,16 @@ public class ResourceForm extends AbstractResourceForm {
   }
 
   private JTextField createIdTextField() {
-    JTextField textFieldId = new JTextField();
+    JTextField textFieldId = new RequiredTextField( suggestedResourceName());
     textFieldId.getDocument().addDocumentListener(new DefaultDocumentListener(e ->
         onResourceIdTextChange(textFieldId.getText().trim())));
     textFieldId.setToolTipText("<html><b>Required</b>. Identifies the user name. This is the Conjur login name.<br>" +
         "It should not contain special characters such as \":\" or \"/\".<br>It may contain the @ symbol.</html>");
 
-    suggestedResourceName(textFieldId);
     return textFieldId;
   }
 
-  private void suggestedResourceName(JTextField textFieldId) {
+  private String suggestedResourceName() {
     Set<String> ids = resources
         .stream()
         .filter(i -> i.getType() == resourceType).map(ResourceIdentifier::getId)
@@ -164,7 +163,7 @@ public class ResourceForm extends AbstractResourceForm {
           ++nameIndex);
     }
 
-    textFieldId.setText(suggestedResourceName);
+    return suggestedResourceName;
   }
 
   private void onResourceIdTextChange(String text) {

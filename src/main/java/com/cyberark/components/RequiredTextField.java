@@ -16,7 +16,7 @@ public class RequiredTextField extends JTextField {
     Border border = (Util.isNullOrEmptyString(getText()))
         ? BorderFactory.createCompoundBorder(
             BorderFactory.createEmptyBorder(1, 1, 1, 1),
-            BorderFactory.createLineBorder(Color.pink, 1)
+            BorderFactory.createLineBorder(Color.pink, 2, true)
           )
         : UIManager.getBorder("TextField.border");
 

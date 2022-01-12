@@ -47,7 +47,7 @@ public class HostFactoryHostForm extends JPanel {
     setLayout(new GridBagLayout());
     setPreferredSize(new Dimension(420, 240));
 
-    add(new JLabel("Host name*"),
+    add(new JLabel("ID:*"),
       new GridBagConstraints(
       0, 0, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST,
@@ -77,7 +77,7 @@ public class HostFactoryHostForm extends JPanel {
             new Insets(0,0,0,0), 0, 0
         )
     );
-    add(new JLabel("Token*"),
+    add(new JLabel("Token:*"),
       new GridBagConstraints(
         0, 2, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST,
@@ -85,7 +85,7 @@ public class HostFactoryHostForm extends JPanel {
         new Insets(0,0,0,48), 0, 0
       )
     );
-
+    tokensTable.setToolTipText("A Host Factory Token must be provided");
     add(new JScrollPane(tokensTable),
       new GridBagConstraints(
           1, 2, 1, 1, 1, 1,
@@ -104,7 +104,7 @@ public class HostFactoryHostForm extends JPanel {
         )
     );
 
-    add(new JLabel("Annotations"),
+    add(new JLabel("Annotations:"),
         new GridBagConstraints(
             0, 4, 1, 1, 0, 0,
             GridBagConstraints.NORTHWEST,
