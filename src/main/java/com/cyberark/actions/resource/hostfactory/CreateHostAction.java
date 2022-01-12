@@ -38,7 +38,7 @@ public class CreateHostAction extends AbstractHostFactoryAction {
           t -> Instant.parse( t.getExpiration() ).isAfter(Instant.now()))
         ) {
       ViewFactory.getInstance().getMessageView().showMessageDialog(
-       "All tokens are expired. Creates one or more tokens and retry."
+       "All tokens have expired. Creates one or more tokens and retry."
       );
       return;
     }
