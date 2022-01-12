@@ -9,13 +9,17 @@ import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.hostfactory.HostFactoryHostModel;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceType;
+import com.cyberark.models.hostfactory.HostFactoryToken;
 import com.cyberark.views.ViewFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @SelectionBasedAction
 public class CreateHostAction extends AbstractHostFactoryAction {
@@ -33,10 +37,13 @@ public class CreateHostAction extends AbstractHostFactoryAction {
       return;
     }
 
-    if (Arrays.stream(model.getTokens())
-        .noneMatch(
-          t -> Instant.parse( t.getExpiration() ).isAfter(Instant.now()))
-        ) {
+    List<HostFactoryToken> validTokens = Arrays.stream(model.getTokens())
+        .sorted(Comparator.comparing(t -> Instant.parse(t.getExpiration())))
+        .filter(t -> Instant.parse(t.getExpiration())
+        .isAfter(Instant.now()))
+        .collect(Collectors.toList());
+
+    if (validTokens.isEmpty()) {
       ViewFactory.getInstance().getMessageView().showMessageDialog(
        "All tokens have expired. Creates one or more tokens and retry."
       );
@@ -44,7 +51,7 @@ public class CreateHostAction extends AbstractHostFactoryAction {
     }
 
     HostFactoryHostForm form = new HostFactoryHostForm(
-      model.getTokens(),
+      validTokens.toArray(new HostFactoryToken[0]),
       String.format("%s-host-%s", model.getIdentifier().getId(), model.getHosts().size() + 1)
     );
 

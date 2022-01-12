@@ -124,8 +124,8 @@ public class Icons {
     return getIcon(type, DEFAULT_FONT_SIZE, LIGHT_COLOR);
   }
 
-  public Icon getIcon(char unicode, int fontSize, Color foreground) {
+  public Icon getIcon(char unicode, int iconSize, Color foreground) {
     cache.computeIfAbsent(unicode, v -> new DefaultIconCode("fontello", unicode));
-    return IconFontSwing.buildIcon(cache.get(unicode), fontSize, foreground);
+    return IconFontSwing.buildIcon(cache.get(unicode), iconSize, foreground);
   }
 }

@@ -2,12 +2,16 @@ package com.cyberark.components;
 
 import com.cyberark.models.hostfactory.HostFactoryToken;
 import com.cyberark.models.table.TokensTableModel;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,6 +32,27 @@ public class HostFactoryTokensTable extends JTable {
     setDefaultRenderer(String.class, new TokensTableCellRenderer());
     getSelectionModel().addListSelectionListener(e -> fireEvent("selected.token",
         getSelectedRow() > -1 ? Objects.requireNonNull(getSelectedToken()).getToken() : null));
+  }
+
+  public String getToolTipText(MouseEvent e) {
+    String tip = null;
+    java.awt.Point p = e.getPoint();
+    int rowIndex = rowAtPoint(p);
+    int colIndex = columnAtPoint(p);
+
+
+    try {
+      String value = getValueAt(rowIndex, colIndex).toString();
+      tip = (colIndex == 1) ? getFormattedDate(value): value;
+    } catch (RuntimeException e1) {
+      //catch null pointer exception if mouse is over an empty line
+    }
+
+    return tip;
+  }
+
+  private static String getFormattedDate(String dateTime) {
+    return (new PrettyTime()).format(Date.from(Instant.parse(dateTime)));
   }
 
   private void fireEvent(String name, String token) {

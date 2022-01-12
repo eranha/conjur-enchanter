@@ -4,6 +4,7 @@ import com.cyberark.models.hostfactory.HostFactoryHostModel;
 import com.cyberark.models.hostfactory.HostFactoryToken;
 import com.cyberark.models.table.AbstractEditableTableModel;
 import com.cyberark.models.table.TokensTableModel;
+import com.cyberark.views.Icons;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,11 +12,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
+import static com.cyberark.Consts.DARK_BG;
+
 public class HostFactoryHostForm extends JPanel {
+  private static final Icon INFO_ICON = Icons.getInstance().getIcon(Icons.ICON_INFO, 16, DARK_BG);
   private PropertyChangeListener listener;
   private final HostFactoryTokensTable tokensTable;
   private final AnnotationsTable annotationsTable;
   private final JTextField hostName;
+  private final static String INFO_TEXT = "A Host Factory Token must be provided.";
+  private final JLabel infoLabel = new JLabel(INFO_TEXT);
 
   public HostFactoryHostForm(HostFactoryToken[] tokens, String hostName) {
     this.hostName = new RequiredTextField(hostName);
@@ -24,7 +30,6 @@ public class HostFactoryHostForm extends JPanel {
         e -> fireEvent(e.getPropertyName(), String.valueOf(e.getNewValue())),
         new TokensTableModel(tokens));
     annotationsTable = new AnnotationsTable(AbstractEditableTableModel.EditMode.AddRemove);
-
     initializeComponents();
   }
 
@@ -46,8 +51,9 @@ public class HostFactoryHostForm extends JPanel {
   private void initializeComponents() {
     setLayout(new GridBagLayout());
     setPreferredSize(new Dimension(420, 240));
+    infoLabel.setIcon(INFO_ICON);
 
-    add(new JLabel("ID:*"),
+    add(new JLabel("ID*:"),
       new GridBagConstraints(
       0, 0, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST,
@@ -77,7 +83,7 @@ public class HostFactoryHostForm extends JPanel {
             new Insets(0,0,0,0), 0, 0
         )
     );
-    add(new JLabel("Token:*"),
+    add(new JLabel("Token*:"),
       new GridBagConstraints(
         0, 2, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST,
@@ -85,7 +91,9 @@ public class HostFactoryHostForm extends JPanel {
         new Insets(0,0,0,48), 0, 0
       )
     );
+
     tokensTable.setToolTipText("A Host Factory Token must be provided");
+
     add(new JScrollPane(tokensTable),
       new GridBagConstraints(
           1, 2, 1, 1, 1, 1,
@@ -95,9 +103,18 @@ public class HostFactoryHostForm extends JPanel {
       )
     );
 
-    add(Box.createVerticalStrut(12),
+    add(infoLabel,
         new GridBagConstraints(
-            0, 3, 1, 1, 0, 0,
+            1, 3, 1, 1, 0, 0,
+            GridBagConstraints.WEST,
+            GridBagConstraints.NONE,
+            new Insets(2,4,4,0), 0, 0
+        )
+    );
+
+    add(Box.createVerticalStrut(4),
+        new GridBagConstraints(
+            0, 4, 1, 1, 0, 0,
             GridBagConstraints.CENTER,
             GridBagConstraints.NONE,
             new Insets(0,0,0,0), 0, 0
@@ -106,16 +123,17 @@ public class HostFactoryHostForm extends JPanel {
 
     add(new JLabel("Annotations:"),
         new GridBagConstraints(
-            0, 4, 1, 1, 0, 0,
+            0, 5, 1, 1, 0, 0,
             GridBagConstraints.NORTHWEST,
             GridBagConstraints.NONE,
             new Insets(0,0,0,48), 0, 0
         )
     );
 
+    annotationsTable.setToolTipText("Annotations to apply to the new Host.");
     add(annotationsTable,
         new GridBagConstraints(
-            1, 4, 1, 1, 1, 1,
+            1, 5, 1, 1, 1, 1,
             GridBagConstraints.NORTHWEST,
             GridBagConstraints.BOTH,
             new Insets(0,4,0,6), 0, 0
@@ -124,6 +142,15 @@ public class HostFactoryHostForm extends JPanel {
   }
 
   private void fireEvent(String name, String value) {
+    if (tokensTable.getSelectedToken() == null) {
+      infoLabel.setForeground(UIManager.getColor("Label.foreground"));
+      infoLabel.setIcon(INFO_ICON);
+    } else {
+      infoLabel.setForeground(UIManager.getColor("Panel.background"));
+      infoLabel.setIcon(null);
+    }
+
+
     if (Objects.nonNull(listener)) {
       listener.propertyChange(
           new PropertyChangeEvent(this, name, null, value));
