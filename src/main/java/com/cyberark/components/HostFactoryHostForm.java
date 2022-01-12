@@ -13,16 +13,16 @@ import java.util.Objects;
 
 public class HostFactoryHostForm extends JPanel {
   private PropertyChangeListener listener;
-  private final JTable tokensTable;
+  private final HostFactoryTokensTable tokensTable;
   private final AnnotationsTable annotationsTable;
   private final JTextField hostName;
-  private final HostFactoryToken[] tokens;
 
   public HostFactoryHostForm(HostFactoryToken[] tokens, String hostName) {
-    this.tokens = tokens;
     this.hostName = new RequiredTextField(hostName);
 
-    tokensTable = new JTable();
+    tokensTable = new HostFactoryTokensTable(
+        e -> fireEvent(e.getPropertyName(), String.valueOf(e.getNewValue())),
+        new TokensTableModel(tokens));
     annotationsTable = new AnnotationsTable(AbstractEditableTableModel.EditMode.AddRemove);
 
     initializeComponents();
@@ -31,7 +31,7 @@ public class HostFactoryHostForm extends JPanel {
   public HostFactoryHostModel getModel() {
     return new HostFactoryHostModel(
         getHostName(),
-        Objects.requireNonNull(getSelectedToken()),
+        Objects.requireNonNull(tokensTable.getSelectedToken()),
         annotationsTable.getModel().getAnnotations());
   }
 
@@ -41,12 +41,6 @@ public class HostFactoryHostForm extends JPanel {
 
   private String getHostName() {
     return hostName.getText().trim();
-  }
-
-  private HostFactoryToken getSelectedToken() {
-    return tokensTable.getSelectedRow() > -1
-        ? tokens[tokensTable.getSelectedRow()]
-        : null;
   }
 
   private void initializeComponents() {
@@ -91,13 +85,6 @@ public class HostFactoryHostForm extends JPanel {
         new Insets(0,0,0,48), 0, 0
       )
     );
-
-
-    tokensTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    tokensTable.setModel(new TokensTableModel(tokens));
-    tokensTable.setDefaultRenderer(String.class, new TokensTableCellRenderer());
-    tokensTable.getSelectionModel().addListSelectionListener(e -> fireEvent("selected.token",
-        tokensTable.getSelectedRow() > -1 ? Objects.requireNonNull(getSelectedToken()).getToken() : null));
 
     add(new JScrollPane(tokensTable),
       new GridBagConstraints(
