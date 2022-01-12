@@ -9,6 +9,7 @@ public class InputDialog extends JDialog {
   private final int optionType;
   int result = CANCEL_OPTION;
   public static final int OK_OPTION = 0;
+  public static final int OK_CANCEL_OPTION = 2;
   public static final int CANCEL_OPTION = 1;
 
   public InputDialog(Window owner, String title, boolean modal, Component content) {
@@ -33,7 +34,12 @@ public class InputDialog extends JDialog {
   }
 
   public static int showDialog(Window owner, String title, boolean modal, Component content, int optionType) {
-    InputDialog dlg = new InputDialog(owner, title, modal, content, true, optionType);
+    return showDialog(owner, title, modal, content, true, optionType);
+  }
+
+  public static int showDialog(Window owner, String title, boolean modal, Component content,
+                               boolean isOkButtonEnabled, int optionType) {
+    InputDialog dlg = new InputDialog(owner, title, modal, content, isOkButtonEnabled, optionType);
     return dlg.showDialog();
   }
 
