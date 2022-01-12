@@ -45,7 +45,7 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
 
     if (InputDialog.showDialog(
         getMainForm(),
-        String.format("Edit Permissions of %s", resource.getId()),
+        String.format("Edit Permissions of %s", resource.getIdentifier().getId()),
         true,
         form) == InputDialog.OK_OPTION) {
 
