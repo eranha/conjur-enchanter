@@ -59,7 +59,7 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
               .orElse(null));
 
       Map<String, ResourceIdentifier> rolesMap = roles.stream()
-          .collect(Collectors.toMap(ResourceIdentifier::getId, v -> v));
+          .collect(Collectors.toMap(ResourceIdentifier::getFullyQualifiedId, v -> v));
 
       // Get the set role members
       List<Membership> members;
@@ -75,7 +75,7 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
       
       // Remove all member roles from roles list
       members.forEach(i -> {
-        String id = ResourceIdentifier.fromString(i.getMember()).getId();
+        String id = ResourceIdentifier.fromString(i.getMember()).getFullyQualifiedId();
         roles.remove(rolesMap.get(id));
 
         // adminn user is not returned in the genral roles list
