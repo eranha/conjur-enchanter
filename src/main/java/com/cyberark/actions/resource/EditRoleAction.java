@@ -19,16 +19,17 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Adds an actor role either user or host as a meber of one or more groups or layers respectivly.
+ * Adds an actor role either user or host as a member of one or more groups or layers respectively.
  */
 @SelectionBasedAction
 public class EditRoleAction extends EditItemAction<RoleModel> {
   public EditRoleAction(Supplier<RoleModel> selectedResource) {
-    this(selectedResource, "Edit");
+    this(selectedResource, getString("edit.role.action.text"));
   }
 
   public EditRoleAction(Supplier<RoleModel> selectedResource, String text) {
     super(selectedResource, text);
+    putValue(SHORT_DESCRIPTION, getString("edit.role.action.short.description"));
   }
 
   @Override
@@ -72,23 +73,22 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
           grantingRoles, grantedRoles
       );
 
+      String title = String.format(getString("edit.role.action.form.title"),
+          Util.resourceTypeToTitle(role.getType()),
+          (role.getType() == ResourceType.user
+              ? getString("edit.role.action.form.title.groups")
+              : getString("edit.role.action.form.title.layers")));
       Form form = new Form(
-          String.format("Add %s to %s",
-              Util.resourceTypeToTitle(role.getType()),
-              (role.getType() == ResourceType.user ? "Groups" : "Layers")),
+          title,
           getResourcesInfo().getProperty("role.members"),
           itemsSelector
       );
 
       itemsSelector.setPreferredSize(new Dimension(500, 360));
 
-      if (InputDialog.showDialog(
+      if (InputDialog.showModalDialog(
           getMainForm(),
-          String.format("Add %s: %s to %s",
-              Util.resourceTypeToTitle(role.getType()),
-              role.getId(),
-              (role.getType() == ResourceType.user ? "Groups" : "Layers")),
-          true,
+          title,
           form) == InputDialog.OK_OPTION) {
         List<ResourceIdentifier> selectedItems = itemsSelector.getSelectedItems();
         List<ResourceIdentifier> unSelectedItems = itemsSelector.getUnSelectedItems();
@@ -115,3 +115,4 @@ public class EditRoleAction extends EditItemAction<RoleModel> {
     }
   }
 }
+

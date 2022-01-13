@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Dual list horizontal control, enables select and move items form one list to the other.
  */
-public class ItemsSelector extends JPanel {
+public class ItemsSelector extends ContainerBase {
   private final DefaultListModel<ResourceIdentifier> selectedItemsModel = new DefaultListModel<>();
   private final DefaultListModel<ResourceIdentifier> unSelectedItemsModel = new DefaultListModel<>();
   private final JList<ResourceIdentifier> leftList = new JList<>(unSelectedItemsModel);
@@ -53,7 +53,7 @@ public class ItemsSelector extends JPanel {
     leftList.setCellRenderer(new ResourceListItemCellRenderer());
     rightList.setCellRenderer(new ResourceListItemCellRenderer());
 
-    add(getItemsPanel("Available:", leftList),
+    add(getItemsPanel(getString("items.selector.available.label.text"), leftList),
         new GridBagConstraints(
             0, 0, 1, 1, 1, 1,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -69,7 +69,7 @@ public class ItemsSelector extends JPanel {
         )
     );
 
-    add(getItemsPanel("Granted:", rightList),
+    add(getItemsPanel(getString("items.selector.selected.label.text"), rightList),
         new GridBagConstraints(
             2, 0, 1, 1, 1, 1,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH,
