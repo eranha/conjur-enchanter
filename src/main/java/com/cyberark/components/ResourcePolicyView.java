@@ -7,7 +7,7 @@ import com.cyberark.views.Icons;
 import javax.swing.*;
 import java.awt.*;
 
-public class ResourcePolicyView extends JPanel {
+public class ResourcePolicyView extends ContainerBase {
   private JTextArea permissionsTextArea;
   private JTextArea policyTextArea;
   private JLabel titleLabel;
@@ -43,7 +43,8 @@ public class ResourcePolicyView extends JPanel {
     panel.add(Box.createVerticalStrut(16), spacerConstraints);
 
     JPanel panel1 = new JPanel(new BorderLayout());
-    panel1.setBorder( BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Policy:"));
+    panel1.setBorder( BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+        getString("resource.policy.view.policy.label")));
     panel1.add(new JScrollPane(policyTextArea), BorderLayout.CENTER);
     panel.add(panel1,
         new GridBagConstraints(0, 1, 1, 1, 1, 2,
@@ -56,7 +57,8 @@ public class ResourcePolicyView extends JPanel {
     panel.add(Box.createVerticalStrut(16), spacerConstraints);
 
     JPanel panel2 = new JPanel(new BorderLayout());
-    panel2.setBorder( BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Permissions:"));
+    panel2.setBorder( BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+        getString("resource.policy.view.permissions.label")));
     panel2.add(new JScrollPane(permissionsTextArea), BorderLayout.CENTER);
     panel.add(panel2,
         new GridBagConstraints(0, 3, 1, 1, 1, 2,
