@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class PolicyDisplayPane extends JPanel {
+public class PolicyDisplayPane extends ContainerBase {
   public static final String RESOURCE_ID = "resourceId";
   private final List<PolicyModel> policyModels;
   private PropertyChangeListener propertyChangeListener;
@@ -31,10 +31,10 @@ public class PolicyDisplayPane extends JPanel {
   }
 
   private void initializeComponents(String name) {
-    JLabel nameLabel = new JLabel("ID*:");
+    JLabel nameLabel = new JLabel(getString("required.id.label.text"));
     nameTextField = new RequiredTextField(name);
     Container contentPanel = this;
-    JCheckBox checkBox = new JCheckBox("Copy Permissions");
+    JCheckBox checkBox = new JCheckBox(getString("copy.permissions.label.text"));
 
     setMinimumSize(new Dimension(240,160));
     setPreferredSize(new Dimension(480,320));
@@ -69,7 +69,7 @@ public class PolicyDisplayPane extends JPanel {
     );
 
     // line - policy text
-    add(new JLabel("Text:"),
+    add(new JLabel(getString("text.label.text")),
         new GridBagConstraints(
             0, 2, 1, 0, 0, 0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
@@ -87,7 +87,7 @@ public class PolicyDisplayPane extends JPanel {
     );
 
     // line - policy Branch
-    add(new JLabel("Branch:"),
+    add(new JLabel(getString("branch.label.text")),
         new GridBagConstraints(
             0, 3, 1, 0, 0, 0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,

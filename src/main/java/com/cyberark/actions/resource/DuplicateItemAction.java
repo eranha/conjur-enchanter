@@ -1,6 +1,5 @@
 package com.cyberark.actions.resource;
 
-import com.cyberark.Consts;
 import com.cyberark.PolicyBuilder;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
@@ -19,19 +18,20 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.cyberark.Consts.DARK_BG;
+import static com.cyberark.Consts.*;
 import static com.cyberark.components.PolicyDisplayPane.RESOURCE_ID;
 
 @SelectionBasedAction
 public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> {
   private PolicyDisplayPane policyDisplayPane;
+
   public DuplicateItemAction(Supplier<T> selectedResource) {
-    this(selectedResource, "Duplicate...");
+    this(selectedResource, getString("duplicate.item.action.text"));
   }
 
   public DuplicateItemAction(Supplier<T> selectedResource, String text) {
     super(text, ActionType.DuplicateItem, selectedResource);
-    putValue(SHORT_DESCRIPTION, "Generate a policy of the selected resource");
+    putValue(SHORT_DESCRIPTION, getString("duplicate.item.action.short.description"));
     putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_CLONE,
         16,
         DARK_BG));
@@ -44,7 +44,10 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
   @Override
   public void actionPerformed(ResourceModel resource) {
     ResourceIdentifier resourceIdentifier = resource.getIdentifier();
-    String id = String.format("Copy-of-%s", resource.getIdentifier().getId());
+    String id = String.format(
+        getString("duplicate.item.action.id.pattern"),
+        resource.getIdentifier().getId()
+    );
     ResourceType type = resourceIdentifier.getType();
 
     try {
@@ -83,7 +86,6 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
 
             if (validId) {
               rebuildPolicy(
-                  type,
                   evt.getPropertyName(),
                   evt.getNewValue(),
                   memberships,
@@ -99,7 +101,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
     }
   }
 
-  private void rebuildPolicy(ResourceType type, String propertyName, Object newResourceName,
+  private void rebuildPolicy(String propertyName, Object newResourceName,
                              List<Membership> memberships, List<Membership> members) {
     if (RESOURCE_ID.equals(propertyName)
         && Util.nonNullOrEmptyString(newResourceName)) {
@@ -130,7 +132,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
         ? ResourceIdentifier.fromString(resource.getOwner()):
         null;
 
-    if (owner != null && "admin".compareTo(owner.getId()) != 0) {
+    if (owner != null && ADMIN_USER.compareTo(owner.getId()) != 0) {
       pb.resource(copy, owner);
     } else {
       pb.resource(copy);
@@ -142,7 +144,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
           members
               .stream()
               .map(i -> ResourceIdentifier.fromString(i.getMember()))
-              .filter(i -> "admin".compareTo(i.getId()) != 0)
+              .filter(i -> ADMIN_USER.compareTo(i.getId()) != 0)
               .collect(Collectors.toList())
       );
     }
@@ -163,7 +165,10 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
   private void showPolicyForm(PolicyDisplayPane policyDisplayPane) throws ResourceAccessException,
       JsonProcessingException {
     InputDialog dlg = new InputDialog(getMainForm(),
-        String.format("%s - Duplicate Resource", Consts.APP_NAME),
+        String.format(
+            getString("duplicate.item.action.dialog.title"),
+            getString("application.name")
+        ),
         true,
         policyDisplayPane, true);
 
@@ -175,7 +180,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
         String response = getResourcesService().loadPolicy(
             policyText,
             policyBranch == null
-                ? "root"
+                ? ROOT_POLICY
                 : policyBranch
         );
 
