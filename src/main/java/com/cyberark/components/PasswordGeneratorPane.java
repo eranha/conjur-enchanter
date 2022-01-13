@@ -9,7 +9,7 @@ import java.util.Objects;
 import static com.cyberark.Consts.DARK_BG;
 import static com.cyberark.Util.generatePassword;
 
-public class PasswordGeneratorPane extends JPanel {
+public class PasswordGeneratorPane extends ContainerBase {
   private final JTextField textField = new JTextField(24);
 
   public PasswordGeneratorPane(String initialValue) {
@@ -27,10 +27,9 @@ public class PasswordGeneratorPane extends JPanel {
       textField.setText(initialValue.trim());
     }
 
-    generatePassword.setToolTipText("Generate random secure string");
+    generatePassword.setToolTipText(getString(getString("password.generator.pane.tooltip")));
     topPanel.add(Box.createHorizontalStrut(4));
-    topPanel.add(new JLabel("<html>Enter new value or click the button on the right" +
-        "<br>to generate a random secure string:<html>"));
+    topPanel.add(new JLabel(getString("password.generator.pane.description")));
     panel.add(topPanel, BorderLayout.NORTH);
     panel.add(bottomPanel, BorderLayout.CENTER);
     bottomPanel.add(textField);
@@ -72,8 +71,8 @@ public class PasswordGeneratorPane extends JPanel {
   }
 
   public static class PasswordGeneratorDialogResult {
-    private int result;
-    private char[] password;
+    private final int result;
+    private final char[] password;
 
     public PasswordGeneratorDialogResult(int result, String password) {
       this.result = result;

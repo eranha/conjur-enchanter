@@ -9,6 +9,8 @@ import com.cyberark.models.table.SecretTableModel;
 import javax.swing.*;
 import java.util.List;
 
+import static com.cyberark.util.Resources.getString;
+
 public class SecretsView extends ResourceViewImpl<SecretModel> {
   public SecretsView() {
     super(ViewType.Secrets);
@@ -23,8 +25,8 @@ public class SecretsView extends ResourceViewImpl<SecretModel> {
   @Override
   protected List<Action> getMenuActions() {
     List<Action> items = super.getMenuActions();
-    items.add(new EditSecretAction(this::getSelectedResource, "Set Secret..."));
-    items.add(new RotateSecretAction(this::getSelectedResource, "Rotate Secret..."));
+    items.add(new EditSecretAction(this::getSelectedResource, getString("edit.secret.action.text")));
+    items.add(new RotateSecretAction(this::getSelectedResource, getString("rotate.secret.action.text")));
     return items;
   }
 

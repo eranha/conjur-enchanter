@@ -14,17 +14,19 @@ public class EditSecretAction extends EditItemAction<SecretModel> {
   private final static Map<Integer, String> errorCodes = getErrorCodeMapping();
 
   public EditSecretAction(Supplier<SecretModel> selectedResource) {
-    this(selectedResource, "Edit");
+    this(selectedResource,
+        getString("edit.item.action.text"));
   }
   public EditSecretAction(Supplier<SecretModel> selectedResource, String text) {
     super(selectedResource, text);
+    putValue(SHORT_DESCRIPTION, getString("edit.secret.action.description"));
   }
 
   @Override
   public void actionPerformed(SecretModel secretModel) {
     PasswordGeneratorPane.PasswordGeneratorDialogResult result = PasswordGeneratorPane.showDialog(
         getMainForm(),
-        "Set Secret Value",
+        getString("edit.secret.action.title"),
         JOptionPane.OK_CANCEL_OPTION,
         new String(secretModel.getSecret())
     );

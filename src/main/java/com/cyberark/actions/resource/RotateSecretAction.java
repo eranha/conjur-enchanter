@@ -20,6 +20,7 @@ public class RotateSecretAction extends ActionBase<SecretModel> {
     putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_ROTATE_SECRET,
         16,
         DARK_BG));
+    putValue(SHORT_DESCRIPTION, getString("rotate.secret.action.description"));
     setEnabled(false);
   }
 
@@ -27,18 +28,13 @@ public class RotateSecretAction extends ActionBase<SecretModel> {
   public void actionPerformed(SecretModel secretModel) {
 
     JLabel message = new JLabel(
-        "<html>" +
-            "When a variable is configured for secret rotation, this API<br>" +
-            "<span style='background-color: yellow'>" +
-            "immediately expires the secret</span> value and rotates<br>" +
-            "the existing secret value.<br>" +
-            "Are you sure you want to rotate this secret?" +
-            "</html>"
+        getString("rotate.secret.action.label.text")
     );
 
     if(JOptionPane.showConfirmDialog(
-        getMainForm(), message,
-        "Approve Secret Rotations",
+        getMainForm(),
+        message,
+        getString("rotate.secret.action.approve.dialog.title"),
         JOptionPane.YES_NO_CANCEL_OPTION,
         JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
       try {
