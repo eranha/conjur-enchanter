@@ -21,7 +21,11 @@ import static com.cyberark.Consts.DARK_BG;
 @SelectionBasedAction
 public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T> {
   public EditAnnotationsAction(Supplier<T> selectedResource) {
-    this("Edit Annotations...", ActionType.EditAnnotations, selectedResource);
+    this(
+        getString("edit.annotations.action.text"),
+        ActionType.EditAnnotations,
+        selectedResource
+    );
   }
 
   protected EditAnnotationsAction(String text, ActionType type, Supplier<T> selectedResource) {
@@ -29,7 +33,7 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
     putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_EDIT,
         16,
         DARK_BG));
-    putValue(SHORT_DESCRIPTION, "Edit the resource annotations");
+    putValue(SHORT_DESCRIPTION, getString("edit.annotations.action.short.description"));
     setEnabled(false);
   }
 
@@ -45,15 +49,15 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
         annotationsTableModel, this::getAnnotation);
 
     Form form = new Form(
-        "Annotations",
+        getString("edit.annotations.action.form.title"),
         getResourcesInfo().getProperty("annotations")
-            + " <br><span style='background-color: yellow'>Note:</span> Annotations cannot be deleted.",
+            + getString("edit.annotations.action.note"),
         annotationsTable
     );
 
     if (InputDialog.showDialog(
         getMainForm(),
-        String.format("Edit Annotations of %s",
+        String.format(getString("edit.annotations.action.dialog.title"),
             resource.getId()
         ),
         true,
@@ -81,8 +85,8 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
 
   private Annotation getAnnotation(TableModel model) {
     return new Annotation(
-        String.format("annotation_%s", model.getRowCount() + 1),
-        String.format("value_%s", model.getRowCount() + 1),
+        String.format(getString("edit.annotations.new.item.default.name"), model.getRowCount() + 1),
+        String.format(getString("edit.annotations.new.item.default.value"), model.getRowCount() + 1),
         null
     );
   }
