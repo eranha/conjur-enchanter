@@ -33,6 +33,10 @@ public class InputDialog extends JDialog {
     return showDialog(owner, title, modal, content, JOptionPane.OK_CANCEL_OPTION);
   }
 
+  public static int showModalDialog(Window owner, String title, Component content) {
+    return showDialog(owner, title, true, content, JOptionPane.OK_CANCEL_OPTION);
+  }
+
   public static int showDialog(Window owner, String title, boolean modal, Component content, int optionType) {
     return showDialog(owner, title, modal, content, true, optionType);
   }

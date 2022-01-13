@@ -14,6 +14,7 @@ import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
 import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
+import com.cyberark.util.Resources;
 import com.cyberark.views.ErrorView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -46,6 +47,10 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
     Objects.requireNonNull(selectedResource);
     this.selectedResource = selectedResource;
     putValue(ACTION_TYPE_KEY, type);
+  }
+
+  protected static String getString(String key) {
+    return Resources.getString(key);
   }
 
   @Override

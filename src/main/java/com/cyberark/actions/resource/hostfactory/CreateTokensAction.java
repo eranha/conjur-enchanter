@@ -1,32 +1,37 @@
 package com.cyberark.actions.resource.hostfactory;
 
-import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.actions.resource.SelectionBasedAction;
 import com.cyberark.components.HostFactoryTokensForm;
+import com.cyberark.components.JsonViewer;
 import com.cyberark.dialogs.InputDialog;
+import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.hostfactory.HostFactory;
 import com.cyberark.models.hostfactory.HostFactoryTokensFormModel;
 
-import javax.swing.*;
 import java.util.function.Supplier;
 
 @SelectionBasedAction
 public class CreateTokensAction extends AbstractHostFactoryAction {
 
   public CreateTokensAction(Supplier<HostFactory> selectedResource) {
-    super(ActionType.CreateTokens, selectedResource, "Create Tokens...");
+    super(
+        ActionType.CreateTokens,
+        selectedResource,
+        getString("create.tokens.action.text")
+    );
   }
 
   @Override
-  public void actionPerformed(HostFactory model) {
+  protected void actionPerformed(HostFactory model) {
+    final HostFactoryTokensForm tokensForm = new HostFactoryTokensForm(model.getId());
+    final String formTitle = getString("create.tokens.action.form.title");
+    final String resultTitle = getString("create.tokens.action.form.result.title");
 
-    HostFactoryTokensForm tokensForm = new HostFactoryTokensForm(model.getId());
-    if (InputDialog.showDialog(
-        getMainForm(),
-        "Host Factory - Create Tokens",
-        true,
-        tokensForm) == InputDialog.OK_OPTION) {
+    if (InputDialog.showModalDialog(
+          getMainForm(),
+          formTitle,
+          tokensForm) == InputDialog.OK_OPTION) {
       HostFactoryTokensFormModel tokensFormModel = tokensForm.getModel();
 
       if (tokensFormModel.getExpirationDuration() == 0) {
@@ -35,21 +40,12 @@ public class CreateTokensAction extends AbstractHostFactoryAction {
       }
 
       try {
-        String response = getResourcesService().createHostFactoryTokens(tokensFormModel);
-        String indented = Util.prettyPrintJson(response);
-        JPanel panel = new JPanel();
-        JTextArea jt = new JTextArea(indented);
-
-        panel.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
-        panel.add(new JScrollPane(jt));
-
-        JOptionPane.showMessageDialog(getMainForm(),
-            panel,
-            "Host Factory - Create Tokens Result",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+        JsonViewer.showDialog(
+            getMainForm(),
+            resultTitle,
+            getResourcesService().createHostFactoryTokens(tokensFormModel));
         fireEvent(model);
-      } catch (Exception e) {
+      } catch (ResourceAccessException e) {
         showErrorDialog(e, getErrorCodeMapping());
       }
     }
