@@ -18,7 +18,7 @@ import static com.cyberark.Consts.DARK_BG;
 public class DeleteItemAction<T extends ResourceModel> extends ActionBase<T> {
 
   public DeleteItemAction(Supplier<T> selectedResource) {
-    this(selectedResource, "Delete");
+    this(selectedResource, getString("delete.item.action.text"));
     putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_TRASH,
         16,
         CYBR_BLUE));
@@ -26,7 +26,7 @@ public class DeleteItemAction<T extends ResourceModel> extends ActionBase<T> {
 
   public DeleteItemAction(Supplier<T> selectedResource, String text) {
     super(text, ActionType.DeleteItem, selectedResource);
-    putValue(SHORT_DESCRIPTION, "Delete the selected resource");
+    putValue(SHORT_DESCRIPTION, getString("delete.item.action.short.description"));
     putValue(MNEMONIC_KEY, KeyEvent.VK_D);
     putValue(Action.ACCELERATOR_KEY,
         KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, InputEvent.META_DOWN_MASK));
@@ -38,7 +38,7 @@ public class DeleteItemAction<T extends ResourceModel> extends ActionBase<T> {
 
   @Override
   public void actionPerformed(ResourceModel resource) {
-    String message = "Are you sure you want to delete the selected item?";
+    String message = getString("delete.item.action.message");
     if (JOptionPane.showConfirmDialog(getMainForm(), message) == JOptionPane.YES_OPTION) {
       try {
         getResourcesService().delete(resource);
