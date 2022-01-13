@@ -1,6 +1,5 @@
 package com.cyberark.actions.resource;
 
-import com.cyberark.Consts;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.components.ResourcePolicyView;
@@ -20,12 +19,12 @@ import java.util.stream.Collectors;
 @SelectionBasedAction
 public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBase<T> {
   public ViewResourcePolicyAction(Supplier<T> selectedResource) {
-    this(selectedResource, "View Policy");
+    this(selectedResource, getString("view.resource.policy.action.text"));
   }
 
   public ViewResourcePolicyAction(Supplier<T> selectedResource, String text) {
     super(text, ActionType.ViewPolicy, selectedResource);
-    putValue(SHORT_DESCRIPTION, "View the selected resource policy");
+    putValue(SHORT_DESCRIPTION, getString("view.resource.policy.action.description"));
     putValue(MNEMONIC_KEY, KeyEvent.VK_E);
     setEnabled(false);
   }
@@ -61,8 +60,11 @@ public class ViewResourcePolicyAction<T extends ResourceModel> extends ActionBas
     );
 
     InputDialog.showDialog(getMainForm(),
-        String.format("%s - %s - Resource Policy", Consts.APP_NAME, resource.getIdentifier().getId())
-        , true, new ResourcePolicyView(
+        String.format(getString("view.resource.policy.action.dialog.title"),
+            getString("application.name"),
+            resource.getIdentifier().getId()),
+         true,
+        new ResourcePolicyView(
             resource,
             policy,
             permissions), InputDialog.OK_OPTION);
