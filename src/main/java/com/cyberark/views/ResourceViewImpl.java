@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static com.cyberark.Consts.ACTION_TYPE_KEY;
 import static com.cyberark.Consts.CYBR_BLUE;
+import static com.cyberark.util.Resources.getString;
 import static javax.swing.event.TableModelEvent.DELETE;
 
 /**
@@ -224,7 +225,7 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     }
 
     if (Util.isSetResource(Util.getResourceType(view))) {
-      actions.add(new EditSetResourceAction(this::getSelectedResource, "Edit Members..."));
+      actions.add(new EditSetResourceAction(this::getSelectedResource, getString("edit.set.resource.action.text")));
     }
 
     // general actions for all resource types

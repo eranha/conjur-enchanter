@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 /**
  * A SetResource is either a group or a layer in the system.
- * This acitons adds a role (group, layer, user or host) as members
+ * This actions adds a role (group, layer, user or host) as members
  * to the current selected group or layer.
  */
 @SelectionBasedAction
@@ -31,6 +31,7 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
 
   public EditSetResourceAction(Supplier<ResourceModel> selectedResource, String text) {
     super(selectedResource, text);
+    putValue(SHORT_DESCRIPTION, getString("edit.set.resource.action.description"));
   }
 
   @Override
@@ -51,7 +52,7 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
             ? t == ResourceType.user || t == ResourceType.group
             : t == ResourceType.host || t == ResourceType.layer);
 
-      // remove the current slected role from the roles list
+      // remove the current selected role from the roles list
       roles.remove(
           roles.stream()
               .filter(i-> i.equals(role))
@@ -91,24 +92,23 @@ public class EditSetResourceAction extends EditItemAction<ResourceModel> {
 
       itemsSelector.setPreferredSize(new Dimension(500, 360));
 
+      String title = String.format(getString("edit.set.resource.action.form.title"),
+          role.getType() == ResourceType.group
+              ? getString("edit.set.resource.action.form.title.users")
+              : getString("edit.set.resource.action.form.title.hosts"),
+          Util.resourceTypeToTitle(role.getType()));
+
       Form form = new Form(
-          String.format("Add %s to %s",
-              role.getType() == ResourceType.group ? "Users" : "Hosts",
-              Util.resourceTypeToTitle(role.getType())),
+          title,
           getResourcesInfo().getProperty("role.members"),
           itemsSelector
       );
 
-
-      if (InputDialog.showDialog(
-          getMainForm(),
-          String.format(
-              "Add %s to %s: %s",
-              role.getType() == ResourceType.group ? "Users" : "Hosts",
-              Util.resourceTypeToTitle(role.getType()), role.getId()
-          ),
-          true,
-          form) == InputDialog.OK_OPTION) {
+      if (InputDialog.showModalDialog(
+            getMainForm(),
+            title,
+            form
+      ) == InputDialog.OK_OPTION) {
         List<ResourceIdentifier> selectedItems = itemsSelector.getSelectedItems();
         List<ResourceIdentifier> unSelectedItems = itemsSelector.getUnSelectedItems();
 
