@@ -20,7 +20,7 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
   public UpdatePasswordAction(Supplier<RoleModel> selectedResource, String text) {
     super(text, ActionType.UpdatePassword, selectedResource);
     putValue(SHORT_DESCRIPTION,
-        "Changes a user’s password.");
+        getString("update.password.menu.action.description"));
     putValue(MNEMONIC_KEY, KeyEvent.VK_P);
     setEnabled(false);
   }
@@ -30,19 +30,14 @@ public class UpdatePasswordAction extends ActionBase<RoleModel> {
     try {
       if (JOptionPane.showConfirmDialog(
           getMainForm(),
-          new JLabel("<html>Update password requires " +
-              "<span style=\"background-color:yellow\">rotations of the user's API key</span>.<br>" +
-              "Are you sure you want to continue?</html>")
+          new JLabel(getString("update.password.menu.action.dialog.message"))
       ) == JOptionPane.YES_OPTION) {
 
-        String tooltip = "<html>" +
-             "Type in a new password or submit the <b>random generated</b> password.<br>" +
-             "Choose a password that includes: 12-128 characters, 2 uppercase letters, <br>" +
-             "2 lowercase letters,1 digit and 1 special character.<br></html>";
+        String tooltip = getString("update.password.menu.action.password.generator.tooltip");
 
         PasswordGeneratorPane.PasswordGeneratorDialogResult result = PasswordGeneratorPane.showDialog(
             getMainForm(),
-            "Set Secret Value",
+            getString("update.password.menu.action.dialog.title"),
             JOptionPane.OK_CANCEL_OPTION,
             Util.generatePassword(),
             tooltip
