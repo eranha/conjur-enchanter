@@ -1,7 +1,6 @@
 package com.cyberark.actions.resource;
 
 import com.cyberark.Application;
-import com.cyberark.Consts;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.components.*;
@@ -37,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.cyberark.Consts.*;
+import static com.cyberark.util.Resources.getString;
 
 // TODO this class requires refactoring
 public class NewResourceAction extends AbstractAction {
@@ -68,7 +68,7 @@ public class NewResourceAction extends AbstractAction {
   public NewResourceAction(String text, ResourceType type, int mnemonicKey, KeyStroke keyStroke) {
     super(text);
     this.resourceType = type;
-    putValue(SHORT_DESCRIPTION, String.format("Add new '%s' resource", type.toString()));
+    putValue(SHORT_DESCRIPTION, String.format(getString("new.resource.action.description"), type.toString()));
     putValue(MNEMONIC_KEY, mnemonicKey);
     putValue(MNEMONIC_KEY, mnemonicKey);
     putValue(Action.ACCELERATOR_KEY, keyStroke);
@@ -78,13 +78,13 @@ public class NewResourceAction extends AbstractAction {
   @Override
   public void actionPerformed(ActionEvent e) {
     String resourceTypeTitle =  String.format(
-        "Add New %s",
+        getString("new.resource.action.resource.type.title"),
         resourceTypeToTitle(Objects.requireNonNull(resourceType))
     );
 
     String title = String.format(
         "%s - %s",
-        Consts.APP_NAME, resourceTypeTitle
+        getString("application.name"), resourceTypeTitle
     );
 
     try {
@@ -167,15 +167,16 @@ public class NewResourceAction extends AbstractAction {
     if (apiKey == null) {
       JOptionPane
           .showMessageDialog(getMainForm(),
-              String.format("Rotate the API key of role '%s' to get the its value.", model.getId()),
-              "API Key",
+              String.format(getString("new.resource.action.rotate.key.message"), model.getId()),
+              getString("new.resource.action.rotate.key.title"),
               JOptionPane.INFORMATION_MESSAGE);
       return;
     }
 
-    JLabel label = new JLabel("Click Copy to copy the API key to clipboard.");
-    JLabel label2 = new JLabel("(you will only see this once)");
+    JLabel label = new JLabel(getString("copy.api.key.to.clipboard"));
+    JLabel label2 = new JLabel(getString("only.once.label"));
     JTextField jt = new JTextField(apiKey);
+
     jt.addAncestorListener(new AncestorListener()
     {
       public void ancestorAdded ( AncestorEvent event )
@@ -187,12 +188,13 @@ public class NewResourceAction extends AbstractAction {
       public void ancestorMoved ( AncestorEvent event ) {}
     });
 
-    Object[] choices = {"Copy", "Close"};
+    Object[] choices = getString("copy.api.options").split(",");
     Object defaultChoice = choices[0];
 
     int answer = JOptionPane
-        .showOptionDialog(getMainForm(), new Component[]{label, label2,jt}, "Copy API Key to Clipboard?",
-            JOptionPane.YES_NO_CANCEL_OPTION,//
+        .showOptionDialog(getMainForm(), new Component[]{label, label2,jt},
+            getString("copy.api.key.to.clipboard.dialog.title"),
+            JOptionPane.YES_NO_CANCEL_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, choices, defaultChoice);
 
     if (answer == JOptionPane.YES_OPTION) {
@@ -420,9 +422,10 @@ public class NewResourceAction extends AbstractAction {
   private Page getRestrictionsPage(Properties pageInfo) {
     return new Page(
         PageType.Restrictions.toString(),
-        "Restrictions", pageInfo.getProperty("restrictions"),
+        getString("restrictions.page.title"),
+        pageInfo.getProperty("restrictions"),
         new EditableTableImpl<>(
-            new StringTableModel(), m -> "0.0.0.0", false
+            new StringTableModel(), m -> getString("default.restriction.ip"), false
         )
     );
   }
@@ -463,7 +466,7 @@ public class NewResourceAction extends AbstractAction {
     pages.add(
         new Page(
             PageType.Layers.toString(),
-            "Layers",
+            getString("layers.page.title"),
             pageInfo.getProperty("host_factory.layers"),
             layersSelector
         )
@@ -503,18 +506,19 @@ public class NewResourceAction extends AbstractAction {
                                  List<ResourceIdentifier> roles) {
     return new Page(
         PageType.Privileges.toString(),
-        "Permissions",
+        getString("permissions.page.title"),
         pageInfo.getProperty("role.privileges"),
         new PrivilegesPane(
             !(Util.isRoleResource(resourceType) || Util.isSetResource(resourceType))
-              ? "Roles" : "Resources",
+                ? getString("permissions.page.resource.type.roles")
+                : getString("permissions.page.resource.type.resources"),
             resourceType, new Permission[0], roles));
   }
 
   private Page getSetResourceGrantsPage(ResourceType type, List<ResourceIdentifier> resources, Properties pageInfo) {
     return new Page(
         PageType.Grants.toString(),
-        "Members",
+        getString("grants.page.title"),
         pageInfo.getProperty("role.members"),
         new ItemsSelector(
           filter(
@@ -531,7 +535,9 @@ public class NewResourceAction extends AbstractAction {
   private Page getRoleGrantsPage(ResourceType type, List<ResourceIdentifier> resources, Properties pageInfo) {
     return new Page(
         PageType.Grants.toString(),
-        type == ResourceType.user ? "Groups" : "Layers",
+        type == ResourceType.user
+            ? getString("grant.role.page.groups.title")
+            : getString("grant.role.page.layers.title"),
         pageInfo.getProperty("role.members"),
         new ItemsSelector(filter(resources,
             type == ResourceType.user
@@ -543,7 +549,7 @@ public class NewResourceAction extends AbstractAction {
   private Page getGeneralPage(ResourceType type, List<ResourceIdentifier> resources, Properties pageInfo) {
     return new Page(
         PageType.General.toString(),
-        "General",
+        getString("general.page.title"),
         pageInfo.getProperty(type.toString()),
         new ResourceForm(
             type,
@@ -558,7 +564,7 @@ public class NewResourceAction extends AbstractAction {
                                       Properties pageInfo) {
     return new Page(
         PageType.General.toString(),
-        "General",
+        getString("general.page.title"),
         pageInfo.getProperty(type.toString()),
         new SecretForm(resources)
     );
