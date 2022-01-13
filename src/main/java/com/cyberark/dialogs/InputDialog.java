@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
+import static com.cyberark.util.Resources.getString;
+
 public class InputDialog extends JDialog {
   private final Component content;
   private final int optionType;
@@ -61,8 +63,8 @@ public class InputDialog extends JDialog {
 
   private void initializeComponents() {
     JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-    JButton cancelButton = new JButton("Cancel");
-    JButton okButton = new JButton("OK");
+    JButton cancelButton = new JButton(getString("input.dialog.cancel.button"));
+    JButton okButton = new JButton(getString("input.dialog.ok.button"));
 
     getRootPane().setDefaultButton(okButton);
     getContentPane().setLayout(new BorderLayout());
