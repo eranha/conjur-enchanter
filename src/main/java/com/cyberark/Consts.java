@@ -21,7 +21,7 @@ public interface Consts {
   String ACTION_TYPE_KEY = "action.type";
   String RESOURCE_TYPE_KEY = "resource.type";
   String APP_NAME = "Enchanter";
-  String ROOT = "root";
+  String ROOT_POLICY = "root";
 
   enum PolicyApiMode {
     Post,
@@ -31,4 +31,5 @@ public interface Consts {
 
   String RESOURCES_INFO_PROPERTIES = "/resources_info.properties";
   String HTML_PARAGRAPH = "<html><body style='width: %1spx'>%1s</body></html>";
+  String ADMIN_USER = "admin";
 }

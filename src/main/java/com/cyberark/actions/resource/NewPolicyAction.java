@@ -106,7 +106,7 @@ public class NewPolicyAction extends NewResourceAction {
           view.getPolicyApiMode(),
           policyText,
           policyBranch == null
-            ? Consts.ROOT
+            ? Consts.ROOT_POLICY
             : policyBranch
       );
 

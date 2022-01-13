@@ -9,6 +9,8 @@ import javax.swing.tree.DefaultTreeModel;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.cyberark.Consts.ROOT_POLICY;
+
 public class PoliciesTree extends JTree {
   private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
@@ -32,14 +34,14 @@ public class PoliciesTree extends JTree {
     policies.forEach(policy ->
         nodes.put(policy.getId(), new DefaultMutableTreeNode(policy)));
 
-    if (!nodes.containsKey("root")) {
+    if (!nodes.containsKey(ROOT_POLICY)) {
       throw new IllegalArgumentException("root policy not not found in policies");
     }
 
     policies.forEach(i -> {
         if (i.getId().split("/").length == 1) {
-          if (!i.getId().equals("root")) {
-            nodes.get("root").add(nodes.get(i.getId()));
+          if (!i.getId().equals(ROOT_POLICY)) {
+            nodes.get(ROOT_POLICY).add(nodes.get(i.getId()));
           }
         } else {
           String parentId = i.getId().substring(0, i.getId().lastIndexOf('/'));
@@ -48,13 +50,13 @@ public class PoliciesTree extends JTree {
       }
     );
 
-    DefaultTreeModel treeModel = new DefaultTreeModel(nodes.get("root"));
+    DefaultTreeModel treeModel = new DefaultTreeModel(nodes.get(ROOT_POLICY));
     setModel(treeModel);
   }
 
   public ResourceIdentifier getSelectedPolicy() {
     return getLastSelectedPathComponent() != null
         ? (ResourceIdentifier) ((DefaultMutableTreeNode) getLastSelectedPathComponent()).getUserObject()
-        : (ResourceIdentifier) nodes.get("root").getUserObject();
+        : (ResourceIdentifier) nodes.get(ROOT_POLICY).getUserObject();
   }
 }
