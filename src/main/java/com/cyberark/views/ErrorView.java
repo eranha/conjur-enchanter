@@ -2,6 +2,7 @@ package com.cyberark.views;
 
 import com.cyberark.Errors;
 import com.cyberark.exceptions.ApiCallException;
+import com.cyberark.util.Resources;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class ErrorView {
 
       viewFactory.getMessageView().showMessageDialog(
           message,
-          "Error",
+          Resources.getString("error.view.title"),
           JOptionPane.ERROR_MESSAGE);
     }
   }

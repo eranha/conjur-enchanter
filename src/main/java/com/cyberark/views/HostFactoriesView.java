@@ -12,6 +12,7 @@ import com.cyberark.models.hostfactory.HostFactoryToken;
 import com.cyberark.models.table.DefaultResourceTableModel;
 import com.cyberark.models.table.ResourceTableModel;
 import com.cyberark.models.table.TokensTableModel;
+import com.cyberark.util.Resources;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,7 +44,8 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
   @Override
   protected void initializeComponents() {
     super.initializeComponents();
-    tokenExpirationTimer = new Timer((int)Duration.of(1, ChronoUnit.SECONDS).toMillis(), this::checkForTokenExpiration);
+    tokenExpirationTimer = new Timer((int)Duration.of(1, ChronoUnit.SECONDS).toMillis(),
+        this::checkForTokenExpiration);
   }
 
   private void checkForTokenExpiration(ActionEvent actionEvent) {
@@ -140,12 +142,12 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
     JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
 
-    TitlePanel layersPanel = new TitlePanel("" +
-        "Layers",
+    TitlePanel layersPanel = new TitlePanel(
+        Resources.getString("host-factory.view.layers.title"),
         new JScrollPane(new JList<>(layersModel)), CYBR_BLUE);
 
-    TitlePanel hostsPanel = new TitlePanel("" +
-        "Hosts",
+    TitlePanel hostsPanel = new TitlePanel(
+        Resources.getString("host-factory.view.hosts.title"),
         new JScrollPane(new JList<>(hostsModel)), CYBR_BLUE);
 
     JSplitPane layersHostsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, layersPanel, hostsPanel);
@@ -156,7 +158,7 @@ public class HostFactoriesView extends ResourceViewImpl<HostFactory> {
         new TokensTableCellRenderer());
 
     TitlePanel annotationsPanel = new TitlePanel(
-        "Tokens",
+        Resources.getString("host-factory.view.tokens.title"),
         new JScrollPane(tokensTable), CYBR_BLUE);
 
     rightSplitPane.setTopComponent(layersHostsSplitPane);

@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import static com.cyberark.Consts.CYBR_BLUE;
+import static com.cyberark.util.Resources.getString;
 
 public class PoliciesView extends ResourceViewImpl<PolicyModel> {
   private JTable policyVersionsTable;
@@ -51,8 +52,9 @@ public class PoliciesView extends ResourceViewImpl<PolicyModel> {
       policyVersionsTable.setModel(vModel);
     });
 
-    TitlePanel topPanel = new TitlePanel("Policies", new JScrollPane(getResourceTable()), CYBR_BLUE);
-    TitlePanel bottomPanel = new TitlePanel("Policy Versions",
+    TitlePanel topPanel = new TitlePanel(getString("policy.view.title"),
+        new JScrollPane(getResourceTable()), CYBR_BLUE);
+    TitlePanel bottomPanel = new TitlePanel(getString("policy.view.versions.title"),
         new JScrollPane(policyVersionsTable), CYBR_BLUE);
 
     policyVersionsTable.addMouseListener(new MouseAdapter() {
@@ -65,7 +67,7 @@ public class PoliciesView extends ResourceViewImpl<PolicyModel> {
           JOptionPane.showMessageDialog(
               SwingUtilities.getWindowAncestor(PoliciesView.this),
               new JScrollPane(new JTextArea(model.getPolicyVersion(table.getSelectedRow()))),
-              "Policy Text",
+              getString("policy.view.version.text.dialog.title"),
               JOptionPane.INFORMATION_MESSAGE
           );
         }

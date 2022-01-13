@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.cyberark.Consts.CYBR_BLUE;
+import static com.cyberark.util.Resources.getString;
 
 public class DashboardView extends JPanel implements View {
   private JTable table = new DataTable();
@@ -59,7 +60,7 @@ public class DashboardView extends JPanel implements View {
         .forEach(i -> buttonsPanel.add(createButton(i, actionListener)));
 
     add(buttonsPanel, BorderLayout.NORTH);
-    TitlePanel panel = new TitlePanel("Recent Activity", new JScrollPane(table), CYBR_BLUE);
+    TitlePanel panel = new TitlePanel(getString("audit.view.recent.activity"), new JScrollPane(table), CYBR_BLUE);
     add(panel, BorderLayout.CENTER);
   }
 

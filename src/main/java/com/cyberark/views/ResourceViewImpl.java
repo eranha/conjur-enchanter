@@ -83,8 +83,14 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
    */
   protected Component getInfoPanel() {
     JSplitPane bottomSplitPane = new JSplitPane(SwingConstants.VERTICAL);
-    TitlePanel permissionsPanel = new TitlePanel("Permissions", new JScrollPane(permissionsTable), CYBR_BLUE);
-    TitlePanel annotationsPanel = new TitlePanel("Annotations", new JScrollPane(annotationsTable), CYBR_BLUE);
+    TitlePanel permissionsPanel = new TitlePanel(
+        getString("resource.view.permissions"),
+        new JScrollPane(permissionsTable),
+        CYBR_BLUE);
+    TitlePanel annotationsPanel = new TitlePanel(
+        getString("resource.view.annotations"),
+        new JScrollPane(annotationsTable),
+        CYBR_BLUE);
 
     permissionsTable.setDefaultRenderer(ResourceIdentifier.class, new RoleTableCellRenderer());
     bottomSplitPane.setLeftComponent(permissionsPanel);
@@ -218,19 +224,22 @@ public class ResourceViewImpl<T extends ResourceModel> extends TitlePanel implem
     Action newResourceAction = getNewResourceTypeAction();
 
     if (Objects.nonNull(newResourceAction)) {
-      newResourceAction.putValue(Action.NAME, "New...");
+      newResourceAction.putValue(Action.NAME,
+          getString("resource.view.new.resource.action.name"));
       actions.add(
           newResourceAction
       );
     }
 
     if (Util.isSetResource(Util.getResourceType(view))) {
-      actions.add(new EditSetResourceAction(this::getSelectedResource, getString("edit.set.resource.action.text")));
+      actions.add(new EditSetResourceAction(this::getSelectedResource,
+          getString("edit.set.resource.action.text")));
     }
 
     // general actions for all resource types
     actions.add(new EditAnnotationsAction<>(this::getSelectedResource));
-    actions.add(new DeleteItemAction<>(this::getSelectedResource, "Delete..."));
+    actions.add(new DeleteItemAction<>(this::getSelectedResource,
+        getString("resource.view.delete.resource.action.name")));
     actions.add(new DuplicateItemAction<>(this::getSelectedResource));
     actions.add(new EditPermissions<>(this::getSelectedResource));
     actions.add(new ViewResourcePolicyAction<>(this::getSelectedResource));

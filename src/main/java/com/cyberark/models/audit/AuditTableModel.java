@@ -5,9 +5,11 @@ import com.cyberark.models.ResourceIdentifier;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
+import static com.cyberark.util.Resources.getString;
+
 public class AuditTableModel extends AbstractTableModel {
   private final List<AuditEvent> events;
-  private final String[] columns = new String[]{"Time", "User", "Action"};
+  private final String[] columns = getString("audit.table.model.columns").split(",");
 
   private final Class<?>[] columnClass = new Class<?>[] {
       String.class, ResourceIdentifier.class, String.class
