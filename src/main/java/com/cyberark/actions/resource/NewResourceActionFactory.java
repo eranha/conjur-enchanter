@@ -1,7 +1,6 @@
 package com.cyberark.actions.resource;
 
 import com.cyberark.models.ResourceType;
-import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.views.ViewFactory;
 
 import javax.swing.*;
@@ -16,7 +15,6 @@ public class NewResourceActionFactory {
 
   public NewResourceActionFactory() {
     actions.put(ResourceType.policy, new NewPolicyAction(
-        ResourceServiceFactory.getInstance().getResourcesService(),
         ViewFactory.getInstance().getMessageView()
     ));
     actions.put(ResourceType.user, new NewResourceAction(

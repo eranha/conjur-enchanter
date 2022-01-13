@@ -11,7 +11,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
 
-public class ApiKeysView extends JPanel {
+public class ApiKeysView extends ContainerBase {
   private final String message;
 
   public ApiKeysView(String message) {
@@ -21,8 +21,8 @@ public class ApiKeysView extends JPanel {
 
   private void initializeComponents() {
     setLayout(new BorderLayout());
-    JLabel label = new JLabel("Below is the policy load result, save the returned API keys.");
-    JLabel label2 = new JLabel("(you will only see this once)");
+    JLabel label = new JLabel(getString("api.key.view.label1"));
+    JLabel label2 = new JLabel(getString("api.key.view.label2"));
 
     JPanel topPanel = new JPanel(new GridLayout(3, 1));
     topPanel.add(label);

@@ -10,7 +10,6 @@ import com.cyberark.event.Events;
 import com.cyberark.exceptions.ApiCallException;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.ResourceType;
-import com.cyberark.resource.ResourcesService;
 import com.cyberark.views.ErrorView;
 import com.cyberark.views.MessageView;
 import com.cyberark.views.PolicyFormView;
@@ -21,23 +20,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import static com.cyberark.Consts.APP_NAME;
+import static com.cyberark.util.Resources.getString;
 
 public class NewPolicyAction extends NewResourceAction {
-  public static final String POLICY_PUT_LOAD_WARNING = "<html>Note: In <b>PUT</b> policy load mode, " +
-      "objects, grants, and privileges that <br>exist in the " +
-      "database but are not specified in the policy file are " +
-      "<span style='background-color: yellow'>deleted</span>.<br><br>" +
-      "Are you sure you want to continue?</html>";
+  public static final String POLICY_PUT_LOAD_WARNING = getString("new.policy.action.out.load.warning");
   private final MessageView messageView;
 
-  public NewPolicyAction(ResourcesService resourcesService,
-                         MessageView messageView) {
+  public NewPolicyAction(MessageView messageView) {
     super(
         ResourceType.policy,
         KeyEvent.VK_P,
         KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK)
     );
-
+    putValue(SHORT_DESCRIPTION, getString("new.policy.action.description"));
     this.messageView = messageView;
   }
 
@@ -55,17 +50,17 @@ public class NewPolicyAction extends NewResourceAction {
       while (true) {
         if (view.showDialog(
             Application.getInstance().getMainForm(),
-            String.format("%s - Load Policy", APP_NAME), () -> Util.nonNullOrEmptyString(view.getPolicyText())
+            String.format(getString("new.policy.action.dialog.title"), APP_NAME),
+            () -> Util.nonNullOrEmptyString(view.getPolicyText())
         ) == InputDialog.OK_OPTION) {
           String policyText = view.getPolicyText();
           String policyBranch = view.getBranch();
 
           if (view.getPolicyApiMode() == Consts.PolicyApiMode.Put) {
-            Object[] options = {"Yes",
-                "No", "Cancel"};
+            Object[] options = getString("new.policy.action.dialog.options").split(",");
             int selection = JOptionPane.showOptionDialog(getMainForm(),
                 new JLabel(POLICY_PUT_LOAD_WARNING),
-                "Confirm Operation",
+                getString("new.policy.action.dialog.confirm.title"),
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 
@@ -91,7 +86,7 @@ public class NewPolicyAction extends NewResourceAction {
       } else {
         ErrorView.showErrorMessage(
             String.format(
-              "Error loading policy: %s",
+              getString("new.policy.action.error"),
               ex.getMessage()
           )
         );
@@ -99,8 +94,12 @@ public class NewPolicyAction extends NewResourceAction {
     }
   }
 
-  private void loadPolicy(ViewFactory viewFactory, PolicyFormView view, String policyText, String policyBranch) throws ResourceAccessException {
+  private void loadPolicy(ViewFactory viewFactory,
+                          PolicyFormView view,
+                          String policyText,
+                          String policyBranch) throws ResourceAccessException {
     String response;
+
     if (policyText != null && policyText.trim().length() > 0) {
       response = getResourcesService().loadPolicy(
           view.getPolicyApiMode(),
@@ -128,8 +127,8 @@ public class NewPolicyAction extends NewResourceAction {
   private void promptToCopyApiKey(String response) {
     messageView.showMessageDialog(
         new ApiKeysView(response),
-    "Policy Load Response",
-          JOptionPane.INFORMATION_MESSAGE
+            getString("new.policy.action.response.dialog.title"),
+            JOptionPane.INFORMATION_MESSAGE
     );
   }
 }
