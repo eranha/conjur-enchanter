@@ -1,6 +1,5 @@
 package com.cyberark.dialogs;
 
-import com.cyberark.Consts;
 import com.cyberark.components.DefaultDocumentListener;
 import com.cyberark.event.LoginEventResult;
 
@@ -14,10 +13,12 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Objects;
 
+import static com.cyberark.util.Resources.getString;
+
 public class LoginDialog extends JDialog implements ActionListener {
 
   private static final String LOGIN = "login";
-  JButton loginBtn = new JButton("Login");
+  JButton loginBtn = new JButton(getString("login.dialog.login.button"));
   ActionListener actionListener;
   HashMap<String, Document> formInputs = new HashMap<>();
   JLabel statusLabel = new JLabel();
@@ -28,7 +29,7 @@ public class LoginDialog extends JDialog implements ActionListener {
     this.actionListener = actionListener;
     getContentPane().setLayout(new GridBagLayout());
     addComponentsToContainer();
-    setTitle(String.format("%s - Login", Consts.APP_NAME));
+    setTitle(String.format(getString("login.dialog.login.title"), getString("application.name")));
     setBounds(10, 10, 360, 480);
     setResizable(false);
     loginBtn.addActionListener(this);
@@ -82,7 +83,7 @@ public class LoginDialog extends JDialog implements ActionListener {
     constraints.gridy = gridy++;
     Insets labelInsets = new Insets(0, 6, 0, 4);
     constraints.insets = labelInsets;
-    formPanel.add(createLabel(urlTextField, "URL"), constraints);
+    formPanel.add(createLabel(urlTextField, getString("login.dialog.url.label")), constraints);
 
     constraints.gridy = gridy++;
     constraints.insets = zeroInsets;
@@ -92,7 +93,7 @@ public class LoginDialog extends JDialog implements ActionListener {
     // ACCOUNT
     constraints.gridy = gridy++;
     constraints.insets = labelInsets;
-    formPanel.add(createLabel(accountTextField, "Account"), constraints);
+    formPanel.add(createLabel(accountTextField, getString("login.dialog.account.label")), constraints);
 
     constraints.gridy = gridy++;
     constraints.insets = zeroInsets;
@@ -102,7 +103,7 @@ public class LoginDialog extends JDialog implements ActionListener {
     // USERNAME
     constraints.gridy = gridy++;
     constraints.insets = labelInsets;
-    formPanel.add(createLabel(userTextField, "Username"), constraints);
+    formPanel.add(createLabel(userTextField, getString("login.dialog.user.label")), constraints);
 
     constraints.gridy = gridy++;
     constraints.insets = zeroInsets;
@@ -112,7 +113,7 @@ public class LoginDialog extends JDialog implements ActionListener {
     //PASSWORD
     constraints.gridy = gridy++;
     constraints.insets = labelInsets;
-    formPanel.add(createLabel(passwordField,"Password"), constraints);
+    formPanel.add(createLabel(passwordField,getString("login.dialog.password.label")), constraints);
 
     constraints.gridy = gridy++;
     constraints.insets = zeroInsets;
