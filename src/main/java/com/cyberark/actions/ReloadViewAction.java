@@ -8,11 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import static com.cyberark.Consts.CYBR_BLUE;
+import static com.cyberark.util.Resources.getString;
 
 public class ReloadViewAction extends AbstractAction {
   public ReloadViewAction() {
     super("Reload", Icons.getInstance().getIcon(Icons.ICON_SPIN, 16, CYBR_BLUE));
-    putValue(SHORT_DESCRIPTION, "Reload view");
+    putValue(SHORT_DESCRIPTION, getString("reload.view.action.text"));
     putValue(MNEMONIC_KEY, KeyEvent.VK_R);
   }
 

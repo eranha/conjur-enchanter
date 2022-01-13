@@ -8,7 +8,6 @@ import com.cyberark.dialogs.InputDialog;
 import com.cyberark.exceptions.ResourceAccessException;
 import com.cyberark.models.*;
 import com.cyberark.views.Icons;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -96,7 +95,7 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
       );
 
       showPolicyForm(policyDisplayPane);
-    } catch (ResourceAccessException | JsonProcessingException ex) {
+    } catch (ResourceAccessException ex) {
       showErrorDialog(ex);
     }
   }
@@ -162,8 +161,8 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
     return pb.toPolicy();
   }
 
-  private void showPolicyForm(PolicyDisplayPane policyDisplayPane) throws ResourceAccessException,
-      JsonProcessingException {
+  private void showPolicyForm(PolicyDisplayPane policyDisplayPane)
+      throws ResourceAccessException {
 
     if (InputDialog.showModalDialog(
         getMainForm(),

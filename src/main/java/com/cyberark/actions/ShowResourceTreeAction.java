@@ -20,10 +20,12 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.cyberark.util.Resources.getString;
+
 public class ShowResourceTreeAction extends AbstractAction {
   public ShowResourceTreeAction() {
-    super("Resources");
-    putValue(SHORT_DESCRIPTION, "View resources tree");
+    super(getString("show.resource.tree.action.text"));
+    putValue(SHORT_DESCRIPTION, getString("show.resource.tree.action.description"));
     putValue(MNEMONIC_KEY, KeyEvent.VK_T);
   }
 
@@ -49,7 +51,7 @@ public class ShowResourceTreeAction extends AbstractAction {
 
     InputDialog.showDialog(
         Application.getInstance().getMainForm(),
-         "Resources Browser",
+         getString("show.resource.tree.action.dialog.title"),
         true,
         new ResourceTreeBrowser(
             new ArrayList<>(resourceTypeToResources.get(ResourceType.policy).values()),

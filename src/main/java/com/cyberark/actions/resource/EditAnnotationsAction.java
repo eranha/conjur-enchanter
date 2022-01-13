@@ -23,13 +23,13 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
   public EditAnnotationsAction(Supplier<T> selectedResource) {
     this(
         getString("edit.annotations.action.text"),
-        ActionType.EditAnnotations,
         selectedResource
     );
   }
 
-  protected EditAnnotationsAction(String text, ActionType type, Supplier<T> selectedResource) {
-    super(text, type, selectedResource);
+  protected EditAnnotationsAction(String text, Supplier<T> selectedResource) {
+    super(text, ActionType.EditAnnotations,
+        selectedResource);
     putValue(SMALL_ICON, Icons.getInstance().getIcon(Icons.ICON_EDIT,
         16,
         DARK_BG));
