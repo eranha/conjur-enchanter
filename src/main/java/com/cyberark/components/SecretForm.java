@@ -28,20 +28,18 @@ public class SecretForm extends ResourceForm {
     addResourceIdTextField(row++);
     addSpacingRow(row++);
     // POLICY
-    addComponentRow(row++, "Policy:", getPolicyPanel());
+    addComponentRow(row++, getString("secret.form.policy.label"), getPolicyPanel());
     addSpacingRow(row++);
 
     // variable specific input KIND
     textFieldKind = new JTextField();
-    textFieldKind.setToolTipText("<html>Optional. Assigns a descriptive label to the variable, " +
-        "<br>such as password. The values are not predefined; create your own.</html>");
-    addComponentRow(row++, "Kind:", textFieldKind);
+    textFieldKind.setToolTipText(getString("secret.form.kind.tooltip"));
+    addComponentRow(row++, getString("secret.form.kind.label"), textFieldKind);
     addSpacingRow(row++);
     // variable specific input MIME_TYPE
     textFieldMimeType = new JTextField();
-    textFieldMimeType.setToolTipText("<html>Optional. The expected MIME type of the values. " +
-        "<br>This attribute is used to set the Content-Type header on HTTP responses.</html>");
-    addComponentRow(row++, "Mime Type:", textFieldMimeType);
+    textFieldMimeType.setToolTipText(getString("secret.form.mime.tooltip"));
+    addComponentRow(row++, getString("secret.form.mime.label"), textFieldMimeType);
     addSpacingRow(row++);
     // ANNOTATIONS
     addAnnotationsTable(row++);
