@@ -3,7 +3,7 @@ package com.cyberark.actions.resource;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
 import com.cyberark.components.Form;
-import com.cyberark.components.PrivilegesPanel;
+import com.cyberark.components.PrivilegesPane;
 import com.cyberark.dialogs.InputDialog;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.ResourceEvent;
@@ -19,7 +19,12 @@ import java.util.stream.Collectors;
 @SelectionBasedAction
 public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
   public EditPermissions(Supplier<T> selectedResource) {
-    super("Edit Permissions...", ActionType.EditPermissions, selectedResource);
+    super(
+        getString("edit.permissions.action.text"),
+        ActionType.EditPermissions,
+        selectedResource
+    );
+    putValue(SHORT_DESCRIPTION, getString("edit.permissions.action.short.description"));
     setEnabled(false);
   }
 
@@ -29,24 +34,27 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
     boolean isRole = Util.isRoleResource(type) || Util.isSetResource(type) || type == ResourceType.policy;
 
 
-    PrivilegesPanel privilegesPane = new PrivilegesPanel(
+    PrivilegesPane privilegesPane = new PrivilegesPane(
         !(Util.isRoleResource(type) || Util.isSetResource(type))
-            ? "Roles" : "Resources",
+            ? getString("edit.permissions.action.roles")
+            : getString("edit.permissions.action.resources"),
         resource.getIdentifier().getType(),
         resource.getPermissions(),
         getResources()
     );
 
     Form form = new Form(
-        "Permissions",
+        getString("edit.permissions.action.form.title"),
         getResourcesInfo().getProperty("role.privileges"),
         privilegesPane
     );
 
-    if (InputDialog.showDialog(
+    if (InputDialog.showModalDialog(
         getMainForm(),
-        String.format("Edit Permissions of %s", resource.getIdentifier().getId()),
-        true,
+        String.format(
+            getString("edit.permissions.action.dialog.title"),
+            resource.getIdentifier().getId()
+        ),
         form) == InputDialog.OK_OPTION) {
 
       Map<ResourceIdentifier, Set<String>> updatedPrivileges = privilegesPane.getResourcePrivileges();
@@ -86,7 +94,6 @@ public class EditPermissions<T extends ResourceModel> extends ActionBase<T> {
           }
         )
       );
-
 
       try {
 

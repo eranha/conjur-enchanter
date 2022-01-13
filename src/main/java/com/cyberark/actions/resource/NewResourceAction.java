@@ -243,7 +243,7 @@ public class NewResourceAction extends AbstractAction {
     response = addResource(resourceType, pages, model);
 
     // set permissions in a separate call
-    PrivilegesPanel privilegesPane = (PrivilegesPanel) getPageComponent(PageType.Privileges, pages);
+    PrivilegesPane privilegesPane = (PrivilegesPane) getPageComponent(PageType.Privileges, pages);
     if (Objects.nonNull(privilegesPane)) {
       setPermissions(model, privilegesPane);
     }
@@ -326,7 +326,7 @@ public class NewResourceAction extends AbstractAction {
         .orElse(null);
   }
 
-  private void setPermissions(ResourceModel resource, PrivilegesPanel privilegesPane) throws ResourceAccessException {
+  private void setPermissions(ResourceModel resource, PrivilegesPane privilegesPane) throws ResourceAccessException {
     Map<ResourceIdentifier, Set<String>> privileges = privilegesPane.getPrivileges();
 
     if (!privileges.isEmpty()) {
@@ -505,7 +505,7 @@ public class NewResourceAction extends AbstractAction {
         PageType.Privileges.toString(),
         "Permissions",
         pageInfo.getProperty("role.privileges"),
-        new PrivilegesPanel(
+        new PrivilegesPane(
             !(Util.isRoleResource(resourceType) || Util.isSetResource(resourceType))
               ? "Roles" : "Resources",
             resourceType, new Permission[0], roles));

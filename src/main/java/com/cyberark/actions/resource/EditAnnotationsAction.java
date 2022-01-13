@@ -55,12 +55,12 @@ public class EditAnnotationsAction<T extends ResourceModel> extends ActionBase<T
         annotationsTable
     );
 
-    if (InputDialog.showDialog(
+    if (InputDialog.showModalDialog(
         getMainForm(),
-        String.format(getString("edit.annotations.action.dialog.title"),
+        String.format(
+            getString("edit.annotations.action.dialog.title"),
             resource.getId()
         ),
-        true,
         form) == InputDialog.OK_OPTION) {
       try {
         selectedResource.setAnnotations(annotationsTableModel.getAnnotations());

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PrivilegesPanel extends JPanel {
+public class PrivilegesPane extends ContainerBase {
   private static final PrivilegesTableModel PRIVILEGES_EMPTY_TABLE_MODEL = new PrivilegesTableModel(null, new HashMap<>());
   private final List<ResourceIdentifier> resourceModels;
   private final Map<ResourceIdentifier, Set<String>> resourcePrivileges = new HashMap<>();
@@ -28,18 +28,10 @@ public class PrivilegesPanel extends JPanel {
   private final ResourceType resourceType;
   private EditableTableImpl<Privilege> privilegesTable;
 
-  public PrivilegesPanel(ResourceType resourceType, List<ResourceIdentifier> roles) {
-    this("Resources", resourceType, new Permission[0], roles);
-  }
-
-  public PrivilegesPanel(ResourceType resourceType, Permission[] permissions, List<ResourceIdentifier> roles) {
-    this("Resources", resourceType, permissions, roles);
-  }
-
-  public PrivilegesPanel(String resourcesType,
-                         ResourceType resourceType,
-                         Permission[] permissions,
-                         List<ResourceIdentifier> roles) {
+  public PrivilegesPane(String resourcesType,
+                        ResourceType resourceType,
+                        Permission[] permissions,
+                        List<ResourceIdentifier> roles) {
     this.resourceModels = roles;
     this.resourceType = resourceType;
 
@@ -59,8 +51,8 @@ public class PrivilegesPanel extends JPanel {
     JList<ResourceIdentifier> rolesList = new JList<>();
     DefaultListModel<ResourceIdentifier> rolesListModel = new DefaultListModel<>();
     JLabel label = new JLabel(String.format("%s:", resourcesType));
-    JButton addRoleButton = new JButton("Add...");
-    JButton removeRoleButton = new JButton("Remove");
+    JButton addRoleButton = new JButton(getString("privileges.pane.add.label.text"));
+    JButton removeRoleButton = new JButton(getString("privileges.pane.remove.label.text"));
 
     JPanel topPanel = new JPanel(new BorderLayout());
     JPanel listPanel = new JPanel(new BorderLayout());
@@ -87,7 +79,8 @@ public class PrivilegesPanel extends JPanel {
               ? rolesListModel.get(0).getId()
               : null,
             PrivilegesTableModel.EXECUTE_PRIVILEGES),
-        m -> new Privilege(String.format("privilege%s", m.getRowCount() + 1), false));
+        m -> new Privilege(String.format(
+            getString("privileges.pane.new.item.text"), m.getRowCount() + 1), false));
 
     rolesList.setCellRenderer(new ResourceListItemCellRenderer());
     rolesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -171,7 +164,7 @@ public class PrivilegesPanel extends JPanel {
     Map<String, Boolean> map = new HashMap<>(
         resourceType == ResourceType.variable || resourceType == ResourceType.webservice
         ? PrivilegesTableModel.EXECUTE_PRIVILEGES
-        : PrivilegesTableModel.READ_UPDATE_PRIVILEGES
+        : PrivilegesTableModel.CREATE_UPDATE_PRIVILEGES
     );
 
     resourcePrivileges.get(resource).forEach(
@@ -230,9 +223,8 @@ public class PrivilegesPanel extends JPanel {
       }
     });
 
-    if (InputDialog.showDialog(SwingUtilities.getWindowAncestor(this),
-        "Select Roles",
-        true,
+    if (InputDialog.showModalDialog(SwingUtilities.getWindowAncestor(this),
+        getString("privileges.pane.select.roles.dialog.title"),
         new JScrollPane(list)
     ) == InputDialog.OK_OPTION) {
       // add the selected roles to the permitted roles list

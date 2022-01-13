@@ -164,15 +164,15 @@ public class DuplicateItemAction<T extends ResourceModel> extends ActionBase<T> 
 
   private void showPolicyForm(PolicyDisplayPane policyDisplayPane) throws ResourceAccessException,
       JsonProcessingException {
-    InputDialog dlg = new InputDialog(getMainForm(),
+
+    if (InputDialog.showModalDialog(
+        getMainForm(),
         String.format(
             getString("duplicate.item.action.dialog.title"),
             getString("application.name")
         ),
-        true,
-        policyDisplayPane, true);
-
-    if (dlg.showDialog() == InputDialog.OK_OPTION) {
+        policyDisplayPane
+    ) == InputDialog.OK_OPTION) {
       String policyText = policyDisplayPane.getPolicyText();
       String policyBranch = policyDisplayPane.getBranch();
 

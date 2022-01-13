@@ -9,15 +9,19 @@ import java.util.stream.Collectors;
 
 public class PrivilegesTableModel extends AbstractEditableTableModel<Privilege> {
   private List<Privilege> privileges;
-  private final String[] columnNames = new String[]{"Permissions for %s", "Allow", "Deny"};
+  private final String[] columnNames = new String[] {
+      getString("privileges.pane.table.privilege.column.format"),
+      getString("privileges.pane.table.allow.column"),
+      getString("privileges.pane.table.deny.column")
+  };
   private String role;
 
   public static final Map<String, Boolean> EXECUTE_PRIVILEGES =
-      Arrays.stream(new String[]{"read", "update", "execute"})
+      Arrays.stream(getString("privileges.pane.table.default.execute.privilege").split(","))
       .collect(Collectors.toMap(privilege -> privilege, data -> false));
 
-  public static final Map<String, Boolean> READ_UPDATE_PRIVILEGES =
-      Arrays.stream(new String[]{"read", "create", "update"})
+  public static final Map<String, Boolean> CREATE_UPDATE_PRIVILEGES =
+      Arrays.stream(getString("privileges.pane.table.default.read.privilege").split(","))
           .collect(Collectors.toMap(privilege -> privilege, data -> false));
 
 
@@ -86,7 +90,9 @@ public class PrivilegesTableModel extends AbstractEditableTableModel<Privilege> 
   }
 
   private String getPermissionsColumnName() {
-    return role == null ? "Permissions": String.format(columnNames[0], role);
+    return role == null
+        ? getString("privileges.pane.table.privilege.column")
+        : String.format(getString("privileges.pane.table.privilege.column.format"), role);
   }
 
   @Override
