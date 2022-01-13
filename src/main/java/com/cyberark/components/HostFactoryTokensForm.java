@@ -6,7 +6,7 @@ import com.cyberark.models.table.StringTableModel;
 import javax.swing.*;
 import java.awt.*;
 
-public class HostFactoryTokensForm extends JPanel {
+public class HostFactoryTokensForm extends ContainerBase {
   private final HostFactoryTokensFormModel model;
   private final StringTableModel restrictionsModel = new StringTableModel();
 
@@ -17,7 +17,7 @@ public class HostFactoryTokensForm extends JPanel {
 
   private void initializeComponents() {
     EditableTableImpl<String> table = new EditableTableImpl<>(
-        restrictionsModel, m -> "0.0.0.0", false
+        restrictionsModel, m -> getString("default.restriction.ip"), false
     );
 
     setLayout(new GridBagLayout());
@@ -25,7 +25,7 @@ public class HostFactoryTokensForm extends JPanel {
     int gridy = 0;
 
     // Number of Tokens
-    add(new JLabel("Number of Tokens:"),
+    add(new JLabel(getString("tokens.form.number.of.tokens")),
       new GridBagConstraints(
         0, gridy, 1, 1, 0, 0,
         GridBagConstraints.WEST,
@@ -59,7 +59,7 @@ public class HostFactoryTokensForm extends JPanel {
     );
 
     // Expiration
-    add(new JLabel("Expiration:"),
+    add(new JLabel(getString("tokens.form.expiration")),
         new GridBagConstraints(
             0, 2, 1, 1, 0, 0,
             GridBagConstraints.WEST,
@@ -77,11 +77,11 @@ public class HostFactoryTokensForm extends JPanel {
     hoursSpinner.addChangeListener(e -> model.setExpirationHours((Integer) hoursSpinner.getValue()));
     minutesSpinner.addChangeListener(e -> model.setExpirationMinutes((Integer) minutesSpinner.getValue()));
 
-    panel.add(new JLabel("Days:"));
+    panel.add(new JLabel(getString("tokens.form.expiration.days")));
     panel.add(daysSpinner);
-    panel.add(new JLabel("Hours:"));
+    panel.add(new JLabel(getString("tokens.form.expiration.hours")));
     panel.add(hoursSpinner);
-    panel.add(new JLabel("Minutes:"));
+    panel.add(new JLabel(getString("tokens.form.expiration.minutes")));
     panel.add(minutesSpinner);
     add(panel,
       new GridBagConstraints(
@@ -103,7 +103,7 @@ public class HostFactoryTokensForm extends JPanel {
     );
 
     // Restrictions
-    add(new JLabel("Restrictions:"),
+    add(new JLabel(getString("restrictions.label.text")),
         new GridBagConstraints(
             0, gridy, 1, 1, 0, 0,
             GridBagConstraints.NORTHWEST,
@@ -123,7 +123,6 @@ public class HostFactoryTokensForm extends JPanel {
 
   public HostFactoryTokensFormModel getModel() {
     model.setRestrictions(restrictionsModel.getItems());
-
     return model;
   }
 }
