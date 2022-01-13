@@ -10,6 +10,8 @@ import com.cyberark.models.table.RoleTableModel;
 import javax.swing.*;
 import java.util.List;
 
+import static com.cyberark.util.Resources.getString;
+
 /**
  * Role resource is either user or host
  */
@@ -33,9 +35,9 @@ public class RolesView extends ResourceViewImpl<RoleModel> {
   @Override
   protected List<Action> getMenuActions() {
     List<Action> actions = super.getMenuActions();
-    actions.add(new EditRoleAction(this::getSelectedResource, "Edit Memberships..."));
-    actions.add(new RotateApiKeyAction(this::getSelectedResource, "Rotate API Key..."));
-    actions.add(new UpdatePasswordAction(this::getSelectedResource, "Update Password..."));
+    actions.add(new EditRoleAction(this::getSelectedResource, getString("edit.role.menu.action.text")));
+    actions.add(new RotateApiKeyAction(this::getSelectedResource, getString("rotate.api.key.action.text")));
+    actions.add(new UpdatePasswordAction(this::getSelectedResource, getString("update.password.menu.action.text")));
     return actions;
   }
 }

@@ -16,8 +16,7 @@ public class RotateApiKeyAction extends ActionBase<RoleModel> {
 
   public RotateApiKeyAction(Supplier<RoleModel> selectedResource, String text) {
     super(text, ActionType.RotateApiKey, selectedResource);
-    putValue(SHORT_DESCRIPTION,
-        "Replaces API key with a new, securely random API key");
+    putValue(SHORT_DESCRIPTION, getString("rotate.api.key.action.description"));
     putValue(MNEMONIC_KEY, KeyEvent.VK_N);
     setEnabled(false);
   }
@@ -27,7 +26,7 @@ public class RotateApiKeyAction extends ActionBase<RoleModel> {
     try {
       if (JOptionPane.showConfirmDialog(
           getMainForm(),
-          "Are you sure you want to rotate the API key?") == JOptionPane.YES_OPTION) {
+          getString("rotate.api.key.action.confirmation.message")) == JOptionPane.YES_OPTION) {
         String apiKey = getResourcesService().rotateApiKey(
             getSelectedResource().getIdentifier().getType(),
             getSelectedResource());
