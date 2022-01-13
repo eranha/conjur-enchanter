@@ -42,16 +42,15 @@ public class ResourceForm extends AbstractResourceForm {
 
 
     listOwners.setRenderer(new ResourceListItemCellRenderer());
-    listOwners.setToolTipText("<html>Optional. If owner is not provided,<br>" +
-        "a resource inherits its owner from its policy.</html>");
+    listOwners.setToolTipText(getString("resource.form.owners.list.tooltip"));
 
     int gridy = 0;
 
     addResourceIdTextField(gridy++);
     addSpacingRow(gridy++);
-    addComponentRow(gridy++, "Owner:", listOwners);
+    addComponentRow(gridy++, getString("resource.form.owner.label"), listOwners);
     addSpacingRow(gridy++);
-    addComponentRow(gridy++, "Policy:", getPolicyPanel());
+    addComponentRow(gridy++, getString("resource.form.policy.label"), getPolicyPanel());
     addSpacingRow(gridy++);
     addAnnotationsTable(gridy++);
     addSpacingRow(gridy++);
@@ -73,14 +72,10 @@ public class ResourceForm extends AbstractResourceForm {
     EditableTableImpl<Annotation> tableAnnotations = new EditableTableImpl<>(
         annotationsTableModel, this::getAnnotation);
 
-    tableAnnotations.getTable().setToolTipText(
-        "<html>Annotations on a user resource are optional and customizable.<br>" +
-            "Custom annotations provide a way to store meta data about a resource.<br>Annotations are useful for<br" +
-            "human users and automated processing. Conjur API calls can retrieve annotation values from the <br>" +
-            "Conjur database.<html/>"
+    tableAnnotations.getTable().setToolTipText(getString("annotations.table.tooltip")
     );
     tableAnnotations.setBorder(BorderFactory.createEmptyBorder(0,4,0,5));
-    addComponentRow(gridy, "Annotations:",
+    addComponentRow(gridy, getString("resource.form.annotations.label"),
         tableAnnotations,
         GridBagConstraints.NORTH,
         GridBagConstraints.HORIZONTAL,
@@ -89,7 +84,7 @@ public class ResourceForm extends AbstractResourceForm {
   }
 
   protected void addResourceIdTextField(int gridy) {
-    addComponentRow(gridy, "ID*:", textFieldId);
+    addComponentRow(gridy, getString("resource.form.id.label"), textFieldId);
   }
 
   protected JPanel getPolicyPanel() {
@@ -119,7 +114,7 @@ public class ResourceForm extends AbstractResourceForm {
     scrollPane.setPreferredSize(new Dimension(320, 240));
 
     if (InputDialog.showDialog(SwingUtilities.getWindowAncestor(this),
-        "Select Policy Branch",true,
+        getString("resource.form.select.policy.dialog.title"),true,
         scrollPane) == InputDialog.OK_OPTION) {
         ResourceIdentifier id = tree.getSelectedPolicy();
         String policy = id != null
@@ -135,11 +130,10 @@ public class ResourceForm extends AbstractResourceForm {
   }
 
   private JTextField createIdTextField() {
-    JTextField textFieldId = new RequiredTextField( suggestedResourceName());
+    JTextField textFieldId = new RequiredTextField(suggestedResourceName());
     textFieldId.getDocument().addDocumentListener(new DefaultDocumentListener(e ->
         onResourceIdTextChange(textFieldId.getText().trim())));
-    textFieldId.setToolTipText("<html><b>Required</b>. Identifies the user name. This is the Conjur login name.<br>" +
-        "It should not contain special characters such as \":\" or \"/\".<br>It may contain the @ symbol.</html>");
+    textFieldId.setToolTipText(getString("resource.form.id.tooltip"));
 
     return textFieldId;
   }
@@ -247,8 +241,10 @@ public class ResourceForm extends AbstractResourceForm {
 
   private Annotation getAnnotation(TableModel model) {
     return new Annotation(
-        String.format("annotation_%s", model.getRowCount() + 1),
-        String.format("value_%s", model.getRowCount() + 1),
+        String.format(getString("edit.annotations.new.item.default.name"),
+            model.getRowCount() + 1),
+        String.format(getString("edit.annotations.new.item.default.value"),
+            model.getRowCount() + 1),
         null
     );
   }
