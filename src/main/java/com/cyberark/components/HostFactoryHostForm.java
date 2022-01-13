@@ -14,13 +14,13 @@ import java.util.Objects;
 
 import static com.cyberark.Consts.DARK_BG;
 
-public class HostFactoryHostForm extends JPanel {
+public class HostFactoryHostForm extends ContainerBase {
   private static final Icon INFO_ICON = Icons.getInstance().getIcon(Icons.ICON_INFO, 16, DARK_BG);
   private PropertyChangeListener listener;
   private final HostFactoryTokensTable tokensTable;
   private final AnnotationsTable annotationsTable;
   private final JTextField hostName;
-  private final static String INFO_TEXT = "A Host Factory Token must be provided.";
+  private final static String INFO_TEXT = getString("host-factory.host.form.info.label");
   private final JLabel infoLabel = new JLabel(INFO_TEXT);
 
   public HostFactoryHostForm(HostFactoryToken[] tokens, String hostName) {
@@ -53,7 +53,7 @@ public class HostFactoryHostForm extends JPanel {
     setPreferredSize(new Dimension(420, 240));
     infoLabel.setIcon(INFO_ICON);
 
-    add(new JLabel("ID*:"),
+    add(new JLabel(getString("host-factory.host.form.id.label")),
       new GridBagConstraints(
       0, 0, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST,
@@ -62,8 +62,7 @@ public class HostFactoryHostForm extends JPanel {
       )
     );
 
-    hostName.setToolTipText("<html>Identifier of the Host to be created.<br>" +
-        "It will be created within the account of the Host Factory.</html>");
+    hostName.setToolTipText(getString("host-factory.host.form.tooltip"));
     hostName.getDocument().addDocumentListener(new DefaultDocumentListener(e ->
         fireEvent("host.name", getHostName())));
 
@@ -83,7 +82,7 @@ public class HostFactoryHostForm extends JPanel {
             new Insets(0,0,0,0), 0, 0
         )
     );
-    add(new JLabel("Token*:"),
+    add(new JLabel(getString("host-factory.host.form.tokens.label")),
       new GridBagConstraints(
         0, 2, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST,
@@ -92,7 +91,7 @@ public class HostFactoryHostForm extends JPanel {
       )
     );
 
-    tokensTable.setToolTipText("A Host Factory Token must be provided");
+    tokensTable.setToolTipText(getString("host-factory.host.form.info.label"));
 
     add(new JScrollPane(tokensTable),
       new GridBagConstraints(
@@ -121,7 +120,7 @@ public class HostFactoryHostForm extends JPanel {
         )
     );
 
-    add(new JLabel("Annotations:"),
+    add(new JLabel(getString("host-factory.host.form.annotations.label")),
         new GridBagConstraints(
             0, 5, 1, 1, 0, 0,
             GridBagConstraints.NORTHWEST,
@@ -130,7 +129,7 @@ public class HostFactoryHostForm extends JPanel {
         )
     );
 
-    annotationsTable.setToolTipText("Annotations to apply to the new Host.");
+    annotationsTable.setToolTipText(getString("host-factory.host.form.annotations.tooltip"));
     add(annotationsTable,
         new GridBagConstraints(
             1, 5, 1, 1, 1, 1,

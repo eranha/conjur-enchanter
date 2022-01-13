@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.cyberark.Consts.*;
+import static com.cyberark.util.Resources.getString;
 
 public class MainForm extends JFrame {
   private final JTextField searchTextField = new JTextField();
@@ -37,8 +38,8 @@ public class MainForm extends JFrame {
   private View view;
   private final JPanel mainView = new JPanel(new BorderLayout());
   private final JLabel statusLabel = new JLabel(" ");
-  private final AbstractButton editButton = createToolBarButton("Edit");
-  private final AbstractButton deleteButton = createToolBarButton("Delete");
+  private final AbstractButton editButton = createToolBarButton(getString("main.form.toolbar.edit"));
+  private final AbstractButton deleteButton = createToolBarButton(getString("main.form.toolbar.delete"));
   private final ToolBarLabel userLabelText = new ToolBarLabel("",
       Icons.getInstance().getIcon(ResourceType.user, 16, CYBR_BLUE));
   private NavigationLabel selectedNavigationLabel;
@@ -46,7 +47,7 @@ public class MainForm extends JFrame {
   private final JPanel contentPane = new JPanel(new BorderLayout());
   private final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
   private final JScrollPane scrollPane = new JScrollPane();
-  private final JMenu resourceMenu = new JMenu("Resource");
+  private final JMenu resourceMenu = new JMenu(getString("main.form.resource.menu"));
 
   public MainForm(ViewSelectedListener viewSelectedListener, ActionListener actionListener) {
     this.viewSelectedListener = viewSelectedListener;
@@ -145,7 +146,7 @@ public class MainForm extends JFrame {
     contentPane.add(statusPanel, BorderLayout.SOUTH);
 
 
-    setTitle(String.format("Conjur %s", APP_NAME));
+    setTitle(String.format("Conjur %s", getString("application.name")));
     setVisible(false);
     Dimension size
         = Toolkit.getDefaultToolkit().getScreenSize();
@@ -167,10 +168,10 @@ public class MainForm extends JFrame {
     NewResourceActionFactory actionMap = new NewResourceActionFactory();
     JMenuBar menuBar = new JMenuBar();
 
-    JMenu fileMenu = new JMenu("File");
+    JMenu fileMenu = new JMenu(getString("main.form.file.menu"));
     fileMenu.setMnemonic(KeyEvent.VK_F);
     menuBar.add(fileMenu);
-    JMenu newMenu = new JMenu("New");
+    JMenu newMenu = new JMenu(getString("main.form.new.menu"));
     fileMenu.add(newMenu);
 
     // TODO Add HOST_FACTORY if applicable
@@ -182,7 +183,7 @@ public class MainForm extends JFrame {
         )
     );
 
-    JMenuItem exit = new JMenuItem("Exit");
+    JMenuItem exit = new JMenuItem(getString("main.form.exit.menu.item"));
     exit.addActionListener(e -> System.exit(0));
     fileMenu.add(exit);
 
@@ -191,33 +192,33 @@ public class MainForm extends JFrame {
     resourceMenu.setEnabled(false);
 
 
-    JMenu viewMenu = new JMenu("View");
+    JMenu viewMenu = new JMenu(getString("main.form.view.menu"));
     viewMenu.add(new ViewApiCallLog(this::toggleLogView));
     menuBar.add(viewMenu);
 
-    JMenu helpMenu = new JMenu("Help");
+    JMenu helpMenu = new JMenu(getString("main.form.help.menu"));
     menuBar.add(helpMenu);
 
-    JMenuItem conjurHomeMenuItem = new JMenuItem("Conjur Home");
+    JMenuItem conjurHomeMenuItem = new JMenuItem(getString("main.form.help.menu.conjur.item"));
     conjurHomeMenuItem.addActionListener(e -> actionListener.actionPerformed(
         new ActionEvent(conjurHomeMenuItem, Events.HELP, "conjur.home.uri")
     ));
     helpMenu.add(conjurHomeMenuItem);
 
-    JMenuItem policySyntaxMenuItem = new JMenuItem("Policy Syntax");
+    JMenuItem policySyntaxMenuItem = new JMenuItem(getString("main.form.help.menu.policy.syntax.item"));
     policySyntaxMenuItem.addActionListener(e -> actionListener.actionPerformed(
         new ActionEvent(conjurHomeMenuItem, Events.HELP, "policy.syntax.uri")
     ));
     helpMenu.add(policySyntaxMenuItem);
 
-    JMenuItem getStartedMenuItem = new JMenuItem("Getting Started");
+    JMenuItem getStartedMenuItem = new JMenuItem(getString("main.form.help.menu.getting.started.item"));
     getStartedMenuItem.addActionListener(e -> actionListener.actionPerformed(
         new ActionEvent(conjurHomeMenuItem, Events.HELP, "get.started.uri")
     ));
     helpMenu.add(getStartedMenuItem);
 
 
-    JMenu policyStatementReferenceHelpMenu = new JMenu("Policy Statement Reference");
+    JMenu policyStatementReferenceHelpMenu = new JMenu(getString("main.form.help.menu.policy.statement.item"));
     Arrays.stream(ResourceType.values()).forEach(
         i -> {
           JMenuItem item = new JMenuItem(Util.resourceTypeToTitle(i));
@@ -228,25 +229,33 @@ public class MainForm extends JFrame {
         }
     );
 
-    JMenuItem permitMenuItem = new JMenuItem("Permit");
+    JMenuItem permitMenuItem = new JMenuItem(
+        getString("main.form.help.menu.policy.statement.permit.item")
+    );
     permitMenuItem.addActionListener(e -> actionListener.actionPerformed(
         new ActionEvent(conjurHomeMenuItem, Events.HELP, "permit.uri")
     ));
     policyStatementReferenceHelpMenu.add(permitMenuItem);
 
-    JMenuItem denyMenuItem = new JMenuItem("Deny");
+    JMenuItem denyMenuItem = new JMenuItem(
+        getString("main.form.help.menu.policy.statement.deny.item")
+    );
     denyMenuItem.addActionListener(e -> actionListener.actionPerformed(
         new ActionEvent(conjurHomeMenuItem, Events.HELP, "deny.uri")
     ));
     policyStatementReferenceHelpMenu.add(denyMenuItem);
 
-    JMenuItem grantMenuItem = new JMenuItem("Grant");
+    JMenuItem grantMenuItem = new JMenuItem(
+        getString("main.form.help.menu.policy.statement.grant.item")
+    );
     grantMenuItem.addActionListener(e -> actionListener.actionPerformed(
         new ActionEvent(conjurHomeMenuItem, Events.HELP, "grant.uri")
     ));
     policyStatementReferenceHelpMenu.add(grantMenuItem);
 
-    JMenuItem revokeMenuItem = new JMenuItem("Revoke");
+    JMenuItem revokeMenuItem = new JMenuItem(
+        getString("main.form.help.menu.policy.statement.revoke.item")
+    );
     revokeMenuItem.addActionListener(e -> actionListener.actionPerformed(
         new ActionEvent(conjurHomeMenuItem, Events.HELP, "revoke.uri")
     ));
@@ -286,7 +295,8 @@ public class MainForm extends JFrame {
 
   private AbstractButton createNewItemButton() {
     NewResourceActionFactory actionMap = new NewResourceActionFactory();
-    final JToggleButton button = (JToggleButton) new ToolBarButton(new JToggleButton("New...")).getButton();
+    final JToggleButton button = (JToggleButton) new ToolBarButton(new JToggleButton(
+        getString("main.form.toolbar.new"))).getButton();
     button.addItemListener(e -> {
       if (e.getStateChange() == ItemEvent.SELECTED) {
         createAndShowNewItemsMenu(actionMap, (JComponent) e.getSource(), button);

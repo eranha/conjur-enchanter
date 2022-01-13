@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import static com.cyberark.Consts.CYBR_BLUE;
 import static com.cyberark.Consts.DARK_BG;
 
-public class PolicyEditorPane extends JPanel {
+public class PolicyEditorPane extends ContainerBase {
   public static final String POLICY_TEXT = "policy.text";
   private JTextArea policyTextArea;
   private final List<PolicyModel> policyModels;
@@ -142,8 +142,8 @@ public class PolicyEditorPane extends JPanel {
   private void initializeComponents() {
     setMinimumSize(new Dimension(240,160));
     setPreferredSize(new Dimension(480,320));
-    JLabel fileContentLabel = new JLabel("Text:");
-    JLabel branchLabel = new JLabel("Branch:");
+    JLabel fileContentLabel = new JLabel(getString("policy.editor.pane.label.text"));
+    JLabel branchLabel = new JLabel(getString("policy.editor.pane.label.branch"));
 
     initPolicyTextArea();
     initPolicyBranchTree();
@@ -212,8 +212,10 @@ public class PolicyEditorPane extends JPanel {
 
   private void showTextPopupMenu(MouseEvent e) {
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem copy = new JMenuItem(policyTextArea.getSelectedText() == null ? "Copy" : "Copy Selection");
-    JMenuItem clear = new JMenuItem("Clear All");
+    JMenuItem copy = new JMenuItem(policyTextArea.getSelectedText() == null
+        ? getString("policy.editor.pane.menu.copy")
+        : getString("policy.editor.pane.menu.copy.selection"));
+    JMenuItem clear = new JMenuItem(getString("policy.editor.pane.menu.clear"));
 
     copy.addActionListener(ae -> copyPolicyText());
     clear.addActionListener(ae -> clearPolicyText());
@@ -244,7 +246,7 @@ public class PolicyEditorPane extends JPanel {
     JPanel panel = new JPanel(new BorderLayout());
     JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-    panel.add(new JLabel("Policy Statement:"), BorderLayout.WEST);
+    panel.add(new JLabel(getString("policy.editor.pane.label.policy.statement")), BorderLayout.WEST);
     panel.add(btnPanel, BorderLayout.CENTER);
     panel.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
 
@@ -252,36 +254,40 @@ public class PolicyEditorPane extends JPanel {
 
     Arrays.stream(ResourceType.values()).forEach(t -> btnPanel.add(createPolicyResourceButton(t)));
 
-    final String tooltip = "<html>Add a <b>%s</b> Policy Statement</html>";
+    final String tooltip = getString("policy.editor.pane.label.policy.statement.tooltip");
 
     btnPanel.add(
         createButton(Icons.ICON_PLUS,
-            e -> appendLineToPolicy(PolicyFragments.grantFragment()), String.format(tooltip, "Grant"))
+            e -> appendLineToPolicy(PolicyFragments.grantFragment()),
+            String.format(tooltip, getString("policy.editor.pane.label.grant")))
     );
 
     btnPanel.add(
         createButton(Icons.ICON_MINUS,
-            e -> appendLineToPolicy(PolicyFragments.revokeFragment()),String.format(tooltip, "Revoke"))
+            e -> appendLineToPolicy(PolicyFragments.revokeFragment()),
+            String.format(tooltip, getString("policy.editor.pane.label.revoke")))
     );
 
     btnPanel.add(
         createButton(Icons.ICON_THUMBS_UP,
-            e -> appendLineToPolicy(PolicyFragments.permitFragment()),String.format(tooltip, "Permit"))
+            e -> appendLineToPolicy(PolicyFragments.permitFragment()),
+            String.format(tooltip, getString("policy.editor.pane.label.permit")))
     );
 
     btnPanel.add(
         createButton(Icons.ICON_THUMBS_DOWN,
-            e -> appendLineToPolicy(PolicyFragments.denyFragment()),String.format(tooltip, "Deny"))
+            e -> appendLineToPolicy(PolicyFragments.denyFragment()),
+            String.format(tooltip, getString("policy.editor.pane.label.deny")))
     );
 
     btnPanel.add(
         createButton(Icons.ICON_CLONE,
-            e -> copyPolicyText(),"Copy")
+            e -> copyPolicyText(),getString("policy.editor.pane.label.copy"))
     );
 
     btnPanel.add(
         createButton(Icons.ICON_TRASH,
-            e -> clearPolicyText(),"Clear All")
+            e -> clearPolicyText(),getString("policy.editor.pane.label.clear"))
     );
 
     return panel;
@@ -323,8 +329,8 @@ public class PolicyEditorPane extends JPanel {
     button.setToolTipText(
         String.format(
             (type != ResourceType.policy
-                ?  "<html>Add a <b>%s</b> Policy Statement</html>"
-                : "<html>Add a <b>%s</b> Statement</html>"),
+                ? getString("policy.editor.pane.tooltip.add.policy.statement")
+                : getString("policy.editor.pane.tooltip.add.statement")),
           Util.resourceTypeToTitle(type)
         )
     );
@@ -416,8 +422,6 @@ public class PolicyEditorPane extends JPanel {
 
     }
   }
-
-
 
   private void addHighlight(Point p) {
     if (highlights.get(p) != null) return;
