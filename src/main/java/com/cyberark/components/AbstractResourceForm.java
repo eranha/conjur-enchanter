@@ -12,7 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.function.Supplier;
 
-abstract class AbstractResourceForm extends JPanel implements ResourceFormView {
+abstract class AbstractResourceForm extends ContainerBase implements ResourceFormView {
   protected PropertyChangeListener propertyChangeListener;
 
   public void setPropertyChangeListener(PropertyChangeListener listener) {

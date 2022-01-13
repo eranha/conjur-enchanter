@@ -27,11 +27,11 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
 
   public PolicyForm(List<PolicyModel> policyModels) {
     policyEditorPane = new PolicyEditorPane(policyModels, null);
-    policyEditorPane.setPropertyChangeListener(this::policyTextChnageEvent);
+    policyEditorPane.setPropertyChangeListener(this::policyTextChangeEvent);
     initializeComponents();
   }
 
-  private void policyTextChnageEvent(PropertyChangeEvent e) {
+  private void policyTextChangeEvent(PropertyChangeEvent e) {
     if (PolicyEditorPane.POLICY_TEXT.equals(e.getPropertyName()) && getDefaultButton() != null) {
       getDefaultButton().setEnabled(Util.nonNullOrEmptyString(e.getNewValue()));
       validatePolicyText();
@@ -57,8 +57,7 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
 
       if (set.size() > 0) {
         policyEditorPane.highlightWordsInPolicy(set);
-        policyEditorPane.setPolicyTextAreaTooltipText("<html>In <b>POST</b> mode, if the policy contains deletion " +
-            "statements, such as !delete, !revoke,<br>or !deny, they are treated as errors.");
+        policyEditorPane.setPolicyTextAreaTooltipText(getString("policy.form.post.mode.tooltip"));
       } else {
         policyEditorPane.highlightPlaceHoldersInPolicy();
       }
@@ -70,8 +69,8 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
   private void initializeComponents() {
     setMinimumSize(new Dimension(240,160));
     setPreferredSize(new Dimension(800,600));
-    JLabel fileLabel = new JLabel("File:");
-    JLabel apiModeLabel = new JLabel("Mode:");
+    JLabel fileLabel = new JLabel(getString("policy.form.label.file"));
+    JLabel apiModeLabel = new JLabel(getString("policy.form.label.mode"));
     filePathTextField = new JTextField(24);
     JButton openFileChooserButton = new JButton("...");
     Insets labelInsets = new Insets(0,0,0,16);
@@ -79,8 +78,10 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
     Container contentPanel = this;
     contentPanel.setLayout(new GridBagLayout());
 
+    openFileChooserButton.setToolTipText(getString("policy.form.select.file.tooltip"));
+
     // line - file path
-    add(apiModeLabel, //gbc);
+    add(apiModeLabel,
         new GridBagConstraints(
             0, 0, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.NONE,
@@ -113,7 +114,7 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
         )
     );
 
-    add(openFileChooserButton, //gbc);
+    add(openFileChooserButton,
         new GridBagConstraints(
             2, 1, 1, 1, 0, 0,
             GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
@@ -122,7 +123,7 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
     );
 
     // line - policy editor
-    add(policyEditorPane, //gbc);
+    add(policyEditorPane,
         new GridBagConstraints(
             0, 2, 3, 1, 1, 1,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -136,9 +137,9 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
   private JComboBox<String> getPolicyApiModeComboBox() {
     JComboBox<String> policyApiModeComboBox = new JComboBox<>(
         new String[] {
-          "POST - Conjur only creates new data",
-          "PATCH - Conjur both creates and deletes data",
-          "PUT - Conjur replaces existing data with the data specified in the loaded policy"
+            getString("policy.form.mode.post"),
+            getString("policy.form.mode.patch"),
+            getString("policy.form.mode.put")
         }
     );
 
@@ -165,7 +166,9 @@ public class PolicyForm extends AbstractResourceForm implements PolicyFormView {
       } catch (IOException ex) {
         ex.printStackTrace();
         ViewFactory.getInstance().getMessageView().showMessageDialog(
-            ex.toString(), "Error Loading File", JOptionPane.ERROR_MESSAGE);
+            ex.toString(),
+            getString("policy.form.load.file.error"),
+            JOptionPane.ERROR_MESSAGE);
       }
     }
   }
