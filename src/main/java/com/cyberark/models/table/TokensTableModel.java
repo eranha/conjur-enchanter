@@ -7,10 +7,12 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.cyberark.util.Resources.getString;
+
 public class TokensTableModel extends AbstractTableModel {
 
   private HostFactoryToken[] tokens = new HostFactoryToken[0];
-  private final String[] columnNames  = new String[]{"ID", "Expiration", "CIDR"};
+  private final String[] columnNames  = getString("tokens.table.model.columns").split(",");
 
   public TokensTableModel() {
   }

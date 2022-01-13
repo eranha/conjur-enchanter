@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static com.cyberark.Consts.HTML_PARAGRAPH;
+import static com.cyberark.util.Resources.getString;
 
 /**
  * This class represents the wizard view
@@ -120,10 +121,10 @@ class WizardView {
 
     JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0,0));
     buttonsPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 8));
-    buttonsPanel.add(createWizardButton("< Back", WizardNavigationCommand.Back));
-    buttonsPanel.add(createWizardButton("Next >", WizardNavigationCommand.Next));
-    buttonsPanel.add(createWizardButton("Finish", WizardNavigationCommand.Finish));
-    buttonsPanel.add(createWizardButton("Cancel", WizardNavigationCommand.Cancel));
+    buttonsPanel.add(createWizardButton(getString("wizard.view.back"), WizardNavigationCommand.Back));
+    buttonsPanel.add(createWizardButton(getString("wizard.view.next"), WizardNavigationCommand.Next));
+    buttonsPanel.add(createWizardButton(getString("wizard.view.finish"), WizardNavigationCommand.Finish));
+    buttonsPanel.add(createWizardButton(getString("wizard.view.cancel"), WizardNavigationCommand.Cancel));
     JPanel buttonsPane = new JPanel(new BorderLayout());
     JPanel hr = new JPanel();
     hr.setBorder(BorderFactory.createLineBorder(Color.lightGray));

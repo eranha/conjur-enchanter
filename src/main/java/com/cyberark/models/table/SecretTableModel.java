@@ -21,7 +21,7 @@ public class SecretTableModel extends DefaultResourceTableModel<SecretModel> {
 
     return column < 4
         ? super.getColumnName(column)
-        : "secret";
+        : getString("role.table.model.secret.column");
   }
 
   @Override

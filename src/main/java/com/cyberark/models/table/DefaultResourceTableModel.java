@@ -3,6 +3,7 @@ package com.cyberark.models.table;
 import com.cyberark.Util;
 import com.cyberark.models.ResourceIdentifier;
 import com.cyberark.models.ResourceModel;
+import com.cyberark.util.Resources;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.stream.IntStream;
 public class DefaultResourceTableModel<T extends ResourceModel> extends AbstractTableModel
     implements ResourceTableModel<T> {
   private final List<T> model;
-  private final String[] columnNames =  {"ID", "Owner", "Policy", "Created"};
+  private final String[] columnNames =  getString("default.resource.table.model.columns").split(",");
   private String[][] grid;
 
   public DefaultResourceTableModel(List<T> model) {
@@ -20,6 +21,10 @@ public class DefaultResourceTableModel<T extends ResourceModel> extends Abstract
     grid = new String[model.size()][];
 
     populateTableModel(model);
+  }
+
+  public static String getString(String key) {
+    return Resources.getString(key);
   }
 
   private void populateTableModel(List<T> model) {

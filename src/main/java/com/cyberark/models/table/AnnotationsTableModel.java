@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class AnnotationsTableModel extends AbstractEditableTableModel<Annotation> {
   private final ArrayList<Annotation> annotations ;
-  private final String[] columnNames = new String[]{"name", "value"};
+  private final String[] columnNames = getString("annotations.table.model.columns").split(",");
   private final EditMode editMode;
 
   public AnnotationsTableModel(EditMode editMode) {

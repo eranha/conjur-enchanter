@@ -5,18 +5,12 @@ import com.cyberark.models.PolicyVersion;
 
 import javax.swing.table.AbstractTableModel;
 
+import static com.cyberark.util.Resources.getString;
+
 public class PolicyVersionTableModel extends AbstractTableModel {
   private final PolicyVersion[] policyVersions;
 
-  private final String[] columnNames =  {
-      "ID",
-      "Version",
-      "Role",
-      "Created",
-      "Finished",
-      "Policy Text",
-      "Policy SHA256",
-      "Client IP"};
+  private final String[] columnNames =  getString("policy.version.table.model.columns").split(",");
 
   public PolicyVersionTableModel(PolicyVersion[] policyVersions) {
     this.policyVersions = policyVersions;

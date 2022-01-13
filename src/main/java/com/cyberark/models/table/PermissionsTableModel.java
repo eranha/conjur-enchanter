@@ -5,9 +5,11 @@ import com.cyberark.models.ResourceIdentifier;
 
 import javax.swing.table.AbstractTableModel;
 
+import static com.cyberark.util.Resources.getString;
+
 public class PermissionsTableModel extends AbstractTableModel {
   private Permission[] permissions;
-  private final String[] columnNames = new String[]{"role", "privilege"};
+  private final String[] columnNames = getString("permissions.table.model.columns").split(",");
   private final Class<?>[] columnClass = new Class<?>[] {
      ResourceIdentifier.class, String.class
   };
