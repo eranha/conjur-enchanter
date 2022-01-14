@@ -3,6 +3,7 @@ package com.cyberark.actions.resource;
 import com.cyberark.Application;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
+import com.cyberark.actions.ActionUtil;
 import com.cyberark.controllers.ControllerFactory;
 import com.cyberark.controllers.ViewController;
 import com.cyberark.event.EventPublisher;
@@ -16,14 +17,9 @@ import com.cyberark.resource.ResourceServiceFactory;
 import com.cyberark.resource.ResourcesService;
 import com.cyberark.util.Resources;
 import com.cyberark.views.ErrorView;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.swing.*;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
@@ -44,8 +40,7 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
                        ActionType type,
                        Supplier<T> selectedResource) {
     super(text);
-    Objects.requireNonNull(selectedResource);
-    this.selectedResource = selectedResource;
+    this.selectedResource = Objects.requireNonNull(selectedResource);
     putValue(ACTION_TYPE_KEY, type);
   }
 
@@ -101,55 +96,8 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
   }
 
   protected void promptToCopyApiKeyToClipboard(String response, ResourceIdentifier model) {
-    String apiKey;
-
-    try {
-      apiKey = Util.extractApiKey(
-          response,
-          model.getFullyQualifiedId()
-      );
-    } catch (JsonProcessingException e) {
-      /* response is the api key not a json */
-      apiKey = response;
-    }
-
-    if (apiKey == null) {
-      JOptionPane
-          .showMessageDialog(getMainForm(),
-              String.format("Rotate the API key of role '%s' to get the its value.", model.getId()),
-              "API Key",
-              JOptionPane.INFORMATION_MESSAGE);
-      return;
-    }
-
-    JLabel label = new JLabel("Click Copy to copy the API key to clipboard.");
-    JLabel label2 = new JLabel("(you will only see this once)");
-    JTextField jt = new JTextField(apiKey);
-    jt.addAncestorListener(new AncestorListener()
-    {
-      public void ancestorAdded ( AncestorEvent event )
-      {
-        jt.requestFocus();
-        jt.selectAll();
-      }
-      public void ancestorRemoved ( AncestorEvent event ) {}
-      public void ancestorMoved ( AncestorEvent event ) {}
-    });
-
-    Object[] choices = {"Copy", "Close"};
-    Object defaultChoice = choices[0];
-
-    int answer = JOptionPane
-        .showOptionDialog(getMainForm(), new Component[]{label, label2,jt}, "Copy API Key to Clipboard?",
-            JOptionPane.YES_NO_CANCEL_OPTION,//
-            JOptionPane.QUESTION_MESSAGE, null, choices, defaultChoice);
-
-    if (answer == JOptionPane.YES_OPTION) {
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      clipboard.setContents(new StringSelection(apiKey), null);
-    }
-
-    getViewController().setStatusLabel("API key has been copied to clipboard.");
+    ActionUtil.promptToCopyApiKeyToClipboard(getMainForm(), response, model);
+    getViewController().setStatusLabel(getString("copy.api.key.to.clipboard.status.label"));
   }
 
   @Override

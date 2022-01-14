@@ -3,6 +3,7 @@ package com.cyberark.actions.resource;
 import com.cyberark.Application;
 import com.cyberark.Util;
 import com.cyberark.actions.ActionType;
+import com.cyberark.actions.ActionUtil;
 import com.cyberark.components.*;
 import com.cyberark.event.EventPublisher;
 import com.cyberark.event.Events;
@@ -17,14 +18,9 @@ import com.cyberark.views.Icons;
 import com.cyberark.views.ResourceFormView;
 import com.cyberark.wizard.Page;
 import com.cyberark.wizard.Wizard;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.swing.*;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -152,55 +148,7 @@ public class NewResourceAction extends AbstractAction {
   }
 
   private void promptToCopyApiKeyToClipboard(String response, ResourceIdentifier model) {
-    String apiKey;
-
-    try {
-      apiKey = Util.extractApiKey(
-          response,
-          model.getFullyQualifiedId()
-      );
-    } catch (JsonProcessingException e) {
-      /* response is the api key not a json */
-      apiKey = response;
-    }
-
-    if (apiKey == null) {
-      JOptionPane
-          .showMessageDialog(getMainForm(),
-              String.format(getString("new.resource.action.rotate.key.message"), model.getId()),
-              getString("new.resource.action.rotate.key.title"),
-              JOptionPane.INFORMATION_MESSAGE);
-      return;
-    }
-
-    JLabel label = new JLabel(getString("copy.api.key.to.clipboard"));
-    JLabel label2 = new JLabel(getString("only.once.label"));
-    JTextField jt = new JTextField(apiKey);
-
-    jt.addAncestorListener(new AncestorListener()
-    {
-      public void ancestorAdded ( AncestorEvent event )
-      {
-        jt.requestFocus();
-        jt.selectAll();
-      }
-      public void ancestorRemoved ( AncestorEvent event ) {}
-      public void ancestorMoved ( AncestorEvent event ) {}
-    });
-
-    Object[] choices = getString("copy.api.options").split(",");
-    Object defaultChoice = choices[0];
-
-    int answer = JOptionPane
-        .showOptionDialog(getMainForm(), new Component[]{label, label2,jt},
-            getString("copy.api.key.to.clipboard.dialog.title"),
-            JOptionPane.YES_NO_CANCEL_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, choices, defaultChoice);
-
-    if (answer == JOptionPane.YES_OPTION) {
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      clipboard.setContents(new StringSelection(apiKey), null);
-    }
+    ActionUtil.promptToCopyApiKeyToClipboard(getMainForm(), response, model);
   }
 
   protected Frame getMainForm() {
