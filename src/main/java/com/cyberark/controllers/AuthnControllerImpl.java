@@ -41,7 +41,7 @@ class AuthnControllerImpl implements AuthnController {
       EventPublisher.getInstance().fireEvent(new ApplicationEvent(EventType.Login));
 
       logger.debug("Start inactivity listener");
-      inactivityListener.setInterval(7);
+      inactivityListener.setInterval(Integer.parseInt(System.getProperty("inactivity.interval", "7")));
       inactivityListener.start();
     } else {
       logger.debug("User aborted, application is exiting");
