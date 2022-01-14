@@ -49,15 +49,18 @@ public class ShowResourceTreeAction extends AbstractAction {
           resourceTypeToResources
       );
 
-    InputDialog.showDialog(
+      Component tree = new ResourceTreeBrowser(
+        new ArrayList<>(resourceTypeToResources.get(ResourceType.policy).values()),
+        policyToResources,
+        policyToTextMap
+    );
+
+      InputDialog.showModalDialog(
         Application.getInstance().getMainForm(),
-         getString("show.resource.tree.action.dialog.title"),
-        true,
-        new ResourceTreeBrowser(
-            new ArrayList<>(resourceTypeToResources.get(ResourceType.policy).values()),
-            policyToResources,
-            policyToTextMap),
-        JOptionPane.OK_OPTION);
+        getString("show.resource.tree.action.dialog.title"),
+        tree,
+        JOptionPane.OK_OPTION
+      );
     } catch (ResourceAccessException ex) {
       ex.printStackTrace();
       ErrorView.showErrorMessage(ex);
