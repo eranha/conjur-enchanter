@@ -4,7 +4,7 @@ import com.cyberark.controllers.AuthnController;
 import com.cyberark.controllers.ControllerFactory;
 import com.cyberark.views.Icons;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
