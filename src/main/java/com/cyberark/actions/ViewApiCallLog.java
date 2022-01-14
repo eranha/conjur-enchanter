@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import static com.cyberark.util.Resources.getString;
 
 public class ViewApiCallLog extends AbstractAction {
+  public static final String IS_LOG_VIEW_VISIBLE = "isLogViewVisible";
   private final Consumer<Boolean> logViewer;
 
   public ViewApiCallLog(Consumer<Boolean> logViewer) {
@@ -16,13 +17,13 @@ public class ViewApiCallLog extends AbstractAction {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    if (getValue("isLogViewVisible") == null || getValue("isLogViewVisible") == Boolean.FALSE) {
+    if (getValue(IS_LOG_VIEW_VISIBLE) == null || getValue(IS_LOG_VIEW_VISIBLE) == Boolean.FALSE) {
       putValue(Action.NAME, getString("view.api.call.log.action.hide.text"));
-      putValue("isLogViewVisible", Boolean.TRUE);
+      putValue(IS_LOG_VIEW_VISIBLE, Boolean.TRUE);
       logViewer.accept(true);
     } else {
       putValue(Action.NAME, getString("view.api.call.log.action.text"));
-      putValue("isLogViewVisible", Boolean.FALSE);
+      putValue(IS_LOG_VIEW_VISIBLE, Boolean.FALSE);
       logViewer.accept(false);
     }
   }
