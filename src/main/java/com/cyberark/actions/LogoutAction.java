@@ -13,7 +13,12 @@ import static com.cyberark.util.Resources.getString;
 
 public class LogoutAction extends AbstractAction {
   public LogoutAction() {
-    super(getString("logout.action.text"), Icons.getInstance().getIcon(Icons.LOCK_ICON_UNICODE, 16, CYBR_BLUE));
+    super(
+        getString("logout.action.text"),
+        Icons.getInstance().getIcon(Icons.LOCK_ICON_UNICODE,
+        16,
+        CYBR_BLUE)
+    );
     putValue(SHORT_DESCRIPTION, getString("logout.action.description"));
     putValue(MNEMONIC_KEY, KeyEvent.VK_C);
   }
