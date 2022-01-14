@@ -50,7 +50,7 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    actionPerformed(Objects.requireNonNull(getSelectedResource()));
+    actionPerformed(getSelectedResource());
   }
 
   protected abstract void actionPerformed(T selectedResource);
@@ -92,7 +92,7 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
   }
 
   protected T getSelectedResource() {
-    return selectedResource.get();
+    return Objects.requireNonNull(selectedResource.get());
   }
 
   protected void promptToCopyApiKeyToClipboard(String response, ResourceIdentifier model) {
