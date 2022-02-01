@@ -449,7 +449,7 @@ public class MainForm extends JFrame {
 
     selectedNavigationLabel = label;
 
-    if (label.getViewType() != this.view.getType()) {
+    if (label.getViewType() != view.getType()) {
       viewSelectedListener.viewSelected(label.getViewType());
     }
 
