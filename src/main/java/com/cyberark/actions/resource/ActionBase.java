@@ -92,7 +92,7 @@ public abstract class ActionBase<T extends ResourceModel> extends AbstractAction
   }
 
   protected T getSelectedResource() {
-    return Objects.requireNonNull(selectedResource.get());
+    return selectedResource.get();
   }
 
   protected void promptToCopyApiKeyToClipboard(String response, ResourceIdentifier model) {
