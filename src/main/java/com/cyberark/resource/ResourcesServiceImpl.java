@@ -766,7 +766,12 @@ class ResourcesServiceImpl implements ResourcesService {
                   if (id.getType() == ResourceType.policy) {
                     map.putIfAbsent(ResourceIdentifier.fromString(n.get("id").textValue()), new ArrayList<>());
                   } else {
-                    map.get(ResourceIdentifier.fromString(n.get("policy").textValue())).add(id);
+                    final JsonNode policy = n.get("policy");
+                    List<ResourceIdentifier> resources = null;
+                    if (Objects.nonNull(policy)) { // host_factory and host_factory/host have no policy
+                      resources = map.get(ResourceIdentifier.fromString(policy.textValue()));
+                      resources.add(id);
+                    }
                   }
                 }
             );
